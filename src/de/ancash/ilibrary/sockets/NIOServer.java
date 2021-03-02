@@ -65,7 +65,6 @@ public class NIOServer {
 				                        buffer.flip();
 				                        Packet p = (Packet) SerializationUtils.deserializeFromBytes(buffer.array());
 				                        for (SelectionKey k : selector.keys()) {
-			                                if(k.channel() instanceof SocketChannel && !k.equals(key)) System.out.println("server sent");
 				                        	if(k.channel() instanceof SocketChannel && !k.equals(key)) ((SocketChannel) k.channel()).write(ByteBuffer.wrap(SerializationUtils.serialize(p)));
 			                            }
 				                    } else {
