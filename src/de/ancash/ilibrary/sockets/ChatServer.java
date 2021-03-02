@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public abstract class ChatServer implements Runnable{
+abstract class ChatServer implements Runnable{
 	private ChatServerThread clients[];
 	private ServerSocket server = null;
 	private int clientCount = 0;
@@ -30,6 +30,7 @@ public abstract class ChatServer implements Runnable{
 			try{
 				System.out.println("Waiting for a client ..." + " (" + owner + ")"); 
 				addThread(server.accept()); 
+				
 			} catch(IOException ioe){
 				System.out.println("Server accept error: " + ioe + " (" + owner + ")");
 				try {
@@ -38,6 +39,7 @@ public abstract class ChatServer implements Runnable{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} 
+				
 		   	}
 	   	}
 	}
@@ -73,19 +75,19 @@ public abstract class ChatServer implements Runnable{
    	}
    	
    	public final void sendAll(Packet msg) throws IOException {
-   		if(clientCount == 1) System.out.println("§cThere are no clients to send the packets to!");
+   		//if(clientCount == 1) System.out.println("§cThere are no clients to send the packets to!");
    		for (int i = 0; i < clientCount; i++) 
    			clients[i].send(msg);
    	}
    	
    	public final void sendAllExceptSender(int sender, Packet msg) throws IOException {
-   		if(clientCount == 1) System.out.println("§cThere are no clients to send the packets to!");
+   		//if(clientCount == 1) System.out.println("§cThere are no clients to send the packets to!");
    		for (int i = 0; i < clientCount; i++) 
    			if(clients[i].getID() != sender) clients[i].send(msg);
    	}
    	
    	public final void send(Packet msg, int id) throws IOException {
-   		if(clientCount == 1) System.out.println("§cThere are no clients to send the packets to!"); 
+   		//if(clientCount == 1) System.out.println("§cThere are no clients to send the packets to!"); 
    		for (int i = 0; i < clientCount; i++) 
    			if(id != clients[i].getID()) clients[i].send(msg);
    	}
@@ -132,9 +134,5 @@ public abstract class ChatServer implements Runnable{
    			System.out.println("§cClient refused: maximum " + clients.length + " reached." + " (" + owner + ")");
    	}
    	
-   	public abstract void onRequest(int id, Request packet);
-   	
-   	public abstract void onAnswer(int id, Answer packet);
-   	
-   	public abstract void onInfo(int id, InfoPacket packet);
+   	public abstract void onPacket(Packet packet);
 }

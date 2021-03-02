@@ -54,21 +54,7 @@ class ChatServerThread {
 						return;
 					}
 					
-					if(packet.getTarget() == TargetType.SERVER) {
-						if(packet instanceof Request) {
-				   			server.onRequest(ID, (Request) packet); 
-				   		} else if (packet instanceof Answer) {
-				   			server.onAnswer(ID, (Answer) packet);
-				   		} else if (packet instanceof InfoPacket) {
-				   			server.onInfo(ID, (InfoPacket) packet);
-				   		}
-					} else if (packet.getTarget() == TargetType.CLIENT){
-						try {
-							server.sendAllExceptSender(ID, packet);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
+					server.onPacket(packet);
 					
 				}
 			}

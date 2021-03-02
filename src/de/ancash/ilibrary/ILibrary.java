@@ -11,10 +11,7 @@ import de.ancash.ilibrary.events.AListener;
 import de.ancash.ilibrary.events.EventExecutor;
 import de.ancash.ilibrary.events.EventManager;
 import de.ancash.ilibrary.events.Order;
-import de.ancash.ilibrary.sockets.Answer;
-import de.ancash.ilibrary.sockets.ChatServer;
-import de.ancash.ilibrary.sockets.InfoPacket;
-import de.ancash.ilibrary.sockets.Request;
+import de.ancash.ilibrary.sockets.NIOServer;
 import de.ancash.ilibrary.yaml.configuration.file.YamlFile;
 import de.ancash.ilibrary.yaml.exceptions.InvalidConfigurationException;
 
@@ -23,7 +20,7 @@ public class ILibrary extends JavaPlugin{
 	//TestServer ts;
 	//TestClient tc;
 	
-	private static ChatServer server;
+	private static NIOServer server;
 	private int port;
 	private static ILibrary plugin;
 	private YamlFile f;
@@ -31,9 +28,7 @@ public class ILibrary extends JavaPlugin{
 	@Override
 	public void onEnable() {
 		plugin = this;
-		//ts = new TestServer(25600, 1, "ALibrary");
-		//tc = new TestClient("localhost", 25600, "ALibrary");
-		//tc.send(new Request("ALibrary", "Ping", TargetType.SERVER));
+
 		f = new YamlFile(new File("plugins/ILibrary/config.yml"));
 		if(!f.exists()) {
 			try {
@@ -41,7 +36,7 @@ public class ILibrary extends JavaPlugin{
 				f.load();
 				f.set("defaultSocket", true);
 				f.set("port", 25600);
-				f.set("clientCount", 10);
+				f.set("address", "localhost");
 				f.save();
 			} catch (IOException | InvalidConfigurationException e) {
 				e.printStackTrace();
@@ -51,23 +46,8 @@ public class ILibrary extends JavaPlugin{
 			f.load();
 			port = f.getInt("port");
 			if(f.getBoolean("defaultSocket")) {
-				server = new ChatServer(f.getInt("port"), f.getInt("clientCount"), "ILibrary") {
-					
-					@Override
-					public void onRequest(int id, Request packet) {
-						System.out.println("Received Request from " + packet.getOwner() + " but don't know what to do!");
-					}
-					
-					@Override
-					public void onAnswer(int id, Answer packet) {
-						System.out.println("Received Answer from " + packet.getOwner() + " but don't know what to do!");
-					}
-
-					@Override
-					public void onInfo(int id, InfoPacket packet) {
-						System.out.println("Received Info from " + packet.getOwner() + " but don't know what to do!");
-					}
-				};
+				server = new NIOServer(f.getString("address"), port);
+				server.start();
 			} else {
 				server = null;
 			}
@@ -91,35 +71,18 @@ public class ILibrary extends JavaPlugin{
 	}
 	
 	public String getAddress() {
-		return "localhost";
+		return f.getString("address");
 	}
 	
-	public boolean newServerSocket() {
+	public boolean newServerSocket() throws IOException {
 		if(isDefaultSocketRunning()) return false;
-		server = new ChatServer(port, f.getInt("clientCount"), "ILibrary") {
-			
-			@Override
-			public void onRequest(int id, Request packet) {
-				System.out.println("Received Request from " + packet.getOwner() + " but don't know what to do!");
-			}
-			
-			@Override
-			public void onAnswer(int id, Answer packet) {
-				System.out.println("Received Answer from " + packet.getOwner() + " but don't know what to do!");
-			}
-
-			@Override
-			public void onInfo(int id, InfoPacket packet) {
-				System.out.println("Received Info from " + packet.getOwner() + " but don't know what to do!");
-			}
-		};
+		server = new NIOServer("localhost", port);
 		return true;
 	}
 	
 	@Override
 	public void onDisable() {
-		//tc.stop();
-		//ts.stop();
+
 		if(server != null)
 			try {
 				server.stop();

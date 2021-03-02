@@ -164,6 +164,23 @@ public class SerializationUtils {
         Validate.notNull(objectData, "objectData");
         return deserialize(new ByteArrayInputStream(objectData));
     }
+    
+    public static byte[] serializeToBytes(Object obj) throws IOException {
+        try(ByteArrayOutputStream b = new ByteArrayOutputStream()){
+            try(ObjectOutputStream o = new ObjectOutputStream(b)){
+                o.writeObject(obj);
+            }
+            return b.toByteArray();
+        }
+    }
+
+    public static Object deserializeFromBytes(byte[] bytes) throws IOException, ClassNotFoundException {
+        try(ByteArrayInputStream b = new ByteArrayInputStream(bytes)){
+            try(ObjectInputStream o = new ObjectInputStream(b)){
+                return o.readObject();
+            }
+        }
+    }
 
     /**
      * <p>
@@ -197,13 +214,15 @@ public class SerializationUtils {
     public static <T> T deserialize(final InputStream inputStream) throws Exception {
         Validate.notNull(inputStream, "inputStream");
         ObjectInputStream in = null;
-        while(in == null) {
+        while((in == null || in.available() <= 0)) {
         	try {
         		in = new ObjectInputStream(inputStream);
         	} catch(Exception e) {
+        		e.printStackTrace();
         		throw new Exception(e.getMessage());
         	}
         }
+        System.out.println(in.available());
         try{
             @SuppressWarnings("unchecked")
             final T obj = (T) in.readObject();

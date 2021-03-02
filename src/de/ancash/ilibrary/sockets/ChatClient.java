@@ -12,29 +12,30 @@ public abstract class ChatClient{
 	private Socket socket              = null;
 	private DataOutputStream streamOut = null;
 	private ChatClientThread client    = null;
-	private final String plugin;
+	private final String name;
 	
 	public final void send(Packet str) {
+		//System.out.println("" + SerializationUtils.serialize(str, streamOut));
 		try {
-			streamOut.write(SerializationUtils.serialize(str));
+			streamOut.write(SerializationUtils.serializeToBytes(str));
 			streamOut.flush();
 		} catch (IOException e) {
-			
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public ChatClient(String serverName, int serverPort, String plugin){
-		this.plugin = plugin;
-		System.out.println("Establishing connection. Please wait ..." + " (" + plugin + ")");
+	public ChatClient(String serverName, int serverPort, String name){
+		this.name = name;
+		System.out.println("Establishing connection. Please wait ..." + " (" + name + ")");
 		try{
 			socket = new Socket(serverName, serverPort);
-			System.out.println("Connected: " + socket + " (" + plugin + ")");
+			System.out.println("Connected: " + socket + " (" + name + ")");
 			start();
 		} catch(UnknownHostException uhe) {
-			System.out.println("Host unknown: " + uhe.getMessage() + " (" + plugin + ")"); 
+			System.out.println("Host unknown: " + uhe.getMessage() + " (" + name + ")"); 
 		} catch(IOException ioe){
-			System.out.println("Unexpected exception: " + ioe.getMessage() + " (" + plugin + ")"); 
+			System.out.println("Unexpected exception: " + ioe.getMessage() + " (" + name + ")"); 
 		}
 	}
 
@@ -43,25 +44,20 @@ public abstract class ChatClient{
 		if (client == null) {  
 			client = new ChatClientThread(this, socket);
 		}
-		//runnable.runTaskTimer(plugin, 0, 0);
 	}
 	
 	public final boolean isActive() {
 		return client != null && streamOut != null;
 	}
-	
-	public abstract void onRequest(Request req);
-	
-	public abstract void onAnswer(Answer ans);
-	
-	public abstract void onInfo(InfoPacket packet);
+			
+	public abstract void onPacket(Packet packet);
 	
 	public final void stop() {  
 		try{
 			if (streamOut != null)  streamOut.close();
 			if (socket    != null)  socket.close();
 		} catch(IOException ioe){
-			System.out.println("Error closing ..." + " (" + plugin + ")"); 
+			System.out.println("Error closing ..." + " (" + name + ")"); 
 		}
 		client.close();  
 		client.stop();

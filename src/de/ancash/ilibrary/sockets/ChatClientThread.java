@@ -4,9 +4,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-import org.bukkit.scheduler.BukkitRunnable;
-
-import de.ancash.ilibrary.ILibrary;
 import de.ancash.ilibrary.misc.SerializationUtils;
 
 class ChatClientThread{
@@ -26,34 +23,34 @@ class ChatClientThread{
 				while(thread != null) {
 					Packet packet = null;
 					try {
-						packet = SerializationUtils.deserialize(streamIn);
+						if(streamIn.available() <= 0) continue;
+						byte[] bytes = new byte[streamIn.available()];
+						streamIn.read(bytes);
+						packet = (Packet) SerializationUtils.deserializeFromBytes(bytes);
+						System.out.println("received packet");
+						client.onPacket(packet);
 					} catch (Exception e) {
 						System.out.println("Error while reading input stream! Stopping...");
 						client.stop();
 						stop();
 						return;
 					}
-					if(packet.getTarget() == TargetType.CLIENT) {
-						if(packet instanceof Request) {
-				   			client.onRequest((Request) packet); 
-				   		} else if (packet instanceof Answer) {
-				   			client.onAnswer((Answer) packet);
-				   		} else if (packet instanceof InfoPacket) {
-				   			client.onInfo((InfoPacket) packet);
-				   		}
-					} else if (packet.getTarget() == TargetType.SERVER){
-						client.send(packet);
-					}
 				}
 			}
 		});
-		new BukkitRunnable() {
+		new Runnable() {
 			
 			@Override
 			public void run() {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				thread.start();
 			}
-		}.runTaskLater(ILibrary.getInstance(), 20);
+		}.run();
 	}
 	public void open(){
 		try{
