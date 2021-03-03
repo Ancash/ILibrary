@@ -21,13 +21,17 @@ class ChatClientThread{
 			@Override
 			public void run() {
 				while(thread != null) {
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
 					Packet packet = null;
 					try {
 						if(streamIn.available() <= 0) continue;
 						byte[] bytes = new byte[streamIn.available()];
 						streamIn.read(bytes);
 						packet = (Packet) SerializationUtils.deserializeFromBytes(bytes);
-						System.out.println("received packet");
 						client.onPacket(packet);
 					} catch (Exception e) {
 						System.out.println("Error while reading input stream! Stopping...");

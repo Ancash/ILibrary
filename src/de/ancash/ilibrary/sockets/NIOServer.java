@@ -76,6 +76,7 @@ public class NIOServer {
 				                    break;
 				            }
 				        }
+				        Thread.sleep(1);
 				    }
 				} catch(Exception e) {
 					e.printStackTrace();
