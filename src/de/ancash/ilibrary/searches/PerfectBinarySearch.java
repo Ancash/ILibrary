@@ -1,6 +1,6 @@
 package de.ancash.ilibrary.searches;
 
-class PerfectBinarySearch {
+public class PerfectBinarySearch {
 
    static int binarySearch(int[] arr, int target) {
       int low = 0;

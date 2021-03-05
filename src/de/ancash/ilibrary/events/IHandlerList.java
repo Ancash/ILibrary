@@ -26,7 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * A list of event handlers, stored per-event. Based on lahwran's fevents.
  */
-public class AHandlerList {
+public class IHandlerList {
     /**
      * Handler array. This field being an array is the key to this system's
      * speed.
@@ -40,13 +40,13 @@ public class AHandlerList {
      */
     private final EnumMap<Order, ArrayList<ListenerRegistration>> handlerSlots;
 
-    private final CopyOnWriteArrayList<AHandlerList> children = new CopyOnWriteArrayList<AHandlerList>(); // Not modified that much, it's fine
-    private final AHandlerList parent;
+    private final CopyOnWriteArrayList<IHandlerList> children = new CopyOnWriteArrayList<IHandlerList>(); // Not modified that much, it's fine
+    private final IHandlerList parent;
 
     /**
      * List of all HandlerLists which have been created, for use in bakeAll()
      */
-    private static final ArrayList<AHandlerList> ALL_LISTS = new ArrayList<AHandlerList>();
+    private static final ArrayList<IHandlerList> ALL_LISTS = new ArrayList<IHandlerList>();
 
     /**
      * Bake all handler lists. Best used just after all normal event
@@ -54,13 +54,13 @@ public class AHandlerList {
      * using fevents in a plugin system.
      */
     public static void bakeAll() {
-        for (AHandlerList h : ALL_LISTS) {
+        for (IHandlerList h : ALL_LISTS) {
             h.bake();
         }
     }
 
     public static void unregisterAll() {
-        for (AHandlerList h : ALL_LISTS) {
+        for (IHandlerList h : ALL_LISTS) {
             for (List<ListenerRegistration> regs : h.handlerSlots.values()) {
                 regs.clear();
             }
@@ -69,12 +69,12 @@ public class AHandlerList {
     }
 
     public static void unregisterAll(Object plugin) {
-        for (AHandlerList h : ALL_LISTS) {
+        for (IHandlerList h : ALL_LISTS) {
             h.unregister(plugin);
         }
     }
     
-    public AHandlerList() {
+    public IHandlerList() {
         this(null);
     }
 
@@ -82,7 +82,7 @@ public class AHandlerList {
      * Create a new handler list and initialize using EventPriority The
      * HandlerList is then added to meta-list for use in bakeAll()
      */
-    public AHandlerList(AHandlerList parent) {
+    public IHandlerList(IHandlerList parent) {
         handlerSlots = new EnumMap<Order, ArrayList<ListenerRegistration>>(Order.class);
         for (Order o : Order.values()) {
             handlerSlots.put(o, new ArrayList<ListenerRegistration>());
@@ -186,7 +186,7 @@ public class AHandlerList {
         return handlers;
     }
 
-    private void addChild(AHandlerList child) {
+    private void addChild(IHandlerList child) {
         children.add(child);
     }
 }

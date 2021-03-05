@@ -17,5 +17,5 @@
 package de.ancash.ilibrary.events;
 
 public interface EventExecutor {
-    public void execute(AEvent aEvent) throws EventException;
+    public void execute(IEvent iEvent) throws EventException;
 }

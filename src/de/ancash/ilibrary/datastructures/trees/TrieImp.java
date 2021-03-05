@@ -73,7 +73,7 @@ public class TrieImp {
 
    /** Regex to check if word contains only a-z character */
    public static boolean isValid(String word) {
-      return word.matches("^[a-z]+$");
+	  return word.matches("^[a-z]+$");
    }
 
    /*public static void main(String[] args) {

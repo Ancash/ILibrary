@@ -1,10 +1,12 @@
 package de.ancash.ilibrary.datastructures.heaps;
 
-import java.util.*;
+import java.util.ArrayList;
+
+import de.ancash.ilibrary.datastructures.maps.CompactMap;
 
 public class GenericHeap <T extends Comparable <T> >{
 	ArrayList <T> data=new ArrayList<>();
-	HashMap<T,Integer> map=new HashMap<>();
+	CompactMap<T,Integer> map= new CompactMap<>();
 	public void add(T item) {
 		this.data.add(item);
 		map.put(item,this.data.size()-1);//

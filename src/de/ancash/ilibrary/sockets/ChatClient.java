@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import de.ancash.ilibrary.misc.SerializationUtils;
-
 public abstract class ChatClient{
 	
 	private Socket socket              = null;
@@ -15,14 +13,7 @@ public abstract class ChatClient{
 	private final String name;
 	
 	public final void send(Packet str) {
-		//System.out.println("" + SerializationUtils.serialize(str, streamOut));
-		try {
-			streamOut.write(SerializationUtils.serializeToBytes(str));
-			streamOut.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		client.toSend.add(str);
 	}
 	
 	public ChatClient(String serverName, int serverPort, String name){
@@ -42,7 +33,7 @@ public abstract class ChatClient{
 	private final void start() throws IOException {
 		streamOut = new DataOutputStream(socket.getOutputStream());
 		if (client == null) {  
-			client = new ChatClientThread(this, socket);
+			client = new ChatClientThread(this, socket, streamOut);
 		}
 	}
 	

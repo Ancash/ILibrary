@@ -1,8 +1,11 @@
 package de.ancash.ilibrary.sockets;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import de.ancash.ilibrary.misc.SerializationUtils;
 
@@ -11,8 +14,13 @@ class ChatClientThread{
 	private ChatClient       client   = null;
 	private DataInputStream  streamIn = null;
 	private Thread thread;
+	@SuppressWarnings("unused")
+	private DataOutputStream streamOut = null;
 	
-	ChatClientThread(ChatClient _client, Socket _socket){
+	Queue<Packet> toSend = new LinkedBlockingDeque<Packet>();
+	
+	ChatClientThread(ChatClient _client, Socket _socket, DataOutputStream streamOut){
+		this.streamOut = streamOut;
 		client   = _client;
 		socket   = _socket;
 		open();  
@@ -25,6 +33,14 @@ class ChatClientThread{
 						Thread.sleep(1);
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
+					}
+					if(!toSend.isEmpty()) {
+						try {
+							streamOut.write(SerializationUtils.serializeToBytes(toSend.remove()));
+							streamOut.flush();
+						} catch (IOException e) {
+							System.out.println("Error while sending packet!" + e.getMessage());
+						}
 					}
 					Packet packet = null;
 					try {

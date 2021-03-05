@@ -19,7 +19,7 @@ package de.ancash.ilibrary.events;
 /**
  * Represents a callable event.
  */
-public abstract class AEvent {
+public abstract class IEvent {
 
 	/**
      * Stores cancelled status. Will be false unless a subclass publishes
@@ -32,7 +32,7 @@ public abstract class AEvent {
      *
      * @return HandlerList to call event with
      */
-    public abstract AHandlerList getHandlers();
+    public abstract IHandlerList getHandlers();
 
     /**
      * Get event type name.

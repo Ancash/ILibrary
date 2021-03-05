@@ -5,9 +5,9 @@ import java.io.IOException;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import de.ancash.ilibrary.events.AEvent;
-import de.ancash.ilibrary.events.AHandlerList;
-import de.ancash.ilibrary.events.AListener;
+import de.ancash.ilibrary.events.IEvent;
+import de.ancash.ilibrary.events.IHandlerList;
+import de.ancash.ilibrary.events.IListener;
 import de.ancash.ilibrary.events.EventExecutor;
 import de.ancash.ilibrary.events.EventManager;
 import de.ancash.ilibrary.events.Order;
@@ -91,23 +91,23 @@ public class ILibrary extends JavaPlugin{
 			}
 	}
 	
-	public void registerEvents(AListener aListener, Object owner) {
-		EventManager.registerEvents(aListener, owner);
+	public void registerEvents(IListener iListener, Object owner) {
+		EventManager.registerEvents(iListener, owner);
 	}
 	
-	public <T extends AEvent> T callEvent(T event) {
+	public <T extends IEvent> T callEvent(T event) {
 		return EventManager.callEvent(event);
 	}
 	
-	public void registerEvent(Class<? extends AEvent> aEvent, Order priority, EventExecutor executor, Object owner) {
-        EventManager.registerEvent(aEvent, priority, executor, owner);
+	public void registerEvent(Class<? extends IEvent> iEvent, Order priority, EventExecutor executor, Object owner) {
+        EventManager.registerEvent(iEvent, priority, executor, owner);
     }
 	
 	public void unregisterAllEvents() {
-		AHandlerList.unregisterAll();
+		IHandlerList.unregisterAll();
 	}
 	
 	public void unregisterAllEvents(Object plugin) {
-		AHandlerList.unregisterAll(plugin);
+		IHandlerList.unregisterAll(plugin);
 	}
 }

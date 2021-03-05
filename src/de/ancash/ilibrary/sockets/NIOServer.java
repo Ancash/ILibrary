@@ -9,8 +9,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
-import de.ancash.ilibrary.misc.SerializationUtils;
-
 import static java.nio.channels.SelectionKey.*;
 
 public class NIOServer {
@@ -63,9 +61,9 @@ public class NIOServer {
 				                    buffer.clear();
 				                    if (client.read(buffer) != -1) {
 				                        buffer.flip();
-				                        Packet p = (Packet) SerializationUtils.deserializeFromBytes(buffer.array());
+				                        
 				                        for (SelectionKey k : selector.keys()) {
-				                        	if(k.channel() instanceof SocketChannel && !k.equals(key)) ((SocketChannel) k.channel()).write(ByteBuffer.wrap(SerializationUtils.serialize(p)));
+				                        	if(k.channel() instanceof SocketChannel && !k.equals(key)) ((SocketChannel) k.channel()).write(ByteBuffer.wrap(buffer.array()));
 			                            }
 				                    } else {
 				                        key.cancel();
