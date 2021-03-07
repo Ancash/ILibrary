@@ -31,13 +31,7 @@ public class Test {
 				e.printStackTrace();
 			}
 		    for(int i = 0; i<clients; i++) {
-		    	ChatClient cc = new ChatClient("localhost", 25700, "lol") {
-					
-					@Override
-					public void onPacket(Packet req) {
-						System.out.println("paacekt");
-					}
-				};
+		    	ChatClient cc = new ChatClient("localhost", 25700, "lol");
 				ccs.add(cc);
 		    }
 		    try {

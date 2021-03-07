@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import de.ancash.ilibrary.ILibrary;
+import de.ancash.ilibrary.events.events.ChatClientPacketReceiveEvent;
 import de.ancash.ilibrary.misc.SerializationUtils;
 
 class ChatClientThread{
@@ -48,7 +50,7 @@ class ChatClientThread{
 						byte[] bytes = new byte[streamIn.available()];
 						streamIn.read(bytes);
 						packet = (Packet) SerializationUtils.deserializeFromBytes(bytes);
-						client.onPacket(packet);
+						ILibrary.getInstance().callEvent(new ChatClientPacketReceiveEvent(packet));
 					} catch (Exception e) {
 						System.out.println("Error while reading input stream! Stopping...");
 						client.stop();

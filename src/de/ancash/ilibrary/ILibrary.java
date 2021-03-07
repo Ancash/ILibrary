@@ -11,7 +11,9 @@ import de.ancash.ilibrary.events.IListener;
 import de.ancash.ilibrary.events.EventExecutor;
 import de.ancash.ilibrary.events.EventManager;
 import de.ancash.ilibrary.events.Order;
+import de.ancash.ilibrary.sockets.NIOClient;
 import de.ancash.ilibrary.sockets.NIOServer;
+import de.ancash.ilibrary.sockets.Packet;
 import de.ancash.ilibrary.yaml.configuration.file.YamlFile;
 import de.ancash.ilibrary.yaml.exceptions.InvalidConfigurationException;
 
@@ -21,6 +23,7 @@ public class ILibrary extends JavaPlugin{
 	//TestClient tc;
 	
 	private static NIOServer server;
+	private static NIOClient client;
 	private int port;
 	private static ILibrary plugin;
 	private YamlFile f;
@@ -55,7 +58,15 @@ public class ILibrary extends JavaPlugin{
 		} catch (InvalidConfigurationException | IOException e) {
 			e.printStackTrace();
 		}
-		
+		client = new NIOClient(f.getString("address"), port, this.getClass().getCanonicalName());
+	}
+	
+	public boolean sendPacket(Packet p) {
+		if(client != null && client.isActive()) {
+			client.send(p);
+			return true;
+		}
+		return false;
 	}
 	
 	public static ILibrary getInstance() {
@@ -82,7 +93,11 @@ public class ILibrary extends JavaPlugin{
 	
 	@Override
 	public void onDisable() {
-
+		
+		if(client != null) {
+			client.stop();
+		}
+		
 		if(server != null)
 			try {
 				server.stop();

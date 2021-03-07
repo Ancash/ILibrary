@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public abstract class ChatClient{
+public class ChatClient{
 	
 	private Socket socket              = null;
 	private DataOutputStream streamOut = null;
@@ -40,8 +40,6 @@ public abstract class ChatClient{
 	public final boolean isActive() {
 		return client != null && streamOut != null;
 	}
-			
-	public abstract void onPacket(Packet packet);
 	
 	public final void stop() {  
 		try{
