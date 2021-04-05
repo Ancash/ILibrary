@@ -36,6 +36,7 @@ class ChatClientThread{
 					} catch (InterruptedException e1) {
 						e1.printStackTrace();
 					}
+					
 					if(!toSend.isEmpty()) {
 						try {
 							streamOut.write(SerializationUtils.serializeToBytes(toSend.remove()));
@@ -52,10 +53,10 @@ class ChatClientThread{
 						packet = (Packet) SerializationUtils.deserializeFromBytes(bytes);
 						ILibrary.getInstance().callEvent(new ChatClientPacketReceiveEvent(packet));
 					} catch (Exception e) {
-						System.out.println("Error while reading input stream! Stopping...");
-						client.stop();
-						stop();
-						return;
+						//System.out.println("Error while reading input stream! " + e); 
+						//client.stop();
+						//stop();
+						//return;
 					}
 				}
 			}

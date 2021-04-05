@@ -77,6 +77,10 @@ public class ILibrary extends JavaPlugin{
 		return server != null;
 	}
 	
+	public boolean isChatClientRunning() {
+		return client != null && client.isActive();
+	}
+	
 	public int getDefaultSocketPort() {
 		return port;
 	}

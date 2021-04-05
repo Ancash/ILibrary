@@ -26,6 +26,7 @@ public class EventManager {
                         listener.getExecutor().execute(event);
                     }
                 } catch (Throwable ex) {
+                	if(ex.getClass().getName().contains("InvocationTargetException")) continue;
                     LOGGER.log(Level.SEVERE, "Could not pass event " + event.getEventName() + " to " + listener.getOwner().getClass().getName(), ex);
                 }
             }
@@ -114,7 +115,8 @@ public class EventManager {
                         }
                         method.invoke(iListener, iEvent);
                     } catch (Throwable t) {
-                        throw new EventException(t);
+                    	if(t.getClass().getName().contains("InvocationTargetException")) return;
+                    	throw new EventException(t);
                     }
                 }
 
