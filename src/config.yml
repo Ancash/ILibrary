@@ -1,2 +1,6 @@
+server: false
+chat-client: false
 address: localhost
 port: 25500
+client-wait-strategy: sleeping #blocking, sleeping, busy, yielding
+server-wait-strategy: sleeping #blocking, sleeping, busy, yielding
