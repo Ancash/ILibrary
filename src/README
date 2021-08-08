@@ -1,6 +1,2 @@
 credits:
-	John DeRegnaucourt (CompactMap)
-	jack870131 (Trees)
-	Bukkit (de.ancash.ilibrary.events.*; de.ancash.ilibrary.yaml.*)
 	tr7zw (de.ancash.ilibrary.minecraft.nbt.*)
-	LMAX Disruptor (https://github.com/LMAX-Exchange/disruptor)
