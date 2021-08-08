@@ -53,6 +53,7 @@ public abstract class Tool implements Serializable{
 	 * @param player
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	public boolean hasToolInHand(final Player player) {
 		return isTool(player.getItemInHand());
 	}

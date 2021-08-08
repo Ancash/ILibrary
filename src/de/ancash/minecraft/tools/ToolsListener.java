@@ -3,7 +3,6 @@ package de.ancash.minecraft.tools;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.ClickType;
@@ -27,7 +26,8 @@ public abstract class ToolsListener extends Tool implements Listener {
 	 * @param event
 	 * @throws Exception 
 	 */
-	@EventHandler(priority = EventPriority.HIGH)
+	@SuppressWarnings("deprecation")
+	@EventHandler()
 	public void onToolClick(final PlayerInteractEvent event) throws Exception {
 		final Player player = event.getPlayer();
 		final Tool tool = ToolRegistry.getTool(player.getItemInHand());
@@ -94,7 +94,7 @@ public abstract class ToolsListener extends Tool implements Listener {
 	/**
 	 * Handles hotbar focus/defocus for tools
 	 */
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler()
 	public void onHeltItem(final PlayerItemHeldEvent event) {
 		final Player player = event.getPlayer();
 

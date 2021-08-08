@@ -17,7 +17,7 @@ public abstract class IGUI {
 	private String title;
 	private int size;
 	private InventoryItem[] inventoryItems;
-	private final UUID id;
+	private UUID id;
 	private boolean closeOnNextClose = true;
 	
 	/**
@@ -43,6 +43,15 @@ public abstract class IGUI {
 		inventoryItems = new InventoryItem[size];
 		inv = Bukkit.createInventory(null, size, title);
 		Bukkit.getPlayer(id).openInventory(inv);
+	}
+	
+	/**
+	 * set the {@link UUID}
+	 * 
+	 * @param id
+	 */
+	public void setUUID(UUID id) {
+		this.id = id;
 	}
 	
 	/**

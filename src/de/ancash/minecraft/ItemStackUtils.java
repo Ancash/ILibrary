@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -19,9 +19,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-
-import de.ancash.datastructures.maps.CompactMap;
-import de.ancash.minecraft.nbt.NBTItem;
 
 public class ItemStackUtils {
 
@@ -36,120 +33,7 @@ public class ItemStackUtils {
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
-	public static boolean isSimilar(ItemStack a, ItemStack b) {
-		a = legacyToNormal(a);
-		b = legacyToNormal(b);
-		boolean aNull = a == null || a.getType() == Material.AIR;
-		boolean bNull = b == null || b.getType() == Material.AIR;		
-		
-		if(a == null && b == null) {
-			return false;
-		}
-			
-		if(aNull != bNull) {
-			return false;
-		}
-		
-		if(aNull == true) {
-			return false;
-		}
-		
-		if(!a.getType().equals(b.getType()) && b.getType().getId() != 0) {
-			return false;
-		}
-		if(!matchesMeta(a, b)) {
-			return false;
-		}
-		
-		if(!matchesNBT(a, b)) {
-			return false;
-		}
-		
-		boolean matches = false;
-		if(!a.getType().equals(Material.valueOf("SKULL_ITEM"))) {
-			String one = a.toString().split("\\{")[1].split(" x")[0];
-			String two = b.toString().split("\\{")[1].split(" x")[0];
-			if(!one.equals(two)) {
-				if(!(one.split("_").length == two.split("_").length && one.split("_").length > 1 && one.split("_")[0].equals(two.split("_")[0]))) {
-					return false;
-				}
-			}
-			if(one.equals(two)) matches = true;
-		} else {
-			SkullMeta aM = (SkullMeta) a.getItemMeta();
-			SkullMeta bM = (SkullMeta) b.getItemMeta();
-			if(aM.getOwner() == null && bM.getOwner() != null && !bM.getOwner().equals("Ancash")) 
-				return false;
-			
-			if(aM.getOwner() != null && bM.getOwner() == null && !aM.getOwner().equals("Ancash")) 
-				return false;
-			
-			if(aM.getOwner() != null && !aM.getOwner().equals(bM.getOwner()))  
-				return false;
-			
-			try {
-				String aT = getTexure(a);
-				String bT = getTexure(b);
-				if(aT != null && !aT.equals(bT)) return false;
-				if(bT != null && !aT.equals(aT)) return false;
-			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
-			}
-			matches = true;
-		}
-		if(a.getData().getData() != -1 
-				&& b.getData().getData() != -1 
-				&& a.getData().getData() != b.getData().getData()
-				&& !matches) {
-			return false;
-		}
-		return true;
-	}
-	
-	public static boolean matchesNBT(ItemStack a, ItemStack b) {
-		NBTItem aNbt = new NBTItem(a);
-		NBTItem bNbt = new NBTItem(b);
-		
-		if(!aNbt.getKeys().equals(bNbt.getKeys())) {
-			if(!(aNbt.getKeys().size() - 2 == bNbt.getKeys().size() ||
-					aNbt.getKeys().size() - 1 == bNbt.getKeys().size() ||
-					aNbt.getKeys().size() + 2 == bNbt.getKeys().size() ||
-					aNbt.getKeys().size() + 1 == bNbt.getKeys().size())) {
-				return false;
-			}
-		}
-		for(String key : aNbt.getKeys()) {
-			if(key.equals("meta-type") || key.equals("Damage")) continue;
-			try {
-				Object aOb = aNbt.getObject(key, Object.class);
-				Object bOb = bNbt.getObject(key, Object.class);
-				if(aOb == null && bOb == null) continue;
-				if(aOb.equals(bOb)) return false;
-			} catch(Exception exc) {}
-		}
-		return true;
-	}
-	
-	public static boolean matchesMeta(ItemStack a, ItemStack b) {
-		boolean aHas = a.getItemMeta() == null;
-		boolean bHas = b.getItemMeta() == null;
-		if(aHas != bHas) return false;
-		if(a.getItemMeta() == null || b.getItemMeta() == null) return true;
-		ItemMeta aM = a.getItemMeta();
-		ItemMeta bM = b.getItemMeta();
-		if(aM.getLore() == null && bM.getLore() != null) return false;
-		if(aM.getLore() != null && bM.getLore() == null) return false;
-		if(aM.getLore() != null && !aM.getLore().equals(bM.getLore())) return false;
-		if(!aM.getEnchants().equals(bM.getEnchants())) return false;
-		if(aM.getDisplayName() != null && bM.getDisplayName() == null) return false;
-		if(aM.getDisplayName() == null && bM.getDisplayName() != null) return false;
-		if(aM.getDisplayName() != null && !aM.getDisplayName().equals(bM.getDisplayName())) return false;
-		if(!aM.getItemFlags().equals(bM.getItemFlags())) return false;
-		return true;
-	}
-	
-	public static ItemStack replacePlaceholder(ItemStack is, CompactMap<String, String> placeholder) {
+	public static ItemStack replacePlaceholder(ItemStack is, Map<String, String> placeholder) {
 		ItemMeta im = is.getItemMeta();
 		List<String> lore = new ArrayList<String>();
 		for(String str : im.getLore()) {
@@ -202,14 +86,14 @@ public class ItemStackUtils {
 	public static ItemStack get(FileConfiguration fc, String path) {
 		if(fc.getItemStack(path) != null) {
 			ItemStack is = fc.getItemStack(path);
-			if(!is.getType().equals(Material.SKULL_ITEM) || is.getData().getData() == 3) {
+			if(!is.getType().equals(XMaterial.PLAYER_HEAD.parseMaterial()) || is.getData().getData() == 3) {
 				return is;
 			}
 			if(fc.getString(path + "-texture") != null) is = setTexture(is, fc.getString(path + "-texture"));
 			return is;
 		}
 		if(fc.getString(path + ".type") == null) return null; 
-		ItemStack is = new ItemStack(Material.valueOf(fc.getString(path + ".type")), 1, (short) fc.getInt(path + ".meta.data"));
+		ItemStack is = XMaterial.matchXMaterial(fc.getString(path + ".type") + ": " + fc.getInt(path + ".meta.data")).get().parseItem().clone();
 		ItemMeta im = is.getItemMeta();
 		
 		if(fc.getString(path + ".meta.displayname") != null) im.setDisplayName(fc.getString(path + ".meta.displayname").replace("&", "§"));
@@ -224,7 +108,7 @@ public class ItemStackUtils {
 		
 		is.setItemMeta(im);
 		
-		if(is.getType().equals(Material.valueOf("SKULL_ITEM")) && fc.getString(path + ".meta.texture") != null)
+		if(is.getType().equals(XMaterial.PLAYER_HEAD.parseMaterial()) && fc.getString(path + ".meta.texture") != null)
 			is = setTexture(is, fc.getString(path + ".meta.texture"));
 		
 		List<String> enchs = fc.getStringList(path + ".meta.enchantments");
@@ -237,7 +121,7 @@ public class ItemStackUtils {
 	@SuppressWarnings("deprecation")
 	public static void set(FileConfiguration fc, String path, ItemStack is) {
 		ItemStack result = is.clone();
-		if(result.getType().equals(Material.SKULL_ITEM) && result.getData().getData() == 3) {
+		if(result.getType().equals(XMaterial.PLAYER_HEAD.parseMaterial()) && result.getData().getData() == 3) {
 			String texture = null;
 			try {
 				texture = getTexure(result);
