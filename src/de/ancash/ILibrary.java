@@ -13,6 +13,7 @@ import de.ancash.libs.org.bukkit.event.Listener;
 import de.ancash.libs.org.bukkit.event.Order;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.simpleyaml.configuration.file.YamlFile;
 import org.simpleyaml.exceptions.InvalidConfigurationException;
 
@@ -39,7 +40,17 @@ public class ILibrary extends JavaPlugin{
 			f.load();
 			port = f.getInt("port");
 			if(f.getBoolean("chat-client")) {
-				client = new ChatClient(getAddress(), port, 1);
+				new BukkitRunnable() {
+					
+					@Override
+					public void run() {
+						try {
+							client = new ChatClient(getAddress(), port, 1);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}.runTaskAsynchronously(plugin);
 			}
 		} catch (InvalidConfigurationException | IOException e) {
 			e.printStackTrace();

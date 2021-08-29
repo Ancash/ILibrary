@@ -1,5 +1,6 @@
 package de.ancash.minecraft;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,8 +83,15 @@ public class ItemStackUtils {
 		return is;
 	}
 	
-	@SuppressWarnings("deprecation")
-	public static ItemStack get(FileConfiguration fc, String path) {
+	@Deprecated
+	public static ItemStack get(FileConfiguration fc, String path) throws IOException {
+		if(fc.isString(path))
+			try {
+				return SerializableItemStack.fromBase64(fc.getString(path)).restore();
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+				return null;
+			}
 		if(fc.getItemStack(path) != null) {
 			ItemStack is = fc.getItemStack(path);
 			if(!is.getType().equals(XMaterial.PLAYER_HEAD.parseMaterial()) || is.getData().getData() == 3) {
@@ -118,9 +126,9 @@ public class ItemStackUtils {
 		return is;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static void set(FileConfiguration fc, String path, ItemStack is) {
-		ItemStack result = is.clone();
+		fc.set(path, new SerializableItemStack(is).asBase64());
+		/*ItemStack result = is.clone();
 		if(result.getType().equals(XMaterial.PLAYER_HEAD.parseMaterial()) && result.getData().getData() == 3) {
 			String texture = null;
 			try {
@@ -136,7 +144,7 @@ public class ItemStackUtils {
 			}
 		} else {
 			fc.set(path, result);
-		}
+		}*/
 	}
 	
 	public static String getTexure(ItemStack is) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {

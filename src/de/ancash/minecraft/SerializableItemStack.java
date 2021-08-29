@@ -4,16 +4,20 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -193,6 +197,19 @@ public class SerializableItemStack implements Serializable{
 			metaValues.put("owner", ((SkullMeta) meta).getOwner());
 		if(meta.hasDisplayName()) metaValues.put("displayname", meta.getDisplayName());
 		if(meta.hasLore()) metaValues.put("lore", new ArrayList<>(meta.getLore()));
+		
+		try {
+			
+			if(meta.hasAttributeModifiers()) {
+				Map<String, ArrayList<Map<String, Object>>> attributeModifiers = new HashMap<>();
+				for(Entry<Attribute, Collection<AttributeModifier>> entry : meta.getAttributeModifiers().asMap().entrySet()) {
+					attributeModifiers.put(entry.getKey().name(), new ArrayList<>());
+					entry.getValue().stream().forEach(am -> attributeModifiers.get(entry.getKey().name()).add(am.serialize()));
+				}
+				metaValues.put("AttributeModifier", (Serializable) attributeModifiers);
+			}
+			
+		} catch(Exception ex) {metaValues.remove("AttributeModifier");}
 	}
 	
 	private void setNBTValues(ItemStack item) {
@@ -279,6 +296,14 @@ public class SerializableItemStack implements Serializable{
 		
 		if(meta instanceof SkullMeta && metaValues.containsKey("owner"))
 			((SkullMeta) meta).setOwner((String) metaValues.get("owner"));
+		if(metaValues.containsKey("AttributeModifier")) {
+			Map<String, ArrayList<Map<String, Object>>> attributeModifiers = (Map<String, ArrayList<Map<String, Object>>>) metaValues.get("AttributeModifier");
+			for(Entry<String, ArrayList<Map<String, Object>>> entry : attributeModifiers.entrySet()) {
+				Attribute attribute = Attribute.valueOf(entry.getKey());
+				for(Map<String, Object> attributeModifier : entry.getValue()) 
+					meta.addAttributeModifier(attribute, AttributeModifier.deserialize(attributeModifier));
+			}
+		}
 		item.setItemMeta(meta);
 		if(metaValues.containsKey("enchantments")) 
 			for(String ench : ((ArrayList<String>) metaValues.get("enchantments")))
