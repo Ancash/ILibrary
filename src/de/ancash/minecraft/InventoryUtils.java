@@ -21,13 +21,13 @@ public class InventoryUtils {
 	
 	public static int getFreeSpaceExact(Inventory inventory, ItemStack is) {
 		final Unit<Integer> space = Tuple.of(new Integer(getFreeSlots(inventory) * is.getMaxStackSize()));
-		SerializableItemStack sis = new SerializableItemStack(is);
-		Arrays.asList(inventory.getContents()).stream().filter(item -> item != null).filter(item -> sis.equalsIgnoreAmount(new SerializableItemStack(item))).forEach(item -> space.setFirst(space.getFirst() + (item.getMaxStackSize() - item.getAmount())));
+		IItemStack sis = new IItemStack(is);
+		Arrays.asList(inventory.getContents()).stream().filter(item -> item != null).filter(item -> sis.isSimilar(new IItemStack(item))).forEach(item -> space.setFirst(space.getFirst() + (item.getMaxStackSize() - item.getAmount())));
 		return space.getFirst().intValue();
 	}
 	
 	public static void addItemAmount(int i, ItemStack is, Player p) {
-		SerializableItemStack sis = new SerializableItemStack(is);
+		IItemStack sis = new IItemStack(is);
 		for(int s = 0; s<p.getInventory().getSize(); s++) {
 			if(i == 0) return;
 			ItemStack inv = p.getInventory().getItem(s);
@@ -46,7 +46,7 @@ public class InventoryUtils {
 				return;
 			}
 			
-			if(sis.equalsIgnoreAmount(new SerializableItemStack(inv))) {
+			if(sis.isSimilar(new IItemStack(inv))) {
 				if(inv.getAmount() == inv.getMaxStackSize()) continue;
 				int canAdd= inv.getMaxStackSize() - inv.getAmount();
 				if(canAdd > i) {
@@ -64,10 +64,10 @@ public class InventoryUtils {
 	}
 	
 	public static void removeItemAmount(int i, ItemStack is, Player p) {
-		SerializableItemStack sis = new SerializableItemStack(is);
+		IItemStack sis = new IItemStack(is);
 		for(int s = 0; s<p.getInventory().getSize(); s++) {
 			ItemStack item = p.getInventory().getItem(s);
-			if(item == null || !sis.equalsIgnoreAmount(new SerializableItemStack(item))) continue;
+			if(item == null || !sis.isSimilar(new IItemStack(item))) continue;
 			int dif = i;
 			if(dif > item.getAmount()) {
 				dif = item.getAmount();
@@ -84,12 +84,12 @@ public class InventoryUtils {
 	
 	public static int getContentAmount(Inventory inv, ItemStack is) {
 		int i = 0;
-		SerializableItemStack sis = new SerializableItemStack(is);
+		IItemStack sis = new IItemStack(is);
 		for(int t = 0; t<inv.getSize(); t++) {
 			ItemStack cont = inv.getItem(t);
 			if(cont == null || cont.getType().equals(XMaterial.AIR.parseMaterial())) 
 				continue;
-			if(sis.equalsIgnoreAmount(new SerializableItemStack(cont))) {
+			if(sis.isSimilar(new IItemStack(cont))) {
 				i += cont.getAmount();
 			}
 		}

@@ -96,7 +96,7 @@ public abstract class IGUI {
 	 * @return {@link Boolean}
 	 */
 	public final boolean isInventoryItem(int slot) {
-		return slot >= 0 && inventoryItems[slot] != null;
+		return slot >= 0 && slot < inventoryItems.length && inventoryItems[slot] != null;
 	}
 	
 	public final void addInventoryItem(InventoryItem item) {

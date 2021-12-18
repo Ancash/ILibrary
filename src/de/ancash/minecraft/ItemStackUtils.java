@@ -1,38 +1,63 @@
 package de.ancash.minecraft;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
 public class ItemStackUtils {
 
-	private static final Inventory inv = Bukkit.createInventory(null, 9);
-	
-	public static ItemStack legacyToNormal(ItemStack legacy) {
-		synchronized (inv) {
-			inv.setItem(0, legacy);
-			legacy = inv.getItem(0);
-			inv.setItem(0, null);
-			return legacy;
-		}
-	}
+	public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
+    	try {
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            BukkitObjectOutputStream bukkitOut = new BukkitObjectOutputStream(byteOut);
+            
+            bukkitOut.writeInt(items.length);
+            for (int i = 0; i < items.length; i++)
+                bukkitOut.writeObject(items[i]);
+            
+            bukkitOut.close();
+            return Base64.getEncoder().encodeToString(byteOut.toByteArray());
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to save item stacks.", e);
+        }
+    }
+
+    public static ItemStack[] itemStackArrayFromBase64(String data) throws IOException {
+    	try {
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(Base64.getDecoder().decode(data));
+            BukkitObjectInputStream bukkitIn = new BukkitObjectInputStream(byteIn);
+            ItemStack[] items = new ItemStack[bukkitIn.readInt()];
+    
+            // Read the serialized items
+            for (int i = 0; i < items.length; i++)
+            	items[i] = (ItemStack) bukkitIn.readObject();
+            
+            bukkitIn.close();
+            return items;
+        } catch (ClassNotFoundException e) {
+            throw new IOException("Unable to decode class type.", e);
+        }
+    }
 	
 	public static ItemStack replacePlaceholder(ItemStack is, Map<String, String> placeholder) {
 		ItemMeta im = is.getItemMeta();
@@ -85,13 +110,6 @@ public class ItemStackUtils {
 	
 	@Deprecated
 	public static ItemStack get(FileConfiguration fc, String path) throws IOException {
-		if(fc.isString(path))
-			try {
-				return SerializableItemStack.fromBase64(fc.getString(path)).restore();
-			} catch (ClassNotFoundException | IOException e) {
-				e.printStackTrace();
-				return null;
-			}
 		if(fc.getItemStack(path) != null) {
 			ItemStack is = fc.getItemStack(path);
 			if(!is.getType().equals(XMaterial.PLAYER_HEAD.parseMaterial()) || is.getData().getData() == 3) {
@@ -127,24 +145,7 @@ public class ItemStackUtils {
 	}
 	
 	public static void set(FileConfiguration fc, String path, ItemStack is) {
-		fc.set(path, new SerializableItemStack(is).asBase64());
-		/*ItemStack result = is.clone();
-		if(result.getType().equals(XMaterial.PLAYER_HEAD.parseMaterial()) && result.getData().getData() == 3) {
-			String texture = null;
-			try {
-				texture = getTexure(result);
-			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-					| IllegalAccessException e) {}
-			if(texture != null) {
-				SkullMeta sm = (SkullMeta) result.getItemMeta();
-				sm.setOwner("Ancash");
-				result.setItemMeta(sm);
-				fc.set(path, result);
-				fc.set(path + "-texture", texture);
-			}
-		} else {
-			fc.set(path, result);
-		}*/
+		fc.set(path, is);
 	}
 	
 	public static String getTexure(ItemStack is) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {

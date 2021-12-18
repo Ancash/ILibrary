@@ -20,6 +20,8 @@ import org.simpleyaml.exceptions.InvalidConfigurationException;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.misc.FileUtils;
 import de.ancash.sockets.client.ChatClient;
+import de.ancash.sockets.events.ClientConnectEvent;
+import de.ancash.sockets.events.ClientDisconnectEvent;
 import de.ancash.sockets.packet.Packet;
 
 public class ILibrary extends JavaPlugin{
@@ -31,6 +33,7 @@ public class ILibrary extends JavaPlugin{
 
 	@Override
 	public void onEnable() {		
+
 		plugin = this;
 		f = new YamlFile(new File("plugins/ILibrary/config.yml"));
 		try {
@@ -46,6 +49,8 @@ public class ILibrary extends JavaPlugin{
 					public void run() {
 						try {
 							client = new ChatClient(getAddress(), port, 1);
+							client.onConnect(client -> EventManager.callEvent(new ClientConnectEvent(null)));
+							client.onDisconnect(client -> EventManager.callEvent(new ClientDisconnectEvent(null)));
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
