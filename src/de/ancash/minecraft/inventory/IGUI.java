@@ -13,12 +13,12 @@ import org.bukkit.inventory.ItemStack;
 
 public abstract class IGUI {
 
-	private Inventory inv;
-	private String title;
-	private int size;
-	private InventoryItem[] inventoryItems;
-	private UUID id;
-	private boolean closeOnNextClose = true;
+	protected Inventory inv;
+	protected String title;
+	protected int size;
+	protected InventoryItem[] inventoryItems;
+	protected UUID id;
+	protected boolean closeOnNextClose = true;
 	
 	/**
 	 * Constructor for IGUI.

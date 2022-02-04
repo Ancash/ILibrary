@@ -1,25 +1,15 @@
 package de.ancash.minecraft;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.bukkit.Color;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-
-import com.google.common.collect.Multimap;
 
 import de.ancash.datastructures.tuples.Duplet;
-import de.ancash.datastructures.tuples.Quartet;
 import de.ancash.datastructures.tuples.Tuple;
 import de.ancash.minecraft.nbt.NBTItem;
 
@@ -30,17 +20,43 @@ public class IItemStack {
 	
 	private final String base64original;
 	private final Map<String, Object> nbtValues;
+	private final int hash;
 	
 	public IItemStack(ItemStack original) {
-		this.original = original;
-		Duplet<ItemStack, Map<String, Object>> duplet = split(original);
+		NBTItem check = new NBTItem(original);
+		if(check.hasKey("ILibrary-temp-texture")) {
+			check.removeKey("ILibrary-temp-texture");
+			original = check.getItem();
+		}
+		this.original = original.clone();
+		Duplet<ItemStack, Map<String, Object>> duplet = split(this.original.clone());
 		this.withoutNBT = duplet.getFirst();
+		this.withoutNBT.setAmount(1);
 		this.nbtValues = duplet.getSecond();
-		this.base64original = ItemStackUtils.itemStackArrayToBase64(new ItemStack[] {original});
+		ItemStack temp = this.original.clone();
+		if(nbtValues.containsKey("SkullOwner")) {
+			try {
+				String txt = ItemStackUtils.getTexure(temp);
+				if(txt != null && !txt.isEmpty()) {
+					NBTItem item = new NBTItem(temp);
+					item.setString("ILibrary-temp-texture", txt);
+					item.removeKey("SkullOwner");
+					item.removeKey("skull-owner");
+					temp = ItemStackUtils.setTexture(item.getItem(), null);
+				}
+			} catch(Exception ex) {}
+		}
+		this.base64original = ItemStackUtils.itemStackArrayToBase64(new ItemStack[] {temp});
+		hash = Objects.hash(nbtValues, withoutNBT);
 	}
 
 	IItemStack(String data) throws IOException {
 		this(ItemStackUtils.itemStackArrayFromBase64(data)[0]);
+	}
+	
+	@Override
+	public int hashCode() {
+		return hash;
 	}
 	
 	public static IItemStack fromBase64(String data) throws IOException {
@@ -63,64 +79,23 @@ public class IItemStack {
 		return withoutNBT.isSimilar(compareTo.withoutNBT) && nbtValues.equals(compareTo.nbtValues);
 	}
 	
-	public static Duplet<ItemStack, Map<String, Object>> split(ItemStack original) {
+	private static Duplet<ItemStack, Map<String, Object>> split(ItemStack original) {
 		HashMap<String, Object> nbtValues = new HashMap<>();
-		NBTItem nbt = new NBTItem(original);
-		ItemMeta meta = original.getItemMeta();
-		if(nbt.hasKey("SkullOwner")) {
+		NBTItem nbt = new NBTItem(original.clone());
+		Set<String> keys = nbt.getKeys().stream().collect(Collectors.toSet());
+		keys.forEach(key -> nbtValues.put(key, nbt.getObject(key)));
+		if(keys.contains("SkullOwner") || keys.contains("skull-owner")) {
 			try {
-				nbtValues.put("SkullTexture", ItemStackUtils.getTexure(original));
-			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
-			}
-			nbt.removeKey("SkullOwner");
+				String txt = ItemStackUtils.getTexure(original);
+				if(txt != null && !txt.isEmpty()) {
+
+					nbtValues.put("ILibrary-temp-texture", txt);
+					nbtValues.put("SkullOwner", null);
+				}
+			} catch(Exception ex) {}
 		}
-		if(original.getItemMeta() instanceof LeatherArmorMeta) {
-			nbtValues.put("LeatherColor", ((LeatherArmorMeta) meta).getColor());
-		}
-		if(nbt.hasKey("AttributeModifiers")) {
-			Multimap<Attribute, AttributeModifier> attributeModifiers = meta.getAttributeModifiers();
-			Map<Attribute, List<Quartet<String, Double, Operation, EquipmentSlot>>> attributes = new HashMap<>();
-			for(Attribute att : attributeModifiers.keySet()) {
-				List<Quartet<String, Double, Operation, EquipmentSlot>> modis = new ArrayList<>();
-				for(AttributeModifier modi : attributeModifiers.get(att))
-					modis.add(Tuple.of(modi.getName(), modi.getAmount(), modi.getOperation(), modi.getSlot()));
-				attributes.put(att, modis);
-			}
-			nbt.removeKey("AttributeModifiers");
-			nbtValues.put("AttributeModifiers", attributes);
-		}
-		ItemStack split = nbt.getItem();
-		meta = split.getItemMeta();
-		meta.setAttributeModifiers(null);
-		if(nbtValues.containsKey("LeatherColor"))
-			((LeatherArmorMeta) meta).setColor(null);
-		split.setItemMeta(meta);
-		return Tuple.of(split, nbtValues);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public static ItemStack combine(ItemStack item, Map<String, Object> nbtValues) {
-		if(nbtValues.containsKey("SkullTexture"))
-			item = ItemStackUtils.setTexture(item, (String) nbtValues.get("SkullTexture"));
-		if(nbtValues.containsKey("LeatherColor")) {
-			LeatherArmorMeta lam = (LeatherArmorMeta) item.getItemMeta();
-			lam.setColor((Color) nbtValues.get("LeatherColor"));
-			item.setItemMeta(lam);
-		}
-		if(nbtValues.containsKey("AttributeModifier")) {
-			ItemMeta meta =  item.getItemMeta();
-			Map<Attribute, List<Object[]>> attributes = (Map<Attribute, List<Object[]>>) nbtValues.get("AttributeModifiers");
-			for(Attribute att : attributes.keySet()) {
-				for(Object[] modifier : attributes.get(att))
-					meta.addAttributeModifier(att, new AttributeModifier(UUID.randomUUID(),
-							(String) modifier[0],
-							(int) modifier[1], 
-							(Operation) modifier[2], 
-							(EquipmentSlot) modifier[3]));
-			}
-			item.setItemMeta(meta);
-		}
-		return item;
+		for(String key : keys)
+			nbt.removeKey(key);
+		return Tuple.of(nbt.getItem(), nbtValues);
 	}
 }

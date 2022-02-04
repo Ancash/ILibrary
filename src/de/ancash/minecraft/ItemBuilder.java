@@ -16,17 +16,8 @@ public class ItemBuilder {
 	}
 	
 	public ItemBuilder(XMaterial mat, int amount) {
-		this(mat, amount, mat.getData());
-	}
-	
-	public ItemBuilder(XMaterial mat, int amount, byte data) {
-		this(mat, amount, data, (short) 0);
-	}
-	
-	@SuppressWarnings("deprecation")
-	public ItemBuilder(XMaterial mat, int amount, byte data, short durability) {
-		this.item = new ItemStack(mat.parseMaterial(), amount, data);
-		item.setDurability(durability);
+		this.item = mat.parseItem();
+		item.setAmount(amount);
 		this.meta = item.getItemMeta();
 	}
 	

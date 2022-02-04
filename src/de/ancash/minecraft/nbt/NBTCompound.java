@@ -408,6 +408,15 @@ public class NBTCompound {
 		}
 	}
 
+	public Object getObject(String key) {
+		try {
+			readLock.lock();
+			return NBTReflectionUtil.getData(this, ReflectionMethod.COMPOUND_GET, key);
+		} finally {
+			readLock.unlock();
+		}
+	}
+	
 	/**
 	 * Uses Gson to store an {@link Serializable} Object
 	 * 
@@ -797,8 +806,8 @@ public class NBTCompound {
 					if(!isEqual(this, other, key)) {
 						return false;
 					}
-					return true;
 				}
+				return true;
 			}
 		}
 		return false;

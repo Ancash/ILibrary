@@ -8,9 +8,9 @@ import de.ancash.minecraft.nbt.NBTItem;
 
 public class InventoryItem extends NBTItem{
 	
-	private final IGUI igui;
-	private final int slot;
-	private Clickable clickable;
+	protected final IGUI igui;
+	protected final int slot;
+	protected Clickable clickable;
 	
 	public InventoryItem(IGUI igui, ItemStack item, int slot, Clickable clickable) {
 		super(item);

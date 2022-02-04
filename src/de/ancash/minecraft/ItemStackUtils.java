@@ -24,17 +24,17 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import de.ancash.minecraft.nbt.utils.MinecraftVersion;
+
 public class ItemStackUtils {
 
 	public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
     	try {
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
             BukkitObjectOutputStream bukkitOut = new BukkitObjectOutputStream(byteOut);
-            
             bukkitOut.writeInt(items.length);
             for (int i = 0; i < items.length; i++)
                 bukkitOut.writeObject(items[i]);
-            
             bukkitOut.close();
             return Base64.getEncoder().encodeToString(byteOut.toByteArray());
         } catch (Exception e) {
@@ -48,7 +48,6 @@ public class ItemStackUtils {
             BukkitObjectInputStream bukkitIn = new BukkitObjectInputStream(byteIn);
             ItemStack[] items = new ItemStack[bukkitIn.readInt()];
     
-            // Read the serialized items
             for (int i = 0; i < items.length; i++)
             	items[i] = (ItemStack) bukkitIn.readObject();
             
@@ -64,19 +63,56 @@ public class ItemStackUtils {
 		List<String> lore = new ArrayList<String>();
 		for(String str : im.getLore()) {
 			for(String place : placeholder.keySet())
-				if(str.contains(place)) {
+				if(str.contains(place))
 					str = str.replace(place, placeholder.get(place) == null ? "" : placeholder.get(place));
-				}
-			if(str.contains("\n")) {
+			
+			if(str.contains("\n"))
 				for(String s : str.split("\n"))
 					lore.add(s);
-			} else {
+			else
 				lore.add(str);
-			}
 		}
 		im.setLore(lore);
 		is.setItemMeta(im);
 		return is;
+	}
+	
+	public static ItemStack getItemStack(FileConfiguration fc, String path) {
+		ItemStack item = fc.getItemStack(path).clone();
+		if(!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1))
+			if(fc.getString(path + "-texture") != null)
+				item = setProfileName(item, null);		
+		return item;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static void setItemStack(FileConfiguration fc, String path, ItemStack item) {
+		item = item.clone();
+		if(item.getItemMeta() instanceof SkullMeta) {
+			
+			
+			if(MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1)) {
+				fc.set(path, item);
+			} else {
+				String txt = null;
+				try {
+					txt = ItemStackUtils.getTexure(item);
+				} catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+						| IllegalAccessException e) {
+					
+				}
+				SkullMeta sm = (SkullMeta) item.getItemMeta();
+				if(txt == null) {
+					txt = sm.getOwner();
+				} else {
+					item = setProfileName(item, txt);
+				}
+				fc.set(path, item);
+				fc.set(path + "-texture", txt);
+			}
+		} else {
+			fc.set(path, item);
+		}
 	}
 	
 	public static ItemStack setDisplayname(ItemStack is, String str) {
@@ -100,9 +136,8 @@ public class ItemStackUtils {
 	public static ItemStack removeLine(String hasToContain, ItemStack is) {
 		ItemMeta im = is.getItemMeta();
 		List<String> newLore = new ArrayList<String>();
-		for(String str : im.getLore()) {
+		for(String str : im.getLore())
 			if(!str.contains(hasToContain)) newLore.add(str);
-		}
 		im.setLore(newLore);
 		is.setItemMeta(im);
 		return is;
@@ -144,8 +179,26 @@ public class ItemStackUtils {
 		return is;
 	}
 	
+	@Deprecated
 	public static void set(FileConfiguration fc, String path, ItemStack is) {
-		fc.set(path, is);
+		setItemStack(fc, path, is);
+	}
+	
+	public static ItemStack setProfileName(ItemStack is, String name) {
+		SkullMeta hm = (SkullMeta) is.getItemMeta().clone();
+		try {
+			GameProfile profile = null;
+			Field field = hm.getClass().getDeclaredField("profile");
+			field.setAccessible(true);
+			profile = (GameProfile) field.get(hm);
+			Field nameField = profile.getClass().getDeclaredField("name");
+			nameField.setAccessible(true);
+			nameField.set(profile, name);
+		} catch(IllegalArgumentException  | NoSuchFieldException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		is.setItemMeta(hm);
+		return is;
 	}
 	
 	public static String getTexure(ItemStack is) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
@@ -156,9 +209,8 @@ public class ItemStackUtils {
 		profileField.setAccessible(true);
 		GameProfile profile = (GameProfile) profileField.get(sm);
 		Collection<Property> textures = profile.getProperties().get("textures");
-		for(Property p : textures) {
+		for(Property p : textures)
 			texture = p.getValue();
-		}
 		return texture;
 	}
 	
@@ -169,7 +221,10 @@ public class ItemStackUtils {
 		try {
 			Field field = hm.getClass().getDeclaredField("profile");
 			field.setAccessible(true);
-			field.set(hm, profile);
+			if(texture == null)
+				field.set(hm, null);
+			else
+				field.set(hm, profile);
 		} catch(IllegalArgumentException  | NoSuchFieldException | IllegalAccessException e) {
 			e.printStackTrace();
 		}

@@ -1,29 +1,29 @@
 package de.ancash.minecraft;
 
-import java.util.Arrays;
-
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import de.ancash.datastructures.tuples.Tuple;
-import de.ancash.datastructures.tuples.Unit;
 
 public class InventoryUtils {
 
-	public static int getFreeSlots(Inventory inventory) {
+	public static int getFreeSlots(ItemStack[] items) {
 		int free = 0;
-		for(int i = 0; i<inventory.getSize(); i++) {
-			if(inventory.getItem(i) == null || inventory.getItem(i).getType().equals(XMaterial.AIR.parseMaterial())) free++;
-		}
+		for(int i = 0; i<items.length; i++)
+			if(items[i] == null || items[i].getType().equals(XMaterial.AIR.parseMaterial()))
+				free++;
 		return free;
 	}
 	
-	public static int getFreeSpaceExact(Inventory inventory, ItemStack is) {
-		final Unit<Integer> space = Tuple.of(new Integer(getFreeSlots(inventory) * is.getMaxStackSize()));
+	public static int getFreeSpaceExact(ItemStack[] items, ItemStack is) {
+		int space = getFreeSlots(items) * is.getMaxStackSize();
 		IItemStack sis = new IItemStack(is);
-		Arrays.asList(inventory.getContents()).stream().filter(item -> item != null).filter(item -> sis.isSimilar(new IItemStack(item))).forEach(item -> space.setFirst(space.getFirst() + (item.getMaxStackSize() - item.getAmount())));
-		return space.getFirst().intValue();
+		for(int i = 0; i<items.length; i++) {
+			ItemStack a = items[i];
+			if(a == null || a.getType().equals(XMaterial.AIR.parseMaterial())) continue;
+			if(sis.isSimilar(a))
+				space += a.getMaxStackSize() - a.getAmount();
+				
+		}
+		return space;
 	}
 	
 	public static void addItemAmount(int i, ItemStack is, Player p) {
@@ -63,37 +63,35 @@ public class InventoryUtils {
 		}
 	}
 	
-	public static void removeItemAmount(int i, ItemStack is, Player p) {
+	public static int removeItemAmount(int i, ItemStack is, Player p) {
+		i = is.getAmount() * i;
 		IItemStack sis = new IItemStack(is);
 		for(int s = 0; s<p.getInventory().getSize(); s++) {
 			ItemStack item = p.getInventory().getItem(s);
 			if(item == null || !sis.isSimilar(new IItemStack(item))) continue;
-			int dif = i;
-			if(dif > item.getAmount()) {
-				dif = item.getAmount();
-			}
-			if(item.getAmount() == dif) {
+			if(item.getAmount() <= i) {
+				i -= item.getAmount();
 				p.getInventory().setItem(s, null);
 			} else {
-				item.setAmount(item.getAmount() - dif);
+				item.setAmount(item.getAmount() - i);
+				i = 0;
 			}
-			i -= dif;
 			if(i == 0) break;
 		}
+		return i;
 	}
 	
-	public static int getContentAmount(Inventory inv, ItemStack is) {
+	public static int getContentAmount(ItemStack[] items, ItemStack is) {
 		int i = 0;
 		IItemStack sis = new IItemStack(is);
-		for(int t = 0; t<inv.getSize(); t++) {
-			ItemStack cont = inv.getItem(t);
+		for(int t = 0; t<items.length; t++) {
+			ItemStack cont = items[t];
 			if(cont == null || cont.getType().equals(XMaterial.AIR.parseMaterial())) 
 				continue;
-			if(sis.isSimilar(new IItemStack(cont))) {
+			if(sis.isSimilar(new IItemStack(cont)))
 				i += cont.getAmount();
-			}
 		}
-		return i;
+		return (int) Math.floor(i / is.getAmount());
 	}
 	
 }
