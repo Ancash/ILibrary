@@ -28,13 +28,14 @@ import de.ancash.sockets.packet.Packet;
 
 public class ILibrary extends JavaPlugin{
 
+	public static final AsyncChatClientFactory ASYNC_CHAT_CLIENT_FACTORY = new AsyncChatClientFactory();
+	
 	private AsyncChatClient asyncClient;
 	private int port;
 	private static ILibrary plugin;
 	private YamlFile f;
 
-	@Override
-	public void onEnable() {		
+	public ILibrary() {
 		plugin = this;
 		f = new YamlFile(new File("plugins/ILibrary/config.yml"));
 		try {
@@ -42,25 +43,29 @@ public class ILibrary extends JavaPlugin{
 				FileUtils.copyInputStreamToFile(getResource("config.yml"), new File(f.getFilePath()));
 			
 			f.load();
-			ICraftingManager.getSingleton().init(this);
 			port = f.getInt("port");
-			if(f.getBoolean("chat-client")) {
-				new BukkitRunnable() {
-					
-					@Override
-					public void run() {
-						try {
-							asyncClient = new AsyncChatClientFactory().newInstance(getAddress(), port, 8 * 1024, port, 4);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}.runTaskAsynchronously(plugin);
-			}
-			checkForUpdates();
 		} catch (InvalidConfigurationException | IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public void onEnable() {		
+		ICraftingManager.getSingleton().init(this);
+		if(f.getBoolean("chat-client")) {
+			new BukkitRunnable() {
+					
+				@Override
+				public void run() {
+					try {
+						asyncClient = ASYNC_CHAT_CLIENT_FACTORY.newInstance(getAddress(), port, 10_000, 128 * 1024, 128 * 1024, 2);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}.runTaskAsynchronously(plugin);
+		}
+		checkForUpdates();
 		Bukkit.getPluginManager().registerEvents(new IGUIManager(), this);
 	}
 	
@@ -76,13 +81,9 @@ public class ILibrary extends JavaPlugin{
 			.checkNow();
 	}
 	
-	public void send(Packet packet) throws IOException {
+	public void send(Packet packet) {
 		if(asyncClient != null)
-			try {
-				asyncClient.write(packet);
-			} catch (IOException | InterruptedException e) {
-				throw new IOException(e);
-			}
+			asyncClient.write(packet);
 	}
 	
 	public static ILibrary getInstance() {

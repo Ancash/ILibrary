@@ -15,7 +15,7 @@ public class ICraftingManager {
 		return singleton;
 	}
 	
-	private Class<? extends IContainerWorkbench> clazz; 
+	private Class<? extends IContainerWorkbench> clazz;
 	
 	private ICraftingManager() {
 		
@@ -53,16 +53,26 @@ public class ICraftingManager {
 				return;
 			}
 			clazz = ContainerWorkbench_1_17.class;
-		} else {
+		} else if(MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_18_R1)) {
 			try {
-				ContainerWorkbench_1_18.initReflection();
+				ContainerWorkbench_1_18_R1.initReflection();
 			} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
 					| IllegalArgumentException | IllegalAccessException e) {
 				il.getLogger().severe("Reflection failed:");
 				e.printStackTrace();
 				return;
 			}
-			clazz = ContainerWorkbench_1_18.class;
+			clazz = ContainerWorkbench_1_18_R1.class;
+		} else {
+			try {
+				ContainerWorkbench_1_18_R2.initReflection();
+			} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
+					| IllegalArgumentException | IllegalAccessException e) {
+				il.getLogger().severe("Reflection failed:");
+				e.printStackTrace();
+				return;
+			}
+			clazz = ContainerWorkbench_1_18_R2.class;
 		}
 		
 		il.getLogger().info("Using: " + clazz.getTypeName());

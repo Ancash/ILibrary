@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -25,6 +24,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
 import de.ancash.minecraft.nbt.utils.MinecraftVersion;
+import net.md_5.bungee.api.ChatColor;
 
 public class ItemStackUtils {
 
@@ -117,7 +117,7 @@ public class ItemStackUtils {
 	
 	public static ItemStack setDisplayname(ItemStack is, String str) {
 		ItemMeta im = is.getItemMeta();
-		im.setDisplayName(str);
+		im.setDisplayName(ChatColor.translateAlternateColorCodes('&', str));
 		is.setItemMeta(im);
 		return is;
 	}
@@ -131,6 +131,13 @@ public class ItemStackUtils {
 		im.setLore(lore);
 		is.setItemMeta(im);
 		return is;
+	}
+	
+	public static ItemStack addItemFlag(ItemStack item, ItemFlag flag) {
+		ItemMeta m = item.getItemMeta();
+		m.addItemFlags(flag);
+		item.setItemMeta(m);
+		return item;
 	}
 	
 	public static ItemStack removeLine(String hasToContain, ItemStack is) {
@@ -153,30 +160,7 @@ public class ItemStackUtils {
 			if(fc.getString(path + "-texture") != null) is = setTexture(is, fc.getString(path + "-texture"));
 			return is;
 		}
-		if(fc.getString(path + ".type") == null) return null; 
-		ItemStack is = XMaterial.matchXMaterial(fc.getString(path + ".type") + ": " + fc.getInt(path + ".meta.data")).get().parseItem().clone();
-		ItemMeta im = is.getItemMeta();
-		
-		if(fc.getString(path + ".meta.displayname") != null) im.setDisplayName(fc.getString(path + ".meta.displayname").replace("&", "§"));
-		
-		List<String> lore = new ArrayList<String>();
-		fc.getStringList(path + ".meta.lore").forEach(str -> lore.add(str.replace("&", "§")));
-		if(lore != null) im.setLore(lore);
-		
-		List<String> flags = fc.getStringList(path + ".meta.flags");
-		for(String flag : flags) 
-			im.addItemFlags(ItemFlag.valueOf(flag));
-		
-		is.setItemMeta(im);
-		
-		if(is.getType().equals(XMaterial.PLAYER_HEAD.parseMaterial()) && fc.getString(path + ".meta.texture") != null)
-			is = setTexture(is, fc.getString(path + ".meta.texture"));
-		
-		List<String> enchs = fc.getStringList(path + ".meta.enchantments");
-		for(String ench : enchs) 
-			is.addUnsafeEnchantment(Enchantment.getByName(ench.split(":")[0]), Integer.valueOf(ench.split(":")[1]));
-		
-		return is;
+		return ItemStackFileUtil.getItemStack(fc, path);
 	}
 	
 	@Deprecated
