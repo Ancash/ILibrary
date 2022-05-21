@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
-public class ContainerWorkbench_1_18_R1 extends IContainerWorkbench{
+public class ContainerWorkbench_1_17 extends IContainerWorkbench{
 	
 	private static Constructor<?> containerWorkbenchConstructor;
 	private static Constructor<?> blockPositionConstructor;
@@ -36,15 +36,15 @@ public class ContainerWorkbench_1_18_R1 extends IContainerWorkbench{
 				Class.forName("net.minecraft.world.entity.player.PlayerInventory"),
 				cac
 			);
-		containerAccessMethod = cac.getDeclaredMethod("a", Class.forName("net.minecraft.world.level.World"), bpc);
+		containerAccessMethod = cac.getDeclaredMethod("at", Class.forName("net.minecraft.world.level.World"), bpc);
 		Class<?> entityHuman = Class.forName("net.minecraft.world.entity.player.EntityHuman");
-		playerInventoryField = entityHuman.getDeclaredField("cp");
+		playerInventoryField = entityHuman.getDeclaredField("co");
 		playerInventoryField.setAccessible(true);
 		worldField = Class.forName("net.minecraft.world.entity.Entity").getDeclaredField("t");
 		worldField.setAccessible(true);
 		
-		setItemMethod = icc.getDeclaredMethod("a", int.class, Class.forName("net.minecraft.world.item.ItemStack"));
-		getItemMethod = icc.getDeclaredMethod("a", int.class);
+		setItemMethod = icc.getDeclaredMethod("setItem", int.class, Class.forName("net.minecraft.world.item.ItemStack"));
+		getItemMethod = icc.getDeclaredMethod("getItem", int.class);
 		
 		
 
@@ -63,7 +63,7 @@ public class ContainerWorkbench_1_18_R1 extends IContainerWorkbench{
 	private final Player player;
 	private final Object inventoryCrafting;
 	
-	ContainerWorkbench_1_18_R1(Player player) throws ClassNotFoundException {
+	ContainerWorkbench_1_17(Player player) throws ClassNotFoundException {
 		try {
 			this.player = player;
 			Object nmsPlayer = playerToEntityHuman(player);
@@ -107,10 +107,10 @@ public class ContainerWorkbench_1_18_R1 extends IContainerWorkbench{
 		try {
 			setItemMethod.invoke(inventoryCrafting, i, itemStackAsNMSCopyMethod.invoke(null, item));
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
-
+	
 	public Object getCurrentIRecipe() throws IllegalArgumentException, IllegalAccessException {
 		return getCurrentIRecipeField.get(inventoryCrafting);
 	}

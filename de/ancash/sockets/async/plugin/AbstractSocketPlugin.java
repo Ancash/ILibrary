@@ -2,26 +2,28 @@ package de.ancash.sockets.async.plugin;
 
 import java.io.IOException;
 import java.util.UUID;
-
-import org.bukkit.plugin.java.JavaPlugin;
+import java.util.logging.Logger;
 
 import de.ancash.ILibrary;
 import de.ancash.libs.org.bukkit.event.EventHandler;
 import de.ancash.libs.org.bukkit.event.EventManager;
 import de.ancash.libs.org.bukkit.event.Listener;
-import de.ancash.sockets.async.AsyncChatClient;
-import de.ancash.sockets.async.PacketFuture;
+import de.ancash.sockets.async.impl.packet.client.AsyncPacketClient;
+import de.ancash.sockets.packet.PacketFuture;
 import de.ancash.sockets.async.client.AbstractAsyncClient;
 import de.ancash.sockets.events.ClientConnectEvent;
 import de.ancash.sockets.events.ClientDisconnectEvent;
 import de.ancash.sockets.events.ClientPacketReceiveEvent;
 import de.ancash.sockets.packet.Packet;
 
-public abstract class SocketPlugin extends JavaPlugin implements Listener{
+public abstract class AbstractSocketPlugin implements Listener{
+
+	protected AsyncPacketClient chatClient;
 	
-	protected AsyncChatClient chatClient;
+	private final Logger logger;
 	
-	public SocketPlugin() {
+	public AbstractSocketPlugin(Logger logger) {
+		this.logger = logger;
 		EventManager.registerEvents(this, this);
 	}
 	
@@ -35,7 +37,7 @@ public abstract class SocketPlugin extends JavaPlugin implements Listener{
 		try {
 			chatClient = ILibrary.ASYNC_CHAT_CLIENT_FACTORY.newInstance(address, port, 10_000, 128 * 1024, 128 * 1024, 2);
 		} catch (IOException e) {
-			getLogger().severe("Could not connect to " + address + ":" + port + ": " + e);;
+			logger.severe("Could not connect to " + address + ":" + port + ": " + e);;
 		}
 	}
 	
@@ -74,12 +76,4 @@ public abstract class SocketPlugin extends JavaPlugin implements Listener{
 	public abstract void onClientConnect(AbstractAsyncClient client);
 	
 	public abstract void onPacketReceive(Packet packet);
-	
-	public static String getAddress() {
-		return ILibrary.getInstance().getAddress();
-	}
-	
-	public static int getPort() {
-		return ILibrary.getInstance().getPort();
-	}
 }

@@ -60,11 +60,17 @@ public class ItemStackUtils {
 	
 	public static ItemStack replacePlaceholder(ItemStack is, Map<String, String> placeholder) {
 		ItemMeta im = is.getItemMeta();
+		im.setLore(replacePlaceholder(im.getLore(), placeholder));
+		is.setItemMeta(im);
+		return is;
+	}
+	
+	public static List<String> replacePlaceholder(List<String> toReplace, Map<String, String> placeholder) {
 		List<String> lore = new ArrayList<String>();
-		for(String str : im.getLore()) {
+		for(String str : toReplace) {
 			for(String place : placeholder.keySet())
 				if(str.contains(place))
-					str = str.replace(place, placeholder.get(place) == null ? "" : placeholder.get(place));
+					str = str.replace(place, placeholder.get(place) == null ? place : placeholder.get(place));
 			
 			if(str.contains("\n"))
 				for(String s : str.split("\n"))
@@ -72,9 +78,14 @@ public class ItemStackUtils {
 			else
 				lore.add(str);
 		}
-		im.setLore(lore);
-		is.setItemMeta(im);
-		return is;
+		return lore;
+	}
+	
+	public static String replaceString(String str, Map<String, String> placeholder) {
+		for(String s : placeholder.keySet())
+			if(str.contains(s))
+				str = str.replace(s, placeholder.get(s) == null ? s : placeholder.get(s));
+		return str;
 	}
 	
 	public static ItemStack getItemStack(FileConfiguration fc, String path) {

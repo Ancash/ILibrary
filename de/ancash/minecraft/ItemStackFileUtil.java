@@ -57,7 +57,7 @@ public class ItemStackFileUtil {
 			if("custom-model-data".equals(prop)) continue;
 			if(prop.startsWith("meta.nbt")) continue;
 			if(!GET_CONSUMERS.containsKey(prop)) {
-				System.err.println("Unknown item property: " + prop);
+				//System.err.println("Unknown item property: " + prop);
 				continue;
 			}
 			try {

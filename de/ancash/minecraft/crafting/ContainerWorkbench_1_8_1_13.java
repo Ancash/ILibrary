@@ -111,7 +111,7 @@ public class ContainerWorkbench_1_8_1_13 extends IContainerWorkbench{
 		try {
 			setItemMethod.invoke(inventoryCrafting, i, itemStackAsNMSCopyMethod.invoke(null, item));
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 	
