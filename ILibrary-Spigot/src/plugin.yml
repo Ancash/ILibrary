@@ -1,0 +1,4 @@
+name: ILibrary
+version: 3.4.1
+main: de.ancash.ILibrary
+api-version: 1.13
