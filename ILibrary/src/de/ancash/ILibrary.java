@@ -38,7 +38,6 @@ public class ILibrary extends JavaPlugin{
 		plugin = this;
 		f = new YamlFile(new File("plugins/ILibrary/config.yml"));
 		try {
-			//asdas
 			if(!f.exists()) 
 				FileUtils.copyInputStreamToFile(getResource("config.yml"), new File(f.getFilePath()));
 			
