@@ -59,6 +59,17 @@ public class IItemStack {
 		return hash;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == null)
+			return false;
+		if(!(obj instanceof IItemStack) && !(obj instanceof ItemStack))
+			return false;
+		if(obj instanceof ItemStack)
+			return isSimilar((ItemStack) obj);
+		return isSimilar((IItemStack) obj);
+	}
+	
 	public static IItemStack fromBase64(String data) throws IOException {
 		return new IItemStack(data);
 	}
