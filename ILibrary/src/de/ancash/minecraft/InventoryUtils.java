@@ -21,7 +21,6 @@ public class InventoryUtils {
 			if(a == null || a.getType().equals(XMaterial.AIR.parseMaterial())) continue;
 			if(sis.hashCode() == new IItemStack(a).hashCode())
 				space += a.getMaxStackSize() - a.getAmount();
-				
 		}
 		return space;
 	}
