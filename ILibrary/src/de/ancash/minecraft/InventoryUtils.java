@@ -19,7 +19,7 @@ public class InventoryUtils {
 		for(int i = 0; i<items.length; i++) {
 			ItemStack a = items[i];
 			if(a == null || a.getType().equals(XMaterial.AIR.parseMaterial())) continue;
-			if(sis.isSimilar(a))
+			if(sis.hashCode() == new IItemStack(a).hashCode())
 				space += a.getMaxStackSize() - a.getAmount();
 				
 		}
@@ -46,7 +46,7 @@ public class InventoryUtils {
 				return;
 			}
 			
-			if(sis.isSimilar(new IItemStack(inv))) {
+			if(sis.hashCode() == new IItemStack(inv).hashCode()) {
 				if(inv.getAmount() == inv.getMaxStackSize()) continue;
 				int canAdd= inv.getMaxStackSize() - inv.getAmount();
 				if(canAdd > i) {
@@ -68,7 +68,7 @@ public class InventoryUtils {
 		IItemStack sis = new IItemStack(is);
 		for(int s = 0; s<p.getInventory().getSize(); s++) {
 			ItemStack item = p.getInventory().getItem(s);
-			if(item == null || !sis.isSimilar(new IItemStack(item))) continue;
+			if(item == null || sis.hashCode() != new IItemStack(item).hashCode()) continue;
 			if(item.getAmount() <= i) {
 				i -= item.getAmount();
 				p.getInventory().setItem(s, null);
@@ -88,7 +88,7 @@ public class InventoryUtils {
 			ItemStack cont = items[t];
 			if(cont == null || cont.getType().equals(XMaterial.AIR.parseMaterial())) 
 				continue;
-			if(sis.isSimilar(new IItemStack(cont)))
+			if(sis.hashCode() == new IItemStack(cont).hashCode())
 				i += cont.getAmount();
 		}
 		return (int) Math.floor(i / is.getAmount());
