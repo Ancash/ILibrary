@@ -14,6 +14,7 @@ import de.ancash.minecraft.nbt.utils.MinecraftVersion;
  * @author tr7zw
  *
  */
+@SuppressWarnings("javadoc")
 public enum ObjectCreator {
 	NMS_NBTTAGCOMPOUND(null, null, ClassWrapper.NMS_NBTTAGCOMPOUND.getClazz()),
 	NMS_BLOCKPOSITION(null, null, ClassWrapper.NMS_BLOCKPOSITION.getClazz(), int.class, int.class, int.class),
