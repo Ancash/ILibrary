@@ -63,7 +63,7 @@ public class ICraftingManager {
 				return;
 			}
 			clazz = ContainerWorkbench_1_18_R1.class;
-		} else {
+		} else if(MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_18_R2)){
 			try {
 				ContainerWorkbench_1_18_R2.initReflection();
 			} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
@@ -73,6 +73,16 @@ public class ICraftingManager {
 				return;
 			}
 			clazz = ContainerWorkbench_1_18_R2.class;
+		} else {
+			try {
+				ContainerWorkbench_1_19_R1.initReflection();
+			} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
+					| IllegalArgumentException | IllegalAccessException e) {
+				il.getLogger().severe("Reflection failed:");
+				e.printStackTrace();
+				return;
+			}
+			clazz = ContainerWorkbench_1_19_R1.class;
 		}
 		
 		il.getLogger().info("Using: " + clazz.getTypeName());
