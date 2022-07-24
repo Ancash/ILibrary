@@ -2,6 +2,7 @@ package de.ancash;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bukkit.Bukkit;
 
@@ -33,7 +34,8 @@ public class ILibrary extends JavaPlugin{
 	private int port;
 	private static ILibrary plugin;
 	private YamlFile f;
-
+	private static final AtomicInteger TICK = new AtomicInteger(0);
+	
 	public ILibrary() {
 		plugin = this;
 		f = new YamlFile(new File("plugins/ILibrary/config.yml"));
@@ -50,6 +52,7 @@ public class ILibrary extends JavaPlugin{
 	
 	@Override
 	public void onEnable() {		
+		Bukkit.getScheduler().runTaskTimer(plugin, () -> TICK.incrementAndGet(), 0, 1);
 		ICraftingManager.getSingleton().init(this);
 		if(f.getBoolean("chat-client")) {
 			new BukkitRunnable() {
@@ -83,6 +86,10 @@ public class ILibrary extends JavaPlugin{
 	public void send(Packet packet) {
 		if(asyncClient != null)
 			asyncClient.write(packet);
+	}
+	
+	public static int getTick() {
+		return TICK.get();
 	}
 	
 	public static ILibrary getInstance() {

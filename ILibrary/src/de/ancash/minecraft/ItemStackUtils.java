@@ -126,6 +126,13 @@ public class ItemStackUtils {
 		}
 	}
 	
+	public static String getDisplayName(ItemStack item) {
+		return item.getItemMeta().getDisplayName() == null
+				|| item.getItemMeta().getDisplayName().isEmpty()
+				? XMaterial.matchXMaterial(item).toString()
+				: item.getItemMeta().getDisplayName();
+	}
+	
 	public static ItemStack setDisplayname(ItemStack is, String str) {
 		ItemMeta im = is.getItemMeta();
 		im.setDisplayName(ChatColor.translateAlternateColorCodes('&', str));

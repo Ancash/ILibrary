@@ -11,6 +11,8 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import de.ancash.ILibrary;
+
 public abstract class IGUI {
 
 	protected Inventory inv;
@@ -19,6 +21,7 @@ public abstract class IGUI {
 	protected InventoryItem[] inventoryItems;
 	protected UUID id;
 	protected boolean closeOnNextClose = true;
+	protected int openTick;
 	
 	/**
 	 * Constructor for IGUI.
@@ -36,12 +39,16 @@ public abstract class IGUI {
 	}
 	
 	public void newInventory(String title, int size) {
-		if(size % 9 != 0 || size <= 0) throw new IllegalArgumentException("The size must be greater than 0 and a multiple of 9. Not " + size);
+		if(size % 9 != 0 || size <= 0) throw new IllegalArgumentException("Invalid size: " + size); //$NON-NLS-1$
 		this.title = title;
 		this.size = size;
-		closeOnNextClose = false;
 		inventoryItems = new InventoryItem[size];
 		inv = Bukkit.createInventory(null, size, title);
+	}
+	
+	public void open() {
+		openTick = ILibrary.getTick();
+		IGUIManager.register(this, id);
 		Bukkit.getPlayer(id).openInventory(inv);
 	}
 	
@@ -209,6 +216,8 @@ public abstract class IGUI {
 	 * @param event
 	 */
 	final void preOnInventoryClose(InventoryCloseEvent event) {
+		if(ILibrary.getTick() == openTick || ILibrary.getTick() - 1 == openTick)
+			return;
 		if(!closeOnNextClose) {
 			closeOnNextClose = true;
 		} else {

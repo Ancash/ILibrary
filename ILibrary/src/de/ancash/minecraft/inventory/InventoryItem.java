@@ -6,15 +6,17 @@ import org.bukkit.inventory.ItemStack;
 
 import de.ancash.minecraft.nbt.NBTItem;
 
-public class InventoryItem extends NBTItem{
+public class InventoryItem {
 	
 	protected final IGUI igui;
 	protected final int slot;
 	protected Clickable clickable;
+	protected NBTItem asNBT;
+	protected ItemStack item;
 	
 	public InventoryItem(IGUI igui, ItemStack item, int slot, Clickable clickable) {
-		super(item);
 		this.igui = igui;
+		this.item = item;
 		this.slot = slot;
 		this.clickable = clickable;
 	}
@@ -52,6 +54,14 @@ public class InventoryItem extends NBTItem{
 	 */
 	public final IGUI getIGUI() {
 		return igui;
+	}
+	
+	public ItemStack getItem() {
+		return asNBT == null ? item : asNBT.getItem();
+	}
+	
+	public  NBTItem getAsNBT() {
+		return asNBT == null ? asNBT = new NBTItem(item) : asNBT;
 	}
 	
 	/**
