@@ -17,7 +17,7 @@ import de.ancash.libs.org.bukkit.event.Order;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import de.ancash.libs.org.simpleyaml.configuration.file.YamlFile;
-
+import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.crafting.ICraftingManager;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.updatechecker.UpdateCheckSource;
@@ -27,11 +27,6 @@ import de.ancash.sockets.async.impl.packet.client.AsyncPacketClientFactory;
 import de.ancash.sockets.packet.Packet;
 
 public class ILibrary extends JavaPlugin{
-
-	public static void main(String[] args) {
-		System.out.println("Not for you!");
-		throw new UnsupportedOperationException();
-	}
 	
 	public static final AsyncPacketClientFactory ASYNC_CHAT_CLIENT_FACTORY = new AsyncPacketClientFactory();
 	
@@ -59,6 +54,7 @@ public class ILibrary extends JavaPlugin{
 	public void onEnable() {		
 		Bukkit.getScheduler().runTaskTimer(plugin, () -> TICK.incrementAndGet(), 0, 1);
 		ICraftingManager.getSingleton().init(this);
+		ItemStackUtils.checkDataVersion(this);
 		if(f.getBoolean("chat-client")) {
 			new BukkitRunnable() {
 					

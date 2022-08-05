@@ -2,8 +2,6 @@ package de.ancash.minecraft.inventory.input;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,6 +34,7 @@ public class NumberInputGUI<T extends Number> extends StringInputGUI {
 	}
 	
 	private final Class<T> clazz;
+	private T t;
 	
 	public NumberInputGUI(JavaPlugin plugin, Player player, Class<T> clazz, Consumer<T> onComplete) {
 		this(plugin, player, clazz, onComplete, (t) -> true);
@@ -45,22 +44,18 @@ public class NumberInputGUI<T extends Number> extends StringInputGUI {
 		super(plugin, player);
 		this.clazz = clazz;
 		super.isValid(str -> {
-			ParsePosition pos = new ParsePosition(0);
-			NumberFormat.getInstance().parse(str, pos);
-			return Tuple.of(str.length() == pos.getIndex() && (isValid == null ? true : isValid.apply(get(str))), "Invalid Input: " + str); //$NON-NLS-1$
+			try {
+				get(str);
+			} catch(Exception ex) {
+				t = null;
+			}
+			return Tuple.of(t != null && (isValid == null ? true : isValid.apply(t)), "Invalid Input: " + str); //$NON-NLS-1$
 		});
-		super.onComplete(str -> {
-			onComplete.accept(get(str));
-		});
+		super.onComplete(str -> onComplete.accept(t));
 	}
 	
 	@SuppressWarnings("unchecked")
-	private T get(String str) {
-		try {
-			return (T) valueOf.get(clazz).invoke(null, str);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-		return null;
+	private T get(String str) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		return t = (T) valueOf.get(clazz).invoke(null, str);
 	}
 }
