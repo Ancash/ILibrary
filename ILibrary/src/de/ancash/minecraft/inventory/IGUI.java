@@ -107,8 +107,12 @@ public abstract class IGUI {
 	}
 	
 	public final void addInventoryItem(InventoryItem item) {
-		inventoryItems[item.getSlot()] = item;
-		setItem(item.getItem(), item.getSlot());
+		setInventoryItem(item, item.getSlot());
+	}
+	
+	public final void setInventoryItem(InventoryItem item, int slot) {
+		inventoryItems[slot] = item;
+		setItem(item.getItem(), slot);
 	}
 	
 	/**

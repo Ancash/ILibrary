@@ -9,7 +9,7 @@ import de.ancash.minecraft.nbt.NBTItem;
 public class InventoryItem {
 	
 	protected final IGUI igui;
-	protected final int slot;
+	protected int slot;
 	protected Clickable clickable;
 	protected NBTItem asNBT;
 	protected ItemStack item;
@@ -19,6 +19,10 @@ public class InventoryItem {
 		this.item = item;
 		this.slot = slot;
 		this.clickable = clickable;
+	}
+	
+	public InventoryItem(IGUI igui, ItemStack item, Clickable clickable) {
+		this(igui, item, -1, clickable);
 	}
 	
 	/**

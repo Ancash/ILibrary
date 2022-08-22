@@ -72,6 +72,11 @@ public class ContainerWorkbench_1_14_1_16 extends IContainerWorkbench{
 	}
 	
 	@Override
+	protected Object getInventoryCrafting() {
+		return inventoryCrafting;
+	}
+	
+	@Override
 	public Player getPlayer() {
 		return player;
 	}
@@ -107,7 +112,13 @@ public class ContainerWorkbench_1_14_1_16 extends IContainerWorkbench{
 		}
 	}
 	
-	public Object getCurrentIRecipe() throws IllegalArgumentException, IllegalAccessException {
-		return getCurrentIRecipeField.get(inventoryCrafting);
+	@Override
+	public Object getCurrentIRecipe() {
+		try {
+			return getCurrentIRecipeField.get(inventoryCrafting);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

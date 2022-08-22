@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -32,7 +31,6 @@ import de.ancash.ILibrary;
 import de.ancash.minecraft.nbt.utils.MinecraftVersion;
 import net.md_5.bungee.api.ChatColor;
 
-@SuppressWarnings("nls")
 public class ItemStackUtils {
 
 	private static int DATA_VERSION;
@@ -53,7 +51,7 @@ public class ItemStackUtils {
 			DATA_VERSION = Integer.valueOf(builder.toString());
 			pl.getLogger().info("Data Version: " + DATA_VERSION);
 		} catch (Exception e) {
-			pl.getLogger().log(Level.SEVERE, "Could not determine data version", e);
+			//pl.getLogger().log(Level.SEVERE, "Could not determine data version", e);
 		}
 	}
 	
@@ -288,7 +286,7 @@ public class ItemStackUtils {
 
 	public static ItemStack setTexture(ItemStack is, String texture) {
 		SkullMeta hm = (SkullMeta) is.getItemMeta();
-		GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+		GameProfile profile = new GameProfile(texture != null ? new UUID(texture.hashCode(), texture.hashCode()) : UUID.randomUUID(), null);
 		profile.getProperties().put("textures", new Property("textures", texture));
 		try {
 			Field field = hm.getClass().getDeclaredField("profile");
