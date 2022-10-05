@@ -14,8 +14,8 @@ import de.ancash.minecraft.nbt.utils.nmsmappings.ReflectionMethod;
  */
 public class NBTIntArrayList extends NBTList<int[]> {
 
-    private final NBTContainer tmpContainer;
-    
+	private final NBTContainer tmpContainer;
+
 	protected NBTIntArrayList(NBTCompound owner, String name, NBTType type, Object list) {
 		super(owner, name, type, list);
 		this.tmpContainer = new NBTContainer();

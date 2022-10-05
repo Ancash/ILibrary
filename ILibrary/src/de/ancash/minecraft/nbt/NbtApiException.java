@@ -16,10 +16,9 @@ public class NbtApiException extends RuntimeException {
 	 */
 	private static final long serialVersionUID = -993309714559452334L;
 	/**
-	 * Keep track of the plugin selfcheck. 
-	 * Null = not checked(silentquickstart/shaded)
-	 * true = selfcheck failed
-	 * false = everything should be fine, but apparently wasn't?
+	 * Keep track of the plugin selfcheck. Null = not
+	 * checked(silentquickstart/shaded) true = selfcheck failed false = everything
+	 * should be fine, but apparently wasn't?
 	 */
 	public static Boolean confirmedBroken = null;
 
@@ -59,18 +58,21 @@ public class NbtApiException extends RuntimeException {
 	 * @param cause
 	 */
 	public NbtApiException(Throwable cause) {
-		super(generateMessage(cause==null ? null : cause.toString()), cause);
+		super(generateMessage(cause == null ? null : cause.toString()), cause);
 	}
-	
+
 	private static String generateMessage(String message) {
-	    if(message == null)return null;
-	    if(confirmedBroken == null) {
-            return "[?]"+message;
-        }else if(confirmedBroken == false) {
-	        return "[Selfchecked]"+message;
-	    }
-	    
-	    return "[" + MinecraftVersion.getVersion() + "]There were errors detected during the server self-check! Please, make sure that NBT-API is up to date. Error message: " + message;
+		if (message == null)
+			return null;
+		if (confirmedBroken == null) {
+			return "[?]" + message;
+		} else if (confirmedBroken == false) {
+			return "[Selfchecked]" + message;
+		}
+
+		return "[" + MinecraftVersion.getVersion()
+				+ "]There were errors detected during the server self-check! Please, make sure that NBT-API is up to date. Error message: "
+				+ message;
 	}
 
 }

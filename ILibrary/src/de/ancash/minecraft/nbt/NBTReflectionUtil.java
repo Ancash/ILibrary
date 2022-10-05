@@ -37,7 +37,7 @@ public class NBTReflectionUtil {
 			field_unhandledTags = ClassWrapper.CRAFT_METAITEM.getClazz().getDeclaredField("unhandledTags");
 			field_unhandledTags.setAccessible(true);
 		} catch (NoSuchFieldException e) {
-			
+
 		}
 	}
 
@@ -73,8 +73,9 @@ public class NBTReflectionUtil {
 			return ReflectionMethod.NBTFILE_READ.run(null, stream);
 		} catch (Exception e) {
 			try {
-			    stream.close();
-			}catch(IOException ignore) {}
+				stream.close();
+			} catch (IOException ignore) {
+			}
 			throw new NbtApiException("Exception while reading a NBT File!", e);
 		}
 	}
@@ -93,11 +94,11 @@ public class NBTReflectionUtil {
 			throw new NbtApiException("Exception while writing NBT!", e);
 		}
 	}
-	
+
 	/**
 	 * Writes a Compound to an OutputStream
 	 * 
-	 * @param comp Compound
+	 * @param comp   Compound
 	 * @param stream Stream to write to
 	 */
 	public static void writeApiNBT(NBTCompound comp, OutputStream stream) {
@@ -225,22 +226,23 @@ public class NBTReflectionUtil {
 			Object cworld = ClassWrapper.CRAFT_WORLD.getClazz().cast(tile.getWorld());
 			Object nmsworld = ReflectionMethod.CRAFT_WORLD_GET_HANDLE.run(cworld);
 			Object o = null;
-			if(MinecraftVersion.getVersion() == MinecraftVersion.MC1_7_R4) {
-				o = ReflectionMethod.NMS_WORLD_GET_TILEENTITY_1_7_10.run(nmsworld, tile.getX(), tile.getY(), tile.getZ());
-			}else {
+			if (MinecraftVersion.getVersion() == MinecraftVersion.MC1_7_R4) {
+				o = ReflectionMethod.NMS_WORLD_GET_TILEENTITY_1_7_10.run(nmsworld, tile.getX(), tile.getY(),
+						tile.getZ());
+			} else {
 				Object pos = ObjectCreator.NMS_BLOCKPOSITION.getInstance(tile.getX(), tile.getY(), tile.getZ());
 				o = ReflectionMethod.NMS_WORLD_GET_TILEENTITY.run(nmsworld, pos);
 			}
-			
+
 			Object answer = null;
-			if(MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_18_R1)) {
-			    answer = ReflectionMethod.TILEENTITY_GET_NBT_1181.run(o);
+			if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_18_R1)) {
+				answer = ReflectionMethod.TILEENTITY_GET_NBT_1181.run(o);
 			} else {
-			    answer = ClassWrapper.NMS_NBTTAGCOMPOUND.getClazz().newInstance();
-			    ReflectionMethod.TILEENTITY_GET_NBT.run(o, answer);
+				answer = ClassWrapper.NMS_NBTTAGCOMPOUND.getClazz().newInstance();
+				ReflectionMethod.TILEENTITY_GET_NBT.run(o, answer);
 			}
 			if (answer == null) {
-			    throw new NbtApiException("Unable to get NBTCompound from TileEntity! " + tile + " " + o);
+				throw new NbtApiException("Unable to get NBTCompound from TileEntity! " + tile + " " + o);
 			}
 			return answer;
 		} catch (Exception e) {
@@ -259,18 +261,19 @@ public class NBTReflectionUtil {
 			Object cworld = ClassWrapper.CRAFT_WORLD.getClazz().cast(tile.getWorld());
 			Object nmsworld = ReflectionMethod.CRAFT_WORLD_GET_HANDLE.run(cworld);
 			Object o = null;
-			if(MinecraftVersion.getVersion() == MinecraftVersion.MC1_7_R4) {
-				o = ReflectionMethod.NMS_WORLD_GET_TILEENTITY_1_7_10.run(nmsworld, tile.getX(), tile.getY(), tile.getZ());
-			}else {
+			if (MinecraftVersion.getVersion() == MinecraftVersion.MC1_7_R4) {
+				o = ReflectionMethod.NMS_WORLD_GET_TILEENTITY_1_7_10.run(nmsworld, tile.getX(), tile.getY(),
+						tile.getZ());
+			} else {
 				Object pos = ObjectCreator.NMS_BLOCKPOSITION.getInstance(tile.getX(), tile.getY(), tile.getZ());
 				o = ReflectionMethod.NMS_WORLD_GET_TILEENTITY.run(nmsworld, pos);
 			}
-			if(MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_17_R1)) {
-			    ReflectionMethod.TILEENTITY_SET_NBT.run(o, comp);
-			}else if(MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_16_R1)) {
+			if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_17_R1)) {
+				ReflectionMethod.TILEENTITY_SET_NBT.run(o, comp);
+			} else if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_16_R1)) {
 				Object blockData = ReflectionMethod.TILEENTITY_GET_BLOCKDATA.run(o);
 				ReflectionMethod.TILEENTITY_SET_NBT_LEGACY1161.run(o, blockData, comp);
-			}else {
+			} else {
 				ReflectionMethod.TILEENTITY_SET_NBT_LEGACY1151.run(o, comp);
 			}
 		} catch (Exception e) {
@@ -467,9 +470,9 @@ public class NBTReflectionUtil {
 			} else if (clazz == Long.class) {
 				return (NBTList<T>) new NBTLongList(comp, key, type, nbt);
 			} else if (clazz == int[].class) {
-                return (NBTList<T>) new NBTIntArrayList(comp, key, type, nbt);
+				return (NBTList<T>) new NBTIntArrayList(comp, key, type, nbt);
 			} else if (clazz == UUID.class) {
-                return (NBTList<T>) new NBTUUIDList(comp, key, type, nbt);
+				return (NBTList<T>) new NBTUUIDList(comp, key, type, nbt);
 			} else {
 				return null;
 			}
@@ -477,7 +480,7 @@ public class NBTReflectionUtil {
 			throw new NbtApiException("Exception while getting a list with the type '" + type + "'!", ex);
 		}
 	}
-	
+
 	public static NBTType getListType(NBTCompound comp, String key) {
 		Object rootnbttag = comp.getCompound();
 		if (rootnbttag == null) {
@@ -489,8 +492,8 @@ public class NBTReflectionUtil {
 		try {
 			Object nbt = ReflectionMethod.COMPOUND_GET.run(workingtag, key);
 			String fieldname = "type";
-			if(MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_17_R1)) {
-			    fieldname = "w";
+			if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_17_R1)) {
+				fieldname = "w";
 			}
 			Field f = nbt.getClass().getDeclaredField(fieldname);
 			f.setAccessible(true);
@@ -499,7 +502,7 @@ public class NBTReflectionUtil {
 			throw new NbtApiException("Exception while getting the list type!", ex);
 		}
 	}
-	
+
 	public static Object getEntry(NBTCompound comp, String key) {
 		Object rootnbttag = comp.getCompound();
 		if (rootnbttag == null) {

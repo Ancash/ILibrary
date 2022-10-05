@@ -27,94 +27,98 @@ import org.bukkit.event.HandlerList;
  */
 public class UpdateCheckEvent extends Event {
 
-    private static final HandlerList HANDLERS = new HandlerList();
-    private final UpdateChecker instance;
-    private final UpdateCheckResult result;
-    private final UpdateCheckSuccess success;
-    private CommandSender[] requesters = null;
+	private static final HandlerList HANDLERS = new HandlerList();
+	private final UpdateChecker instance;
+	private final UpdateCheckResult result;
+	private final UpdateCheckSuccess success;
+	private CommandSender[] requesters = null;
 
-    protected UpdateCheckEvent(UpdateCheckSuccess success, UpdateChecker checker) {
-        instance = checker;
-        this.success = success;
-        if (success == UpdateCheckSuccess.FAIL && instance.getLatestVersion() == null) {
-            result = UpdateCheckResult.UNKNOWN;
-        } else {
-            if (instance.isUsingLatestVersion()) {
-                result = UpdateCheckResult.RUNNING_LATEST_VERSION;
-            } else {
-                result = UpdateCheckResult.NEW_VERSION_AVAILABLE;
-            }
-        }
-    }
+	protected UpdateCheckEvent(UpdateCheckSuccess success, UpdateChecker checker) {
+		instance = checker;
+		this.success = success;
+		if (success == UpdateCheckSuccess.FAIL && instance.getLatestVersion() == null) {
+			result = UpdateCheckResult.UNKNOWN;
+		} else {
+			if (instance.isUsingLatestVersion()) {
+				result = UpdateCheckResult.RUNNING_LATEST_VERSION;
+			} else {
+				result = UpdateCheckResult.NEW_VERSION_AVAILABLE;
+			}
+		}
+	}
 
-    public UpdateChecker getChecker() {
-    	return instance;
-    }
-    
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
-    }
+	public UpdateChecker getChecker() {
+		return instance;
+	}
 
-    @Override
-    public HandlerList getHandlers() {
-        return HANDLERS;
-    }
+	public static HandlerList getHandlerList() {
+		return HANDLERS;
+	}
 
-    /**
-     * Returns the latest version string found by the UpdateChecker, or null if all previous checks have failed.
-     *
-     * @return Latest version string found by the UpdateChecker, or null if all previous checks have failed
-     */
-    public String getLatestVersion() {
-        return instance.getLatestVersion();
-    }
+	@Override
+	public HandlerList getHandlers() {
+		return HANDLERS;
+	}
 
-    /**
-     * Gets an array of all CommandSenders who have requested this update check. Normally this will either be the ConsoleCommandSender or a player.
-     *
-     * @return Array of all CommandSenders who have requested this update check
-     */
-    public CommandSender[] getRequesters() {
-        if (requesters == null || requesters.length == 0) return null;
-        return requesters;
-    }
+	/**
+	 * Returns the latest version string found by the UpdateChecker, or null if all
+	 * previous checks have failed.
+	 *
+	 * @return Latest version string found by the UpdateChecker, or null if all
+	 *         previous checks have failed
+	 */
+	public String getLatestVersion() {
+		return instance.getLatestVersion();
+	}
 
-    /**
-     * Sets the CommandSenders who requested this update check.
-     *
-     * @param requesters CommandSenders who requested this update check
-     * @return UpdateCheckEvent instance
-     */
-    protected UpdateCheckEvent setRequesters(CommandSender... requesters) {
-        this.requesters = requesters;
-        return this;
-    }
+	/**
+	 * Gets an array of all CommandSenders who have requested this update check.
+	 * Normally this will either be the ConsoleCommandSender or a player.
+	 *
+	 * @return Array of all CommandSenders who have requested this update check
+	 */
+	public CommandSender[] getRequesters() {
+		if (requesters == null || requesters.length == 0)
+			return null;
+		return requesters;
+	}
 
-    /**
-     * Gets the result, i.e. whether a new version is available or not.
-     *
-     * @return UpdateCheckResult of this update check
-     */
-    public UpdateCheckResult getResult() {
-        return result;
-    }
+	/**
+	 * Sets the CommandSenders who requested this update check.
+	 *
+	 * @param requesters CommandSenders who requested this update check
+	 * @return UpdateCheckEvent instance
+	 */
+	protected UpdateCheckEvent setRequesters(CommandSender... requesters) {
+		this.requesters = requesters;
+		return this;
+	}
 
-    /**
-     * Checks whether the update checking attempt was successful or failed.
-     *
-     * @return UpdateCheckSuccess of this update check
-     */
-    public UpdateCheckSuccess getSuccess() {
-        return success;
-    }
+	/**
+	 * Gets the result, i.e. whether a new version is available or not.
+	 *
+	 * @return UpdateCheckResult of this update check
+	 */
+	public UpdateCheckResult getResult() {
+		return result;
+	}
 
-    /**
-     * Gets the version string of the currently used plugin version.
-     *
-     * @return Version string of the currently used plugin version
-     */
-    public String getUsedVersion() {
-        return instance.getUsedVersion();
-    }
+	/**
+	 * Checks whether the update checking attempt was successful or failed.
+	 *
+	 * @return UpdateCheckSuccess of this update check
+	 */
+	public UpdateCheckSuccess getSuccess() {
+		return success;
+	}
+
+	/**
+	 * Gets the version string of the currently used plugin version.
+	 *
+	 * @return Version string of the currently used plugin version
+	 */
+	public String getUsedVersion() {
+		return instance.getUsedVersion();
+	}
 
 }

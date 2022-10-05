@@ -32,28 +32,29 @@ public class NumberInputGUI<T extends Number> extends StringInputGUI {
 			}
 		}
 	}
-	
+
 	private final Class<T> clazz;
 	private T t;
-	
+
 	public NumberInputGUI(JavaPlugin plugin, Player player, Class<T> clazz, Consumer<T> onComplete) {
 		this(plugin, player, clazz, onComplete, (t) -> true);
 	}
-	
-	public NumberInputGUI(JavaPlugin plugin, Player player, Class<T> clazz, Consumer<T> onComplete, Function<T, Boolean> isValid) {
+
+	public NumberInputGUI(JavaPlugin plugin, Player player, Class<T> clazz, Consumer<T> onComplete,
+			Function<T, Boolean> isValid) {
 		super(plugin, player);
 		this.clazz = clazz;
 		super.isValid(str -> {
 			try {
 				get(str);
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				t = null;
 			}
 			return Tuple.of(t != null && (isValid == null ? true : isValid.apply(t)), "Invalid Input: " + str); //$NON-NLS-1$
 		});
 		super.onComplete(str -> onComplete.accept(t));
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private T get(String str) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		return t = (T) valueOf.get(clazz).invoke(null, str);

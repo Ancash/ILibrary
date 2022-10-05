@@ -27,11 +27,11 @@ public class NBTItem extends NBTCompound {
 	public NBTItem(ItemStack item) {
 		this(item, false);
 	}
-	
+
 	/**
-	 * Constructor for NBTItems. The ItemStack will be cloned! If directApply is true,
-	 * all changed will be mapped to the original item. Changes to the NBTItem will overwrite changes done
-	 * to the original item in that case.
+	 * Constructor for NBTItems. The ItemStack will be cloned! If directApply is
+	 * true, all changed will be mapped to the original item. Changes to the NBTItem
+	 * will overwrite changes done to the original item in that case.
 	 * 
 	 * @param item
 	 * @param directApply
@@ -43,7 +43,7 @@ public class NBTItem extends NBTCompound {
 		}
 		this.directApply = directApply;
 		bukkitItem = item.clone();
-		if(directApply) {
+		if (directApply) {
 			this.originalSrcStack = item;
 		}
 	}
@@ -63,8 +63,8 @@ public class NBTItem extends NBTCompound {
 	/**
 	 * Apply stored NBT tags to the provided ItemStack.
 	 * <p>
-	 * Note: This will completely override current item's {@link ItemMeta}.
-	 * If you still want to keep the original item's NBT tags, see
+	 * Note: This will completely override current item's {@link ItemMeta}. If you
+	 * still want to keep the original item's NBT tags, see
 	 * {@link #mergeNBT(ItemStack)} and {@link #mergeCustomNBT(ItemStack)}.
 	 *
 	 * @param item ItemStack that should get the new NBT data
@@ -99,21 +99,21 @@ public class NBTItem extends NBTCompound {
 			throw new NullPointerException("ItemStack can't be null/Air!");
 		}
 		ItemMeta meta = item.getItemMeta();
-		NBTReflectionUtil.getUnhandledNBTTags(meta).putAll(NBTReflectionUtil.getUnhandledNBTTags(bukkitItem.getItemMeta()));
+		NBTReflectionUtil.getUnhandledNBTTags(meta)
+				.putAll(NBTReflectionUtil.getUnhandledNBTTags(bukkitItem.getItemMeta()));
 		item.setItemMeta(meta);
 	}
 
-	
 	/**
 	 * True, if the item has any tags now known for this item type.
 	 * 
 	 * @return true when custom tags are present
 	 */
 	public boolean hasCustomNbtData() {
-        ItemMeta meta = bukkitItem.getItemMeta();
-        return !NBTReflectionUtil.getUnhandledNBTTags(meta).isEmpty();
+		ItemMeta meta = bukkitItem.getItemMeta();
+		return !NBTReflectionUtil.getUnhandledNBTTags(meta).isEmpty();
 	}
-	
+
 	/**
 	 * Remove all custom (non-vanilla) NBT tags from the NBTItem.
 	 */
@@ -168,7 +168,7 @@ public class NBTItem extends NBTCompound {
 
 	@Override
 	protected void saveCompound() {
-		if(directApply) {
+		if (directApply) {
 			applyNBT(originalSrcStack);
 		}
 	}

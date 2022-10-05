@@ -19,7 +19,7 @@ public class NBTListCompound extends NBTCompound {
 		owner = parent;
 		compound = obj;
 	}
-	
+
 	public NBTList<?> getListParent() {
 		return owner;
 	}

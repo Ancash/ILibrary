@@ -16,8 +16,8 @@ import de.ancash.minecraft.nbt.utils.nmsmappings.ReflectionMethod;
  */
 public class NBTUUIDList extends NBTList<UUID> {
 
-    private final NBTContainer tmpContainer;
-    
+	private final NBTContainer tmpContainer;
+
 	protected NBTUUIDList(NBTCompound owner, String name, NBTType type, Object list) {
 		super(owner, name, type, list);
 		this.tmpContainer = new NBTContainer();

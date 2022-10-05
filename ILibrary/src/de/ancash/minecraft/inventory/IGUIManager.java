@@ -11,25 +11,28 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 
-public class IGUIManager implements Listener{
+public class IGUIManager implements Listener {
 
 	private static final Map<UUID, IGUI> registeredIGUIs = new HashMap<>();
-	
+
 	@EventHandler
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getWhoClicked().getUniqueId())).collect(Collectors.toSet()).forEach(igui -> igui.getValue().preOnInventoryClick(event));
+		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getWhoClicked().getUniqueId()))
+				.collect(Collectors.toSet()).forEach(igui -> igui.getValue().preOnInventoryClick(event));
 	}
-	
+
 	@EventHandler
 	public void inventoryDragEvent(InventoryDragEvent event) {
-		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getWhoClicked().getUniqueId())).collect(Collectors.toSet()).forEach(igui -> igui.getValue().preOnInventoryDrag(event));
+		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getWhoClicked().getUniqueId()))
+				.collect(Collectors.toSet()).forEach(igui -> igui.getValue().preOnInventoryDrag(event));
 	}
-	
+
 	@EventHandler
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
-		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getPlayer().getUniqueId())).collect(Collectors.toSet()).forEach(igui -> igui.getValue().preOnInventoryClose(event));
+		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getPlayer().getUniqueId()))
+				.collect(Collectors.toSet()).forEach(igui -> igui.getValue().preOnInventoryClose(event));
 	}
-	
+
 	/**
 	 * Registering will automatically call event methods:
 	 * {@link IGUI#onInventoryClick(InventoryClickEvent)}
@@ -42,7 +45,7 @@ public class IGUIManager implements Listener{
 	public static void register(IGUI igui, UUID uuid) {
 		registeredIGUIs.put(uuid, igui);
 	}
-	
+
 	/**
 	 * Unregisters {@link IGUI}
 	 * 

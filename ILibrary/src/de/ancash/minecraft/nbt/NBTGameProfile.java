@@ -14,9 +14,10 @@ public class NBTGameProfile {
 	 * @return A NBTContainer with all the GameProfile data
 	 */
 	public static NBTCompound toNBT(GameProfile profile) {
-		return new NBTContainer(ReflectionMethod.GAMEPROFILE_SERIALIZE.run(null, ObjectCreator.NMS_NBTTAGCOMPOUND.getInstance(), profile));
+		return new NBTContainer(ReflectionMethod.GAMEPROFILE_SERIALIZE.run(null,
+				ObjectCreator.NMS_NBTTAGCOMPOUND.getInstance(), profile));
 	}
-	
+
 	/**
 	 * Reconstructs a GameProfile from a NBTCompound
 	 * 
@@ -24,7 +25,8 @@ public class NBTGameProfile {
 	 * @return The reconstructed GameProfile
 	 */
 	public static GameProfile fromNBT(NBTCompound compound) {
-		return (GameProfile) ReflectionMethod.GAMEPROFILE_DESERIALIZE.run(null, NBTReflectionUtil.gettoCompount(compound.getCompound(), compound));
+		return (GameProfile) ReflectionMethod.GAMEPROFILE_DESERIALIZE.run(null,
+				NBTReflectionUtil.gettoCompount(compound.getCompound(), compound));
 	}
-	
+
 }

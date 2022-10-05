@@ -17,61 +17,64 @@ import de.ancash.sockets.events.ClientDisconnectEvent;
 import de.ancash.sockets.events.ClientPacketReceiveEvent;
 import de.ancash.sockets.packet.Packet;
 
-public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Listener{
+public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Listener {
 
 	protected AsyncPacketClient chatClient;
-	
+
 	public AbstractJavaSocketPlugin() {
 		EventManager.registerEvents(this, this);
 	}
-	
-	public synchronized  void connect(String address, int port) {
-		if(chatClient != null) {
+
+	public synchronized void connect(String address, int port) {
+		if (chatClient != null) {
 			try {
 				chatClient.onDisconnect(new IllegalStateException("Only one AsyncChatClient per plugin"));
-			} catch(Exception ex) {}
+			} catch (Exception ex) {
+			}
 			chatClient = null;
 		}
 		try {
-			chatClient = ILibrary.ASYNC_CHAT_CLIENT_FACTORY.newInstance(address, port, 10_000, 256 * 1024, 256 * 1024, 2);
+			chatClient = ILibrary.ASYNC_CHAT_CLIENT_FACTORY.newInstance(address, port, 10_000, 256 * 1024, 256 * 1024,
+					2);
 		} catch (IOException e) {
-			getLogger().severe("Could not connect to " + address + ":" + port + ": " + e);;
+			getLogger().severe("Could not connect to " + address + ":" + port + ": " + e);
+			;
 		}
 	}
-	
+
 	public PacketFuture sendPacket(Packet packet) {
 		return sendPacket(packet, null);
 	}
-	
+
 	public PacketFuture sendPacket(Packet packet, UUID uuid) {
-		if(chatClient != null)
+		if (chatClient != null)
 			chatClient.write(packet);
 		else
 			ILibrary.getInstance().send(packet);
 		return new PacketFuture(packet, uuid);
 	}
-	
+
 	@EventHandler
 	public void onPacket(ClientPacketReceiveEvent event) {
-		if(event.getReceiver() == null || chatClient == null || event.getReceiver().equals(chatClient))
+		if (event.getReceiver() == null || chatClient == null || event.getReceiver().equals(chatClient))
 			this.onPacketReceive(event.getPacket());
 	}
-	
+
 	@EventHandler
 	public void onClientDisconnect(ClientDisconnectEvent event) {
-		if(event.getClient() == null || chatClient == null || event.getClient().equals(chatClient))
+		if (event.getClient() == null || chatClient == null || event.getClient().equals(chatClient))
 			this.onClientDisconnect(event.getClient());
 	}
-	
+
 	@EventHandler
 	public void onClientConnect(ClientConnectEvent event) {
-		if(event.getClient() == null || chatClient == null || event.getClient().equals(chatClient))
+		if (event.getClient() == null || chatClient == null || event.getClient().equals(chatClient))
 			this.onClientConnect(event.getClient());
 	}
-	
+
 	public abstract void onClientDisconnect(AbstractAsyncClient client);
-	
+
 	public abstract void onClientConnect(AbstractAsyncClient client);
-	
+
 	public abstract void onPacketReceive(Packet packet);
 }

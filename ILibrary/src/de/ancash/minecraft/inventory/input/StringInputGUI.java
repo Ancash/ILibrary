@@ -20,54 +20,55 @@ public class StringInputGUI {
 	private final JavaPlugin plugin;
 	private Consumer<String> onComplete;
 	private Function<String, Duplet<Boolean, String>> isValid;
-	
+
 	public StringInputGUI(JavaPlugin plugin, Player player) {
 		this(plugin, player, null, (chars) -> Tuple.of(true, null));
 	}
-	
+
 	public StringInputGUI(JavaPlugin plugin, Player player, Consumer<String> onComplete) {
 		this(plugin, player, onComplete, (chars) -> Tuple.of(true, null));
 	}
-	
-	public StringInputGUI(JavaPlugin plugin, Player player, Consumer<String> onComplete, Function<String, Duplet<Boolean, String>> isValid) {
+
+	public StringInputGUI(JavaPlugin plugin, Player player, Consumer<String> onComplete,
+			Function<String, Duplet<Boolean, String>> isValid) {
 		this.player = player;
 		this.plugin = plugin;
 		this.onComplete = onComplete;
 		this.isValid = isValid;
 	}
-	
+
 	public void onComplete(Consumer<String> onComplete) {
 		this.onComplete = onComplete;
 	}
-	
+
 	public void isValid(Function<String, Duplet<Boolean, String>> isValid) {
 		this.isValid = isValid;
 	}
-	
+
 	public StringInputGUI setLeft(ItemStack left) {
 		this.left = left;
 		return this;
 	}
-	
+
 	public StringInputGUI setRight(ItemStack right) {
 		this.right = right;
 		return this;
 	}
-	
+
 	public StringInputGUI setTitle(String title) {
 		this.title = title;
 		return this;
 	}
-	
+
 	public StringInputGUI setText(String text) {
 		this.text = text;
 		return this;
 	}
-	
+
 	public void open() {
 		new AnvilGUI.Builder().itemLeft(left).itemRight(right).title(title).onComplete((player, text) -> {
 			Duplet<Boolean, String> valid = isValid.apply(text);
-			if(!valid.getFirst())
+			if (!valid.getFirst())
 				return AnvilGUI.Response.text(valid.getSecond());
 			onComplete.accept(text);
 			return AnvilGUI.Response.close();

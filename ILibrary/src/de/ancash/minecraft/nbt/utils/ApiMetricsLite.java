@@ -31,11 +31,13 @@ import java.util.zip.GZIPOutputStream;
  * <p>
  * Check out https://bStats.org/ to learn more about bStats!
  * 
- * This class is modified by tr7zw to work when the api is shaded into other peoples plugins.
+ * This class is modified by tr7zw to work when the api is shaded into other
+ * peoples plugins.
  */
 public class ApiMetricsLite {
 
-	private static final String PLUGINNAME = "ItemNBTAPI"; // DO NOT CHANGE THE NAME! else it won't link the data on bStats
+	private static final String PLUGINNAME = "ItemNBTAPI"; // DO NOT CHANGE THE NAME! else it won't link the data on
+															// bStats
 
 	// The version of this bStats class
 	public static final int B_STATS_VERSION = 1;
@@ -70,14 +72,16 @@ public class ApiMetricsLite {
 	 */
 	public ApiMetricsLite() {
 
-		// The register method just uses any enabled plugin it can find to register. This *shouldn't* cause any problems, since the plugin isn't used any other way.
+		// The register method just uses any enabled plugin it can find to register.
+		// This *shouldn't* cause any problems, since the plugin isn't used any other
+		// way.
 		// Register our service
-		for(Plugin plug : Bukkit.getPluginManager().getPlugins()) {
-				plugin = plug;
-				if(plugin != null)
-					break;
+		for (Plugin plug : Bukkit.getPluginManager().getPlugins()) {
+			plugin = plug;
+			if (plugin != null)
+				break;
 		}
-		if(plugin == null) {
+		if (plugin == null) {
 			return;// Didn't find any plugin that could work
 		}
 
@@ -102,14 +106,15 @@ public class ApiMetricsLite {
 
 			// Inform the server owners about bStats
 			config.options().header(
-					"bStats collects some data for plugin authors like how many servers are using their plugins.\n" +
-							"To honor their work, you should not disable it.\n" +
-							"This has nearly no effect on the server performance!\n" +
-							"Check out https://bStats.org/ to learn more :)"
-					).copyDefaults(true);
+					"bStats collects some data for plugin authors like how many servers are using their plugins.\n"
+							+ "To honor their work, you should not disable it.\n"
+							+ "This has nearly no effect on the server performance!\n"
+							+ "Check out https://bStats.org/ to learn more :)")
+					.copyDefaults(true);
 			try {
 				config.save(configFile);
-			} catch (IOException ignored) { }
+			} catch (IOException ignored) {
+			}
 		}
 
 		// Load the data
@@ -125,27 +130,31 @@ public class ApiMetricsLite {
 				try {
 					service.getField("NBT_BSTATS_VERSION"); // Create only one instance of the nbt-api bstats.
 					return;
-				} catch (NoSuchFieldException ignored) { }
+				} catch (NoSuchFieldException ignored) {
+				}
 				try {
 					service.getField("B_STATS_VERSION"); // Our identifier :)
 					found = true; // We aren't the first
 					break;
-				} catch (NoSuchFieldException ignored) { }
+				} catch (NoSuchFieldException ignored) {
+				}
 			}
 			boolean fFound = found;
 			// Register our service
-			if(Bukkit.isPrimaryThread()){
+			if (Bukkit.isPrimaryThread()) {
 				Bukkit.getServicesManager().register(ApiMetricsLite.class, this, plugin, ServicePriority.Normal);
 				if (!fFound) {
-					getLogger().info("[NBTAPI] Using the plugin '" + plugin.getName() + "' to create a bStats instance!");
+					getLogger()
+							.info("[NBTAPI] Using the plugin '" + plugin.getName() + "' to create a bStats instance!");
 					// We are the first!
 					startSubmitting();
 				}
-			}else{
+			} else {
 				Bukkit.getScheduler().runTask(plugin, () -> {
 					Bukkit.getServicesManager().register(ApiMetricsLite.class, this, plugin, ServicePriority.Normal);
 					if (!fFound) {
-						getLogger().info("[NBTAPI] Using the plugin '" + plugin.getName() + "' to create a bStats instance!");
+						getLogger().info(
+								"[NBTAPI] Using the plugin '" + plugin.getName() + "' to create a bStats instance!");
 						// We are the first!
 						startSubmitting();
 					}
@@ -175,19 +184,22 @@ public class ApiMetricsLite {
 					timer.cancel();
 					return;
 				}
-				// Nevertheless we want our code to run in the Bukkit main thread, so we have to use the Bukkit scheduler
-				// Don't be afraid! The connection to the bStats server is still async, only the stats collection is sync ;)
+				// Nevertheless we want our code to run in the Bukkit main thread, so we have to
+				// use the Bukkit scheduler
+				// Don't be afraid! The connection to the bStats server is still async, only the
+				// stats collection is sync ;)
 				Bukkit.getScheduler().runTask(plugin, () -> submitData());
 			}
 		}, 1000l * 60l * 5l, 1000l * 60l * 30l);
-		// Submit the data every 30 minutes, first time after 5 minutes to give other plugins enough time to start
-		// WARNING: Changing the frequency has no effect but your plugin WILL be blocked/deleted!
+		// Submit the data every 30 minutes, first time after 5 minutes to give other
+		// plugins enough time to start
+		// WARNING: Changing the frequency has no effect but your plugin WILL be
+		// blocked/deleted!
 		// WARNING: Just don't do it!
 	}
 
 	/**
-	 * Gets the plugin specific data.
-	 * This method is called using Reflection.
+	 * Gets the plugin specific data. This method is called using Reflection.
 	 *
 	 * @return The plugin specific data.
 	 */
@@ -211,11 +223,12 @@ public class ApiMetricsLite {
 		int playerAmount;
 		try {
 			// Around MC 1.8 the return type was changed to a collection from an array,
-			// This fixes java.lang.NoSuchMethodError: org.bukkit.Bukkit.getOnlinePlayers()Ljava/util/Collection;
+			// This fixes java.lang.NoSuchMethodError:
+			// org.bukkit.Bukkit.getOnlinePlayers()Ljava/util/Collection;
 			Method onlinePlayersMethod = Class.forName("org.bukkit.Server").getMethod("getOnlinePlayers");
 			playerAmount = onlinePlayersMethod.getReturnType().equals(Collection.class)
 					? ((Collection<?>) onlinePlayersMethod.invoke(Bukkit.getServer())).size()
-							: ((Player[]) onlinePlayersMethod.invoke(Bukkit.getServer())).length;
+					: ((Player[]) onlinePlayersMethod.invoke(Bukkit.getServer())).length;
 		} catch (Exception e) {
 			playerAmount = Bukkit.getOnlinePlayers().size(); // Just use the new method if the Reflection failed
 		}
@@ -278,17 +291,22 @@ public class ApiMetricsLite {
 							} catch (ClassNotFoundException e) {
 								// minecraft version 1.14+
 								if (logFailedRequests) {
-									getLogger().log(Level.WARNING, "[NBTAPI][BSTATS] Encountered exception while posting request!", e);
-									// Not using the plugins logger since the plugin isn't the plugin containing the NBT-Api most of the time
-									//this.plugin.getLogger().log(Level.SEVERE, "Encountered unexpected exception ", e); 
+									getLogger().log(Level.WARNING,
+											"[NBTAPI][BSTATS] Encountered exception while posting request!", e);
+									// Not using the plugins logger since the plugin isn't the plugin containing the
+									// NBT-Api most of the time
+									// this.plugin.getLogger().log(Level.SEVERE, "Encountered unexpected exception
+									// ", e);
 								}
 								continue; // continue looping since we cannot do any other thing.
 							}
 						}
-					} catch (NullPointerException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
+					} catch (NullPointerException | NoSuchMethodException | IllegalAccessException
+							| InvocationTargetException ignored) {
 					}
 				}
-			} catch (NoSuchFieldException ignored) { }
+			} catch (NoSuchFieldException ignored) {
+			}
 		}
 
 		data.add("plugins", pluginData);
@@ -303,9 +321,12 @@ public class ApiMetricsLite {
 				} catch (Exception e) {
 					// Something went wrong! :(
 					if (logFailedRequests) {
-						getLogger().log(Level.WARNING, "[NBTAPI][BSTATS] Could not submit plugin stats of " + plugin.getName(), e);
-						// Not using the plugins logger since the plugin isn't the plugin containing the NBT-Api most of the time
-						//plugin.getLogger().log(Level.WARNING, "Could not submit plugin stats of " + plugin.getName(), e);
+						getLogger().log(Level.WARNING,
+								"[NBTAPI][BSTATS] Could not submit plugin stats of " + plugin.getName(), e);
+						// Not using the plugins logger since the plugin isn't the plugin containing the
+						// NBT-Api most of the time
+						// plugin.getLogger().log(Level.WARNING, "Could not submit plugin stats of " +
+						// plugin.getName(), e);
 					}
 				}
 			}
@@ -316,7 +337,7 @@ public class ApiMetricsLite {
 	 * Sends the data to the bStats server.
 	 *
 	 * @param plugin Any plugin. It's just used to get a logger instance.
-	 * @param data The data to send.
+	 * @param data   The data to send.
 	 * @throws Exception If the request failed.
 	 */
 	private static void sendData(Plugin plugin, JsonObject data) throws Exception {
@@ -327,9 +348,10 @@ public class ApiMetricsLite {
 			throw new IllegalAccessException("This method must not be called from the main thread!");
 		}
 		if (logSentData) {
-		    MinecraftVersion.getLogger().info("[NBTAPI][BSTATS] Sending data to bStats: " + data.toString());
-			// Not using the plugins logger since the plugin isn't the plugin containing the NBT-Api most of the time
-			//plugin.getLogger().info("Sending data to bStats: " + data.toString());
+			MinecraftVersion.getLogger().info("[NBTAPI][BSTATS] Sending data to bStats: " + data.toString());
+			// Not using the plugins logger since the plugin isn't the plugin containing the
+			// NBT-Api most of the time
+			// plugin.getLogger().info("Sending data to bStats: " + data.toString());
 		}
 		HttpsURLConnection connection = (HttpsURLConnection) new URL(URL).openConnection();
 
@@ -363,8 +385,10 @@ public class ApiMetricsLite {
 		bufferedReader.close();
 		if (logResponseStatusText) {
 			getLogger().info("[NBTAPI][BSTATS] Sent data to bStats and received response: " + builder.toString());
-			// Not using the plugins logger since the plugin isn't the plugin containing the NBT-Api most of the time
-			//plugin.getLogger().info("Sent data to bStats and received response: " + builder.toString());
+			// Not using the plugins logger since the plugin isn't the plugin containing the
+			// NBT-Api most of the time
+			// plugin.getLogger().info("Sent data to bStats and received response: " +
+			// builder.toString());
 		}
 	}
 

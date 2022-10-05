@@ -42,19 +42,19 @@ public class ItemStackUtils {
 			int pos = 0;
 			char c = str.charAt(pos);
 			StringBuilder builder = new StringBuilder();
-			while(c >= 48 && c <= 57) {
+			while (c >= 48 && c <= 57) {
 				builder.append(c);
 				pos++;
 				c = str.charAt(pos);
 			}
-			
+
 			DATA_VERSION = Integer.valueOf(builder.toString());
 			pl.getLogger().info("Data Version: " + DATA_VERSION);
 		} catch (Exception e) {
-			//pl.getLogger().log(Level.SEVERE, "Could not determine data version", e);
+			// pl.getLogger().log(Level.SEVERE, "Could not determine data version", e);
 		}
 	}
-	
+
 	public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
 		try {
 			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -86,13 +86,13 @@ public class ItemStackUtils {
 		try {
 			file.createNewFile();
 			YamlConfiguration fc = YamlConfiguration.loadConfiguration(file);
-			
+
 			try {
 				fc.loadFromString(str);
-				return get(fc, "item");
-			} catch(Exception ex) {
+				return getItemStack(fc, "item");
+			} catch (Exception ex) {
 				fc.loadFromString(replaceDataVersion(str, DATA_VERSION));
-				return get(fc, "item");
+				return getItemStack(fc, "item");
 			}
 		} finally {
 			file.delete();
@@ -103,12 +103,11 @@ public class ItemStackUtils {
 		StringBuilder builder = new StringBuilder();
 		builder.append(from.split("v: ")[0]);
 		from = from.split("v: ")[1];
-		while(from.charAt(0) >= 48 && from.charAt(0) <= 57) 
+		while (from.charAt(0) >= 48 && from.charAt(0) <= 57)
 			from = from.substring(1);
-		return builder.append(i)
-				.append(from).toString();
+		return builder.append(i).append(from).toString();
 	}
-	
+
 	public static ItemStack[] itemStackArrayFromBase64(String data) throws IOException {
 		try {
 			ByteArrayInputStream byteIn = new ByteArrayInputStream(Base64.getDecoder().decode(data));
@@ -155,43 +154,6 @@ public class ItemStackUtils {
 		return str;
 	}
 
-	public static ItemStack getItemStack(FileConfiguration fc, String path) {
-		ItemStack item = fc.getItemStack(path).clone();
-		if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1))
-			if (fc.getString(path + "-texture") != null)
-				item = setProfileName(item, null);
-		return item;
-	}
-
-	@SuppressWarnings("deprecation")
-	public static void setItemStack(FileConfiguration fc, String path, ItemStack item) {
-		item = item.clone();
-		if (item.getItemMeta() instanceof SkullMeta) {
-
-			if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1)) {
-				fc.set(path, item);
-			} else {
-				String txt = null;
-				try {
-					txt = ItemStackUtils.getTexure(item);
-				} catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-						| IllegalAccessException e) {
-
-				}
-				SkullMeta sm = (SkullMeta) item.getItemMeta();
-				if (txt == null) {
-					txt = sm.getOwner();
-				} else {
-					item = setProfileName(item, txt);
-				}
-				fc.set(path, item);
-				fc.set(path + "-texture", txt);
-			}
-		} else {
-			fc.set(path, item);
-		}
-	}
-
 	public static String getDisplayName(ItemStack item) {
 		return item.getItemMeta().getDisplayName() == null || item.getItemMeta().getDisplayName().isEmpty()
 				? XMaterial.matchXMaterial(item).toString()
@@ -234,18 +196,49 @@ public class ItemStackUtils {
 		return is;
 	}
 
-	@Deprecated
-	public static ItemStack get(FileConfiguration fc, String path) throws IOException {
-		if (fc.getItemStack(path) != null) {
-			ItemStack is = fc.getItemStack(path);
-			if (!is.getType().equals(XMaterial.PLAYER_HEAD.parseMaterial()) || is.getData().getData() == 3) {
-				return is;
+	@SuppressWarnings("deprecation")
+	public static void setItemStack(FileConfiguration fc, String path, ItemStack item) {
+		item = item.clone();
+		if (item.getItemMeta() instanceof SkullMeta) {
+
+			if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1)) {
+				fc.set(path, item);
+			} else {
+				String txt = null;
+				try {
+					txt = ItemStackUtils.getTexure(item);
+				} catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+						| IllegalAccessException e) {
+
+				}
+				SkullMeta sm = (SkullMeta) item.getItemMeta();
+				if (txt == null) {
+					txt = sm.getOwner();
+				} else {
+					item = setProfileName(item, txt);
+				}
+				fc.set(path, item);
+				fc.set(path + "-texture", txt);
 			}
-			if (fc.getString(path + "-texture") != null)
-				is = setTexture(is, fc.getString(path + "-texture"));
-			return is;
+		} else {
+			fc.set(path, item);
 		}
-		return ItemStackFileUtil.getItemStack(fc, path);
+	}
+
+	public static ItemStack getItemStack(FileConfiguration fc, String path) {
+		try {
+			return getItemStack0(fc, path);
+		} catch (Exception ex) {
+			return ItemStackFileUtil.getItemStack(fc, path);
+		}
+	}
+
+	private static ItemStack getItemStack0(FileConfiguration fc, String path) {
+		ItemStack item = fc.getItemStack(path).clone();
+		if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1))
+			if (fc.getString(path + "-texture") != null)
+				item = setTexture(item, fc.getString(path + "-texture"));
+		return item;
 	}
 
 	@Deprecated
@@ -286,7 +279,8 @@ public class ItemStackUtils {
 
 	public static ItemStack setTexture(ItemStack is, String texture) {
 		SkullMeta hm = (SkullMeta) is.getItemMeta();
-		GameProfile profile = new GameProfile(texture != null ? new UUID(texture.hashCode(), texture.hashCode()) : UUID.randomUUID(), null);
+		GameProfile profile = new GameProfile(
+				texture != null ? new UUID(texture.hashCode(), texture.hashCode()) : UUID.randomUUID(), null);
 		profile.getProperties().put("textures", new Property("textures", texture));
 		try {
 			Field field = hm.getClass().getDeclaredField("profile");

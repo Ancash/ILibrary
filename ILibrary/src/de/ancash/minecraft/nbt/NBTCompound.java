@@ -417,7 +417,7 @@ public class NBTCompound {
 			readLock.unlock();
 		}
 	}
-	
+
 	/**
 	 * Uses Gson to store an {@link Serializable} Object
 	 * 
@@ -481,7 +481,7 @@ public class NBTCompound {
 			readLock.unlock();
 		}
 	}
-	
+
 	/**
 	 * Setter
 	 *
@@ -593,7 +593,7 @@ public class NBTCompound {
 			readLock.unlock();
 		}
 	}
-	
+
 	/**
 	 * The same as addCompound, just with a name that better reflects what it does
 	 * 
@@ -633,36 +633,36 @@ public class NBTCompound {
 			writeLock.unlock();
 		}
 	}
-	
+
 	/**
-     * @param name
-     * @return The retrieved Integer List
-     */
-    public NBTList<int[]> getIntArrayList(String name) {
-        try {
-            writeLock.lock();
-            NBTList<int[]> list = NBTReflectionUtil.getList(this, name, NBTType.NBTTagIntArray, int[].class);
-            saveCompound();
-            return list;
-        } finally {
-            writeLock.unlock();
-        }
-    }
-    
-   /**
-    * @param name
-    * @return The retrieved Integer List
-    */
-   public NBTList<UUID> getUUIDList(String name) {
-       try {
-           writeLock.lock();
-           NBTList<UUID> list = NBTReflectionUtil.getList(this, name, NBTType.NBTTagIntArray, UUID.class);
-           saveCompound();
-           return list;
-       } finally {
-           writeLock.unlock();
-       }
-   }
+	 * @param name
+	 * @return The retrieved Integer List
+	 */
+	public NBTList<int[]> getIntArrayList(String name) {
+		try {
+			writeLock.lock();
+			NBTList<int[]> list = NBTReflectionUtil.getList(this, name, NBTType.NBTTagIntArray, int[].class);
+			saveCompound();
+			return list;
+		} finally {
+			writeLock.unlock();
+		}
+	}
+
+	/**
+	 * @param name
+	 * @return The retrieved Integer List
+	 */
+	public NBTList<UUID> getUUIDList(String name) {
+		try {
+			writeLock.lock();
+			NBTList<UUID> list = NBTReflectionUtil.getList(this, name, NBTType.NBTTagIntArray, UUID.class);
+			saveCompound();
+			return list;
+		} finally {
+			writeLock.unlock();
+		}
+	}
 
 	/**
 	 * @param name
@@ -708,7 +708,7 @@ public class NBTCompound {
 			writeLock.unlock();
 		}
 	}
-	
+
 	/**
 	 * Returns the type of the list, null if not a list
 	 * 
@@ -751,9 +751,9 @@ public class NBTCompound {
 			readLock.lock();
 			if (MinecraftVersion.getVersion() == MinecraftVersion.MC1_7_R4) {
 				Object nbtbase = NBTReflectionUtil.getData(this, ReflectionMethod.COMPOUND_GET, name);
-				if(nbtbase == null)
+				if (nbtbase == null)
 					return null;
-				return NBTType.valueOf((byte)ReflectionMethod.COMPOUND_OWN_TYPE.run(nbtbase));
+				return NBTType.valueOf((byte) ReflectionMethod.COMPOUND_OWN_TYPE.run(nbtbase));
 			}
 			Object o = NBTReflectionUtil.getData(this, ReflectionMethod.COMPOUND_GET_TYPE, name);
 			if (o == null)
@@ -802,7 +802,7 @@ public class NBTCompound {
 	/**
 	 * Remove all keys from this compound
 	 */
-	public void clearNBT(){
+	public void clearNBT() {
 		for (String key : getKeys()) {
 			removeKey(key);
 		}
@@ -810,7 +810,8 @@ public class NBTCompound {
 
 	/**
 	 * @deprecated Just use toString()
-	 * @return A {@link String} representation of the NBT in Mojang JSON. This is different from normal JSON!
+	 * @return A {@link String} representation of the NBT in Mojang JSON. This is
+	 *         different from normal JSON!
 	 */
 	@Deprecated
 	public String asNBTString() {
@@ -819,9 +820,9 @@ public class NBTCompound {
 			Object comp = NBTReflectionUtil.gettoCompount(getCompound(), this);
 			if (comp == null)
 				return "{}";
-			if (MinecraftVersion.isForgePresent() && MinecraftVersion.getVersion() == MinecraftVersion.MC1_7_R4){
+			if (MinecraftVersion.isForgePresent() && MinecraftVersion.getVersion() == MinecraftVersion.MC1_7_R4) {
 				return Forge1710Mappings.toString(comp);
-			}else {
+			} else {
 				return comp.toString();
 			}
 		} finally {
@@ -843,11 +844,11 @@ public class NBTCompound {
 			return true;
 		if (obj == null)
 			return false;
-		if(obj instanceof NBTCompound) {
+		if (obj instanceof NBTCompound) {
 			NBTCompound other = (NBTCompound) obj;
-			if(getKeys().equals(other.getKeys())) {
-				for(String key : getKeys()) {
-					if(!isEqual(this, other, key)) {
+			if (getKeys().equals(other.getKeys())) {
+				for (String key : getKeys()) {
+					if (!isEqual(this, other, key)) {
 						return false;
 					}
 				}
@@ -856,10 +857,11 @@ public class NBTCompound {
 		}
 		return false;
 	}
-	
+
 	protected static boolean isEqual(NBTCompound compA, NBTCompound compB, String key) {
-		if(compA.getType(key) != compB.getType(key))return false;
-		switch(compA.getType(key)) {
+		if (compA.getType(key) != compB.getType(key))
+			return false;
+		switch (compA.getType(key)) {
 		case NBTTagByte:
 			return compA.getByte(key).equals(compB.getByte(key));
 		case NBTTagByteArray:
@@ -869,7 +871,7 @@ public class NBTCompound {
 		case NBTTagDouble:
 			return compA.getDouble(key).equals(compB.getDouble(key));
 		case NBTTagEnd:
-			return true; //??
+			return true; // ??
 		case NBTTagFloat:
 			return compA.getFloat(key).equals(compB.getFloat(key));
 		case NBTTagInt:
@@ -877,7 +879,8 @@ public class NBTCompound {
 		case NBTTagIntArray:
 			return Arrays.equals(compA.getIntArray(key), compB.getIntArray(key));
 		case NBTTagList:
-			return NBTReflectionUtil.getEntry(compA, key).toString().equals(NBTReflectionUtil.getEntry(compB, key).toString()); // Just string compare the 2 lists
+			return NBTReflectionUtil.getEntry(compA, key).toString()
+					.equals(NBTReflectionUtil.getEntry(compB, key).toString()); // Just string compare the 2 lists
 		case NBTTagLong:
 			return compA.getLong(key).equals(compB.getLong(key));
 		case NBTTagShort:

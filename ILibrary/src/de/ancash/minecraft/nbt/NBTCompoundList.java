@@ -24,10 +24,10 @@ public class NBTCompoundList extends NBTList<NBTListCompound> {
 	public NBTListCompound addCompound() {
 		return (NBTListCompound) addCompound(null);
 	}
-	
+
 	/**
-	 * Adds a copy of the Compound to the end of the List and returns it.
-	 * When null is given, a new Compound will be created
+	 * Adds a copy of the Compound to the end of the List and returns it. When null
+	 * is given, a new Compound will be created
 	 * 
 	 * @param comp
 	 * @return
@@ -42,7 +42,7 @@ public class NBTCompoundList extends NBTList<NBTListCompound> {
 			}
 			getParent().saveCompound();
 			NBTListCompound listcomp = new NBTListCompound(this, compound);
-			if(comp != null){
+			if (comp != null) {
 				listcomp.mergeCompound(comp);
 			}
 			return listcomp;

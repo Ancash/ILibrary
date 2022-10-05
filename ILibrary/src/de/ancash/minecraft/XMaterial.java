@@ -35,20 +35,27 @@ import java.util.regex.PatternSyntaxException;
  * <b>XMaterial</b> - Data Values/Pre-flattening<br>
  * 1.13 and above as priority.
  * <p>
- * This class is mainly designed to support {@link ItemStack}. If you want to use it on blocks, you'll have to use
- * <a href="https://github.com/CryptoMorin/XSeries/blob/master/src/main/java/com/cryptomorin/xseries/XBlock.java">XBlock</a>
+ * This class is mainly designed to support {@link ItemStack}. If you want to
+ * use it on blocks, you'll have to use <a href=
+ * "https://github.com/CryptoMorin/XSeries/blob/master/src/main/java/com/cryptomorin/xseries/XBlock.java">XBlock</a>
  * <p>
- * Pre-flattening: https://minecraft.gamepedia.com/Java_Edition_data_values/Pre-flattening
+ * Pre-flattening:
+ * https://minecraft.gamepedia.com/Java_Edition_data_values/Pre-flattening
  * Materials: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
- * Materials (1.12): https://helpch.at/docs/1.12.2/index.html?org/bukkit/Material.html
- * Material IDs: https://minecraft-ids.grahamedgecombe.com/
- * Material Source Code: https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse/src/main/java/org/bukkit/Material.java
+ * Materials (1.12):
+ * https://helpch.at/docs/1.12.2/index.html?org/bukkit/Material.html Material
+ * IDs: https://minecraft-ids.grahamedgecombe.com/ Material Source Code:
+ * https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse/src/main/java/org/bukkit/Material.java
  * XMaterial v1: https://www.spigotmc.org/threads/329630/
  * <p>
- * This class will throw a "unsupported material" error if someone tries to use an item with an invalid data value which can only happen in 1.12 servers and below or when the
- * utility is missing a new material in that specific version.
- * To get an invalid item, (aka <a href="https://minecraft.fandom.com/wiki/Missing_Texture_Block">Missing Texture Block</a>) you can use the command
- * <b>/give @p minecraft:dirt 1 10</b> where 1 is the item amount, and 10 is the data value. The material {@link #DIRT} with a data value of {@code 10} doesn't exist.
+ * This class will throw a "unsupported material" error if someone tries to use
+ * an item with an invalid data value which can only happen in 1.12 servers and
+ * below or when the utility is missing a new material in that specific version.
+ * To get an invalid item, (aka
+ * <a href="https://minecraft.fandom.com/wiki/Missing_Texture_Block">Missing
+ * Texture Block</a>) you can use the command <b>/give @p minecraft:dirt 1
+ * 10</b> where 1 is the item amount, and 10 is the data value. The material
+ * {@link #DIRT} with a data value of {@code 10} doesn't exist.
  *
  * @author Crypto Morin
  * @version 11.0.0

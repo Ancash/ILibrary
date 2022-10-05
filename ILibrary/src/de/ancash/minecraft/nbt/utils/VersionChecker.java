@@ -51,8 +51,8 @@ public class VersionChecker {
 						"[NBTAPI] Please update the NBTAPI or the plugin that contains the api(nag the mod author when the newest release has an old version, not the NBTAPI dev)!");
 
 			} else if (versionDifference == 0) {
-			    if(!hideOk)
-			        MinecraftVersion.getLogger().log(Level.INFO, "[NBTAPI] The NBT-API seems to be up-to-date!");
+				if (!hideOk)
+					MinecraftVersion.getLogger().log(Level.INFO, "[NBTAPI] The NBT-API seems to be up-to-date!");
 			} else if (versionDifference == 1) {
 				MinecraftVersion.getLogger().log(Level.INFO, "[NBTAPI] The NBT-API at '" + NBTItem.class.getPackage()
 						+ "' seems to be a future Version, not yet released on Spigot/CurseForge! This is not an error!");
