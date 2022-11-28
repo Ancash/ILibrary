@@ -38,7 +38,6 @@ public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Lis
 					2);
 		} catch (IOException e) {
 			getLogger().severe("Could not connect to " + address + ":" + port + ": " + e);
-			;
 		}
 	}
 
