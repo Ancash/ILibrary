@@ -70,7 +70,7 @@ public class ILibrary extends JavaPlugin {
 			}.runTaskAsynchronously(plugin);
 		}
 		checkForUpdates();
-		Bukkit.getPluginManager().registerEvents(new IGUIManager(), this);
+		Bukkit.getPluginManager().registerEvents(new IGUIManager(this), this);
 	}
 
 	private final int SPIGOT_RESOURCE_ID = 89796;

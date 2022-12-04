@@ -21,10 +21,6 @@ public class InventoryItem {
 		this.clickable = clickable;
 	}
 
-	public InventoryItem(IGUI igui, ItemStack item, Clickable clickable) {
-		this(igui, item, -1, clickable);
-	}
-
 	/**
 	 * Set this item in the igui
 	 * 
