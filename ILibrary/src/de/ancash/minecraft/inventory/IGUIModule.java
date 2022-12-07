@@ -56,6 +56,8 @@ public abstract class IGUIModule {
 		onEnable();
 	}
 
+	protected abstract boolean canBeEnabled();
+	
 	protected abstract void onDisable();
 
 	protected abstract void onEnable();

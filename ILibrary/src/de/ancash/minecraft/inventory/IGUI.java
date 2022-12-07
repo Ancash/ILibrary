@@ -145,14 +145,13 @@ public abstract class IGUI {
 	}
 
 	protected void checkModuleItems(InventoryClickEvent event) {
-		if(!event.getInventory().equals(event.getClickedInventory()))
+		if (!event.getInventory().equals(event.getClickedInventory()))
 			return;
 		Optional.ofNullable(modules.get(event.getSlot())).ifPresent(mod -> {
 			if (mod.isEnabled()) {
 				mod.preOnClick(event.getSlot(), event.isShiftClick(), event.getAction());
-			}
-			else
-				mod.onDisabledClick();	
+			} else
+				mod.onDisabledClick();
 		});
 	}
 
@@ -184,7 +183,7 @@ public abstract class IGUI {
 		t.slots.forEach(slot -> modules.put(slot, t));
 		return t;
 	}
-	
+
 	public Map<Integer, IGUIModule> getModules() {
 		return Collections.unmodifiableMap(modules);
 	}
@@ -194,6 +193,12 @@ public abstract class IGUI {
 	}
 
 	protected void updateModules() {
-		modules.values().stream().filter(IGUIModule::isEnabled).forEach(IGUIModule::onUpdate);
+		for (IGUIModule mod : modules.values()) {
+			if (!mod.isEnabled() && mod.canBeEnabled())
+				mod.enable();
+			if (!mod.isEnabled())
+				continue;
+			mod.onUpdate();
+		}
 	}
 }
