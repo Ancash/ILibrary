@@ -1,5 +1,6 @@
 package de.ancash.minecraft.crafting.recipe;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -11,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 
 import de.ancash.ILibrary;
-import de.ancash.minecraft.XMaterial;
+import de.ancash.minecraft.cryptomorin.xseries.XMaterial;
 import de.ancash.minecraft.nbt.utils.MinecraftVersion;
 
 public class ComplexRecipeWrapper extends ShapedRecipe implements WrappedRecipe {
@@ -19,15 +20,16 @@ public class ComplexRecipeWrapper extends ShapedRecipe implements WrappedRecipe 
 	private static final boolean USE_NAMESPACEDKEY = MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_12_R1);
 	private static final AtomicInteger COUNTER = new AtomicInteger();
 
+	@SuppressWarnings("nls")
 	public static ComplexRecipeWrapper newInstance(ItemStack item, ComplexRecipeType type) {
 		if (!USE_NAMESPACEDKEY)
 			return new ComplexRecipeWrapper(item, type);
-		return new ComplexRecipeWrapper(
-				new NamespacedKey(ILibrary.getInstance(), "complex-recipe-" + COUNTER.incrementAndGet()), item, type);
+		return new ComplexRecipeWrapper(new NamespacedKey(ILibrary.getInstance(),
+				"complex-recipe-" + type.name().toLowerCase().replace("_", "-") + "-" + COUNTER.incrementAndGet()),
+				item, type);
 	}
 
-	private final ComplexRecipeType type;
-	private final Set<Integer> ignoreOnCraft = new HashSet<>();
+	protected final ComplexRecipeType type;
 
 	public ComplexRecipeWrapper(NamespacedKey key, ItemStack result, ComplexRecipeType type) {
 		super(key, updateAmount(result, type));
@@ -44,75 +46,43 @@ public class ComplexRecipeWrapper extends ShapedRecipe implements WrappedRecipe 
 		return type;
 	}
 
-	public void computeIgnoreOnCraft() {
-		switch (type) {
-		case ARMOR_DYE:
-			changeArmorDyeRecipe();
-			break;
-		case BOOK_DUPLICATE:
-			changeBookDuplicateRecipe();
-			break;
-		case FIREWORK:
-			changeFireworkRecipe();
-			break;
-		case BANNER_DUPLICATE:
-			changeBannerDuplicateRecipe();
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid ComplexRecipeType: " + type);
-		}
+	public Set<XMaterial> getIgnoredMaterials() {
+		return type.getIgnoredMaterials();
 	}
 
-	public Set<Integer> getIgnoreOnCraft() {
-		return Collections.unmodifiableSet(ignoreOnCraft);
-	}
-
-	private void changeArmorDyeRecipe() {
-
-	}
-
-	private void changeBookDuplicateRecipe() {
-		computeIgnoreOnCraft(getIngredientMap().entrySet().stream()
-				.filter(entry -> entry.getValue() != null
-						&& entry.getValue().toString().toLowerCase(Locale.ENGLISH).contains("written_book"))
-				.findAny().get().getKey());
-	}
-
-	private void changeBannerDuplicateRecipe() {
-
-	}
-
-	private void computeIgnoreOnCraft(char c) {
-		for (int a = 0; a < getShape().length; a++)
-			for (int b = 0; b < getShape()[a].length(); b++)
-				if (getShape()[a].charAt(b) == c)
-					ignoreOnCraft.add(a * 3 + b);
-	}
-
-	private void changeFireworkRecipe() {
-
-	}
-
-	private static ItemStack updateAmount(ItemStack item, ComplexRecipeType type) {
+	protected static ItemStack updateAmount(ItemStack item, ComplexRecipeType type) {
 		if (type == ComplexRecipeType.BANNER_DUPLICATE)
 			item.setAmount(2);
 		return item;
 	}
 
 	public enum ComplexRecipeType {
-		BANNER_DUPLICATE, ARMOR_DYE, FIREWORK, BOOK_DUPLICATE;
+		BANNER_DUPLICATE, ARMOR_DYE, SHULKER_DYE, FIREWORK, BOOK_DUPLICATE(XMaterial.WRITTEN_BOOK);
 
+		private final Set<XMaterial> ignoreOnCraft;
+
+		private ComplexRecipeType(XMaterial... ignore) {
+			ignoreOnCraft = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(ignore)));
+		}
+
+		public Set<XMaterial> getIgnoredMaterials() {
+			return ignoreOnCraft;
+		}
+
+		@SuppressWarnings("nls")
 		public static ComplexRecipeType matchType(ItemStack result) {
 			String name = XMaterial.matchXMaterial(result).toString().toLowerCase(Locale.ENGLISH);
 			if (name.contains("banner"))
 				return BANNER_DUPLICATE;
-			if (name.contains("firework"))
+			else if (name.contains("firework"))
 				return FIREWORK;
-			if (name.contains("leather"))
+			else if (name.contains("leather"))
 				return ARMOR_DYE;
-			if (name.contains("book"))
+			else if (name.contains("book"))
 				return BOOK_DUPLICATE;
-			return null;
+			else if (name.contains("shulker"))
+				return SHULKER_DYE;
+			throw new IllegalArgumentException("Could not match complex recipe: " + name);
 		}
 	}
 }

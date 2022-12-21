@@ -66,8 +66,9 @@ public enum ReflectionMethod {
 	COMPOUND_GET_LIST(ClassWrapper.NMS_NBTTAGCOMPOUND, new Class[] { String.class, int.class },
 			MinecraftVersion.MC1_7_R4, new Since(MinecraftVersion.MC1_7_R4, "getList"),
 			new Since(MinecraftVersion.MC1_18_R1, "getList(java.lang.String,int)")),
+	// Only needed for 1.7.10 getType
 	COMPOUND_OWN_TYPE(ClassWrapper.NMS_NBTBASE, new Class[] {}, MinecraftVersion.MC1_7_R4, MinecraftVersion.MC1_7_R4,
-			new Since(MinecraftVersion.MC1_7_R4, "getTypeId")), // Only needed for 1.7.10 getType
+			new Since(MinecraftVersion.MC1_7_R4, "getTypeId")),
 
 	COMPOUND_GET_FLOAT(ClassWrapper.NMS_NBTTAGCOMPOUND, new Class[] { String.class }, MinecraftVersion.MC1_7_R4,
 			new Since(MinecraftVersion.MC1_7_R4, "getFloat"),
@@ -127,10 +128,10 @@ public enum ReflectionMethod {
 	COMPOUND_GET_KEYS(ClassWrapper.NMS_NBTTAGCOMPOUND, new Class[] {}, MinecraftVersion.MC1_7_R4,
 			new Since(MinecraftVersion.MC1_7_R4, "c"), new Since(MinecraftVersion.MC1_13_R1, "getKeys"),
 			new Since(MinecraftVersion.MC1_18_R1, "getAllKeys()")),
-
+	// FIXME ?!?
 	LISTCOMPOUND_GET_KEYS(ClassWrapper.NMS_NBTTAGCOMPOUND, new Class[] {}, MinecraftVersion.MC1_7_R4,
 			new Since(MinecraftVersion.MC1_7_R4, "c"), new Since(MinecraftVersion.MC1_13_R1, "getKeys"),
-			new Since(MinecraftVersion.MC1_18_R1, "getAllKeys()")), // FIXME ?!?
+			new Since(MinecraftVersion.MC1_18_R1, "getAllKeys()")),
 	LIST_REMOVE_KEY(ClassWrapper.NMS_NBTTAGLIST, new Class[] { int.class }, MinecraftVersion.MC1_8_R3,
 			new Since(MinecraftVersion.MC1_8_R3, "a"), new Since(MinecraftVersion.MC1_9_R1, "remove"),
 			new Since(MinecraftVersion.MC1_18_R1, "remove(int)")),
@@ -179,17 +180,14 @@ public enum ReflectionMethod {
 	NMS_WORLD_GET_TILEENTITY_1_7_10(ClassWrapper.NMS_WORLDSERVER, new Class[] { int.class, int.class, int.class },
 			MinecraftVersion.MC1_7_R4, MinecraftVersion.MC1_7_R4,
 			new Since(MinecraftVersion.MC1_7_R4, "getTileEntity")),
-
+	// FIXME: No Spigot mapping!
 	TILEENTITY_LOAD_LEGACY191(ClassWrapper.NMS_TILEENTITY,
 			new Class[] { ClassWrapper.NMS_MINECRAFTSERVER.getClazz(), ClassWrapper.NMS_NBTTAGCOMPOUND.getClazz() },
-			MinecraftVersion.MC1_9_R1, MinecraftVersion.MC1_9_R1, new Since(MinecraftVersion.MC1_9_R1, "a")), // FIXME:
-																												// No
-																												// Spigot
-																												// mapping!
+			MinecraftVersion.MC1_9_R1, MinecraftVersion.MC1_9_R1, new Since(MinecraftVersion.MC1_9_R1, "a")),
+	// FIXME: No Spigot mapping!
 	TILEENTITY_LOAD_LEGACY183(ClassWrapper.NMS_TILEENTITY, new Class[] { ClassWrapper.NMS_NBTTAGCOMPOUND.getClazz() },
 			MinecraftVersion.MC1_8_R3, MinecraftVersion.MC1_9_R2, new Since(MinecraftVersion.MC1_8_R3, "c"),
-			new Since(MinecraftVersion.MC1_9_R1, "a"), new Since(MinecraftVersion.MC1_9_R2, "c")), // FIXME: No Spigot
-																									// mapping!
+			new Since(MinecraftVersion.MC1_9_R1, "a"), new Since(MinecraftVersion.MC1_9_R2, "c")),
 	TILEENTITY_LOAD_LEGACY1121(ClassWrapper.NMS_TILEENTITY,
 			new Class[] { ClassWrapper.NMS_WORLD.getClazz(), ClassWrapper.NMS_NBTTAGCOMPOUND.getClazz() },
 			MinecraftVersion.MC1_10_R1, MinecraftVersion.MC1_12_R1, new Since(MinecraftVersion.MC1_10_R1, "a"),
@@ -248,13 +246,12 @@ public enum ReflectionMethod {
 			MinecraftVersion.MC1_13_R1, new Since(MinecraftVersion.MC1_11_R1, "keySet")),
 	REGISTRY_GET(ClassWrapper.NMS_REGISTRYSIMPLE, new Class[] { Object.class }, MinecraftVersion.MC1_11_R1,
 			MinecraftVersion.MC1_13_R1, new Since(MinecraftVersion.MC1_11_R1, "get")),
+	// FIXME: No Spigot mapping!
 	REGISTRY_SET(ClassWrapper.NMS_REGISTRYSIMPLE, new Class[] { Object.class, Object.class },
-			MinecraftVersion.MC1_11_R1, MinecraftVersion.MC1_13_R1, new Since(MinecraftVersion.MC1_11_R1, "a")), // FIXME:
-																													// No
-																													// Spigot
-																													// mapping!
+			MinecraftVersion.MC1_11_R1, MinecraftVersion.MC1_13_R1, new Since(MinecraftVersion.MC1_11_R1, "a")),
+	// FIXME: No Spigot mapping!
 	REGISTRY_GET_INVERSE(ClassWrapper.NMS_REGISTRYMATERIALS, new Class[] { Object.class }, MinecraftVersion.MC1_11_R1,
-			MinecraftVersion.MC1_13_R1, new Since(MinecraftVersion.MC1_11_R1, "b")), // FIXME: No Spigot mapping!
+			MinecraftVersion.MC1_13_R1, new Since(MinecraftVersion.MC1_11_R1, "b")),
 	REGISTRYMATERIALS_KEYSET(ClassWrapper.NMS_REGISTRYMATERIALS, new Class[] {}, MinecraftVersion.MC1_13_R1,
 			MinecraftVersion.MC1_17_R1, new Since(MinecraftVersion.MC1_13_R1, "keySet")),
 	REGISTRYMATERIALS_GET(ClassWrapper.NMS_REGISTRYMATERIALS, new Class[] { ClassWrapper.NMS_MINECRAFTKEY.getClazz() },
@@ -359,7 +356,7 @@ public enum ReflectionMethod {
 			return method.invoke(target, args);
 		} catch (Exception ex) {
 			throw new NbtApiException("Error while calling the method '" + methodName + "', loaded: " + loaded
-					+ ", Enum: " + this + " Passed Class: " + target.getClass(), ex);
+					+ ", Enum: " + this + ", Passed Class: " + (target == null ? "null" : target.getClass()), ex);
 		}
 	}
 

@@ -1,9 +1,14 @@
 package de.ancash.minecraft.nbt;
 
+import java.util.function.BiConsumer;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import de.ancash.minecraft.nbt.iface.ReadWriteItemNBT;
+import de.ancash.minecraft.nbt.iface.ReadWriteNBT;
+import de.ancash.minecraft.nbt.iface.ReadableNBT;
 import de.ancash.minecraft.nbt.utils.nmsmappings.ReflectionMethod;
 
 /**
@@ -13,7 +18,7 @@ import de.ancash.minecraft.nbt.utils.nmsmappings.ReflectionMethod;
  * @author tr7zw
  *
  */
-public class NBTItem extends NBTCompound {
+public class NBTItem extends NBTCompound implements ReadWriteItemNBT {
 
 	private ItemStack bukkitItem;
 	private boolean directApply;
@@ -38,8 +43,8 @@ public class NBTItem extends NBTCompound {
 	 */
 	public NBTItem(ItemStack item, boolean directApply) {
 		super(null, null);
-		if (item == null || item.getType() == Material.AIR) {
-			throw new NullPointerException("ItemStack can't be null/Air! This is not a NBTAPI bug!");
+		if (item == null || item.getType() == Material.AIR || item.getAmount() <= 0) {
+			throw new NullPointerException("ItemStack can't be null/air/amount of 0! This is not a NBTAPI bug!");
 		}
 		this.directApply = directApply;
 		bukkitItem = item.clone();
@@ -144,6 +149,45 @@ public class NBTItem extends NBTCompound {
 	}
 
 	/**
+	 * Gives save access to the {@link ItemMeta} of the internal {@link ItemStack}.
+	 * Supported operations while inside this scope: - any get/set method of
+	 * {@link ItemMeta} - any getter on {@link NBTItem}
+	 * 
+	 * All changes made to the {@link NBTItem} during this scope will be reverted at
+	 * the end.
+	 * 
+	 * @param handler
+	 */
+	public void modifyMeta(BiConsumer<ReadableNBT, ItemMeta> handler) {
+		ItemMeta meta = bukkitItem.getItemMeta();
+		handler.accept(this, meta);
+		bukkitItem.setItemMeta(meta);
+		if (directApply) {
+			applyNBT(originalSrcStack);
+		}
+	}
+
+	/**
+	 * Gives save access to the {@link ItemMeta} of the internal {@link ItemStack}.
+	 * Supported operations while inside this scope: - any get/set method of
+	 * {@link ItemMeta} - any getter on {@link NBTItem}
+	 * 
+	 * All changes made to the {@link NBTItem} during this scope will be reverted at
+	 * the end.
+	 * 
+	 * @param handler
+	 */
+	public <T extends ItemMeta> void modifyMeta(Class<T> type, BiConsumer<ReadableNBT, T> handler) {
+		@SuppressWarnings("unchecked")
+		T meta = (T) bukkitItem.getItemMeta();
+		handler.accept(this, meta);
+		bukkitItem.setItemMeta(meta);
+		if (directApply) {
+			applyNBT(originalSrcStack);
+		}
+	}
+
+	/**
 	 * Helper method that converts {@link ItemStack} to {@link NBTContainer} with
 	 * all it's data like Material, Damage, Amount and Tags.
 	 * 
@@ -155,7 +199,7 @@ public class NBTItem extends NBTCompound {
 	}
 
 	/**
-	 * Helper method to do the inverse to "convertItemtoNBT". Creates an
+	 * Helper method to do the inverse of "convertItemtoNBT". Creates an
 	 * {@link ItemStack} using the {@link NBTCompound}
 	 * 
 	 * @param comp
@@ -164,6 +208,62 @@ public class NBTItem extends NBTCompound {
 	public static ItemStack convertNBTtoItem(NBTCompound comp) {
 		return (ItemStack) ReflectionMethod.ITEMSTACK_BUKKITMIRROR.run(null,
 				NBTReflectionUtil.convertNBTCompoundtoNMSItem(comp));
+	}
+
+	/**
+	 * Helper method that converts {@link ItemStack}[] to {@link NBTContainer} with
+	 * all it data like Material, Damage, Amount and Tags. This is a custom
+	 * implementation and won't work with vanilla code(Shulker content etc).
+	 * 
+	 * @param items
+	 * @return Standalone {@link NBTContainer} with the Item's data
+	 */
+	public static NBTContainer convertItemArraytoNBT(ItemStack[] items) {
+		NBTContainer container = new NBTContainer();
+		container.setInteger("size", items.length);
+		NBTCompoundList list = container.getCompoundList("items");
+		for (int i = 0; i < items.length; i++) {
+			ItemStack item = items[i];
+			if (item == null || item.getType() == Material.AIR) {
+				continue;
+			}
+			NBTListCompound entry = list.addCompound();
+			entry.setInteger("Slot", i);
+			entry.mergeCompound(convertItemtoNBT(item));
+		}
+		return container;
+	}
+
+	/**
+	 * Helper method to do the inverse of "convertItemArraytoNBT". Creates an
+	 * {@link ItemStack}[] using the {@link NBTCompound}. This is a custom
+	 * implementation and won't work with vanilla code(Shulker content etc).
+	 * 
+	 * Will return null for invalid data. Empty slots in the array are filled with
+	 * AIR Stacks!
+	 * 
+	 * @param comp
+	 * @return ItemStack[] using the {@link NBTCompound}'s data
+	 */
+	public static ItemStack[] convertNBTtoItemArray(NBTCompound comp) {
+		if (!comp.hasTag("size")) {
+			return null;
+		}
+		ItemStack[] rebuild = new ItemStack[comp.getInteger("size")];
+		for (int i = 0; i < rebuild.length; i++) { // not using Arrays.fill, since then it's all the same instance
+			rebuild[i] = new ItemStack(Material.AIR);
+		}
+		if (!comp.hasTag("items")) {
+			return rebuild;
+		}
+		NBTCompoundList list = comp.getCompoundList("items");
+		for (ReadWriteNBT lcomp : list) {
+			if (lcomp instanceof NBTCompound) {
+				int slot = lcomp.getInteger("Slot");
+				rebuild[slot] = convertNBTtoItem((NBTCompound) lcomp);
+			}
+		}
+		return rebuild;
 	}
 
 	@Override

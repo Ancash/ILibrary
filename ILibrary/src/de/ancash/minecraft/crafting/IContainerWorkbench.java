@@ -26,7 +26,7 @@ import de.ancash.minecraft.crafting.recipe.ComplexRecipeWrapper;
 import de.ancash.minecraft.crafting.recipe.ComplexRecipeWrapper.ComplexRecipeType;
 import de.ancash.minecraft.nbt.utils.MinecraftVersion;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({ "deprecation", "nls" })
 public abstract class IContainerWorkbench {
 
 	static final ConcurrentHashMap<List<Integer>, Optional<Recipe>> cache = new ConcurrentHashMap<>();
@@ -94,7 +94,7 @@ public abstract class IContainerWorkbench {
 				setItem(i, ings[i]);
 			Recipe r = getCurrentRecipe();
 			if (r != null && isComplexRecipe())
-				r = craftRecipe(r, ings);
+				r = getComplexRecipe(r, ings);
 			for (int i = 0; i < 9; i++)
 				setItem(i, null);
 			cache.put(key, Optional.ofNullable(r));
@@ -102,7 +102,7 @@ public abstract class IContainerWorkbench {
 		return cache.get(key).orElse(null);
 	}
 
-	private Recipe craftRecipe(Recipe recipe, ItemStack[] ingredients) {
+	private Recipe getComplexRecipe(Recipe recipe, ItemStack[] ingredients) {
 		ItemStack result = craftRecipe0(getCurrentIRecipe());
 		if (result == null || result.getType() == Material.AIR)
 			return null;
@@ -111,7 +111,6 @@ public abstract class IContainerWorkbench {
 		complex.shape(duplet.getFirst());
 		for (Entry<Character, MaterialData> entry : duplet.getSecond().entrySet())
 			complex.setIngredient(entry.getKey(), entry.getValue());
-		complex.computeIgnoreOnCraft();
 		return complex;
 	}
 

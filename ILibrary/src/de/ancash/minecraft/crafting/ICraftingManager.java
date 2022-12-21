@@ -21,70 +21,40 @@ public class ICraftingManager {
 
 	}
 
+	@SuppressWarnings("nls")
 	public void init(ILibrary il) {
 		il.getLogger().info(
 				"Init version specific " + getClass().getSimpleName() + " for " + MinecraftVersion.getVersion().name());
-		if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1)) {
-			try {
+		try {
+			if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1)) {
 				ContainerWorkbench_1_8_1_13.initReflection();
-				il.getLogger().info("Reflection successfull!");
-			} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException e) {
-				il.getLogger().severe("Reflection failed:");
-				e.printStackTrace();
-				return;
-			}
-			clazz = ContainerWorkbench_1_8_1_13.class;
-		} else if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_17_R1)) {
-			try {
+				clazz = ContainerWorkbench_1_8_1_13.class;
+			} else if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_17_R1)) {
 				ContainerWorkbench_1_14_1_16.initReflection();
-				il.getLogger().info("Reflection successfull!");
-			} catch (IllegalArgumentException | ClassNotFoundException | NoSuchFieldException | SecurityException
-					| NoSuchMethodException | IllegalAccessException e) {
-				il.getLogger().severe("Reflection failed:");
-				e.printStackTrace();
-				return;
-			}
-			clazz = ContainerWorkbench_1_14_1_16.class;
-		} else if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_18_R1)) {
-			try {
+				clazz = ContainerWorkbench_1_14_1_16.class;
+			} else if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_18_R1)) {
 				ContainerWorkbench_1_17.initReflection();
-			} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
-					| IllegalArgumentException | IllegalAccessException e) {
-				il.getLogger().severe("Reflection failed:");
-				e.printStackTrace();
-				return;
-			}
-			clazz = ContainerWorkbench_1_17.class;
-		} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_18_R1)) {
-			try {
+				clazz = ContainerWorkbench_1_17.class;
+			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_18_R1)) {
 				ContainerWorkbench_1_18_R1.initReflection();
-			} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
-					| IllegalArgumentException | IllegalAccessException e) {
-				il.getLogger().severe("Reflection failed:");
-				e.printStackTrace();
-				return;
-			}
-			clazz = ContainerWorkbench_1_18_R1.class;
-		} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_18_R2)) {
-			try {
+				clazz = ContainerWorkbench_1_18_R1.class;
+			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_18_R2)) {
 				ContainerWorkbench_1_18_R2.initReflection();
-			} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
-					| IllegalArgumentException | IllegalAccessException e) {
-				il.getLogger().severe("Reflection failed:");
-				e.printStackTrace();
-				return;
-			}
-			clazz = ContainerWorkbench_1_18_R2.class;
-		} else {
-			try {
+				clazz = ContainerWorkbench_1_18_R2.class;
+			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_19_R1)) {
 				ContainerWorkbench_1_19_R1.initReflection();
-			} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
-					| IllegalArgumentException | IllegalAccessException e) {
-				il.getLogger().severe("Reflection failed:");
-				e.printStackTrace();
-				return;
+				clazz = ContainerWorkbench_1_19_R1.class;
+			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_19_R2)) {
+				ContainerWorkbench_1_19_R2.initReflection();
+				clazz = ContainerWorkbench_1_19_R2.class;
+			} else {
+				il.getLogger().severe("No compatible " + IContainerWorkbench.class.getSimpleName() + " impl for "
+						+ MinecraftVersion.getVersion() + " found!");
 			}
-			clazz = ContainerWorkbench_1_19_R1.class;
+		} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
+				| IllegalArgumentException | IllegalAccessException e) {
+			il.getLogger().severe("Reflection failed:");
+			e.printStackTrace();
 		}
 
 		il.getLogger().info("Using: " + clazz.getTypeName());

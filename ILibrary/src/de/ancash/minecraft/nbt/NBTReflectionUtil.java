@@ -28,6 +28,7 @@ import de.ancash.minecraft.nbt.utils.nmsmappings.ReflectionMethod;
  * @author tr7zw
  *
  */
+@SuppressWarnings("deprecation")
 public class NBTReflectionUtil {
 
 	private static Field field_unhandledTags = null;

@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import de.ancash.minecraft.cryptomorin.xseries.XMaterial;
 import de.ancash.minecraft.nbt.NBTItem;
 import net.md_5.bungee.api.ChatColor;
 
@@ -70,7 +71,6 @@ public class ItemStackFileUtil {
 			if (prop.startsWith("meta.nbt"))
 				continue;
 			if (!GET_CONSUMERS.containsKey(prop)) {
-				// System.err.println("Unknown item property: " + prop);
 				continue;
 			}
 			try {

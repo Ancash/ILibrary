@@ -11,7 +11,9 @@ import org.bukkit.inventory.ItemStack;
 
 import de.ancash.datastructures.tuples.Duplet;
 import de.ancash.datastructures.tuples.Tuple;
-import de.ancash.minecraft.nbt.NBTItem;
+import de.ancash.minecraft.nbt.NBT;
+import de.ancash.minecraft.nbt.NBTContainer;
+import de.ancash.minecraft.nbt.iface.ReadWriteNBT;
 
 @SuppressWarnings("nls")
 public class IItemStack {
@@ -24,12 +26,12 @@ public class IItemStack {
 	private final int hash;
 
 	public IItemStack(ItemStack original) {
-		NBTItem check = new NBTItem(original);
-		if (check.hasKey("ILibrary-temp-texture")) {
-			check.removeKey("ILibrary-temp-texture");
-			original = check.getItem();
-		}
 		this.original = original.clone();
+		ReadWriteNBT nbt = NBT.itemStackToNBT(original);
+		if (nbt.hasTag("ILibrary-temp-texture")) {
+			nbt.removeKey("ILibrary-temp-texture");
+			original = NBT.itemStackFromNBT(nbt);
+		}
 		Duplet<ItemStack, Map<String, Object>> duplet = split(this.original.clone());
 		this.withoutNBT = duplet.getFirst();
 		this.withoutNBT.setAmount(1);
@@ -39,11 +41,11 @@ public class IItemStack {
 			try {
 				String txt = ItemStackUtils.getTexure(temp);
 				if (txt != null && !txt.isEmpty()) {
-					NBTItem item = new NBTItem(temp);
-					item.setString("ILibrary-temp-texture", txt);
-					item.removeKey("SkullOwner");
-					item.removeKey("skull-owner");
-					temp = ItemStackUtils.setTexture(item.getItem(), null);
+					nbt = NBT.itemStackToNBT(temp);
+					nbt.setString("ILibrary-temp-texture", txt);
+					nbt.removeKey("SkullOwner");
+					nbt.removeKey("skull-owner");
+					temp = ItemStackUtils.setTexture(NBT.itemStackFromNBT(nbt), null);
 				}
 			} catch (Exception ex) {
 			}
@@ -93,8 +95,9 @@ public class IItemStack {
 	}
 
 	private static Duplet<ItemStack, Map<String, Object>> split(ItemStack original) {
+		original.setAmount(1);
 		HashMap<String, Object> nbtValues = new HashMap<>();
-		NBTItem nbt = new NBTItem(original.clone());
+		NBTContainer nbt = (NBTContainer) NBT.itemStackToNBT(original);
 		Set<String> keys = nbt.getKeys().stream().collect(Collectors.toSet());
 		keys.forEach(key -> nbtValues.put(key, nbt.getObject(key)));
 		if (keys.contains("SkullOwner") || keys.contains("skull-owner")) {
@@ -108,8 +111,11 @@ public class IItemStack {
 			} catch (Exception ex) {
 			}
 		}
-		for (String key : keys)
+		for (String key : keys) {
+			if ("id".equals(key) || "Count".equals(key))
+				continue;
 			nbt.removeKey(key);
-		return Tuple.of(nbt.getItem(), nbtValues);
+		}
+		return Tuple.of(NBT.itemStackFromNBT(nbt), nbtValues);
 	}
 }

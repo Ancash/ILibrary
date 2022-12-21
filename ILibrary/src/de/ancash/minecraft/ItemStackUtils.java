@@ -28,6 +28,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
 import de.ancash.ILibrary;
+import de.ancash.minecraft.cryptomorin.xseries.XMaterial;
 import de.ancash.minecraft.nbt.utils.MinecraftVersion;
 import net.md_5.bungee.api.ChatColor;
 
@@ -155,8 +156,7 @@ public class ItemStackUtils {
 	}
 
 	public static String getDisplayName(ItemStack item) {
-		return item.getItemMeta().getDisplayName() == null || item.getItemMeta().getDisplayName().isEmpty()
-				? XMaterial.matchXMaterial(item).toString()
+		return item.getItemMeta().hasDisplayName() ? XMaterial.matchXMaterial(item).toString()
 				: item.getItemMeta().getDisplayName();
 	}
 
