@@ -54,7 +54,6 @@ public class ILibrary extends JavaPlugin {
 	public void onEnable() {
 		Bukkit.getScheduler().runTaskTimer(plugin, () -> TICK.incrementAndGet(), 0, 1);
 		ICraftingManager.getSingleton().init(this);
-		ItemStackUtils.checkDataVersion(this);
 		if (f.getBoolean("chat-client")) {
 			new BukkitRunnable() {
 

@@ -34,27 +34,27 @@ import net.md_5.bungee.api.ChatColor;
 
 public class ItemStackUtils {
 
-	private static int DATA_VERSION;
-
-	public static void checkDataVersion(ILibrary pl) {
-		try {
-			String str = itemStackToString(new ItemStack(Material.DIRT));
-			str = str.split("v: ")[1];
-			int pos = 0;
-			char c = str.charAt(pos);
-			StringBuilder builder = new StringBuilder();
-			while (c >= 48 && c <= 57) {
-				builder.append(c);
-				pos++;
-				c = str.charAt(pos);
-			}
-
-			DATA_VERSION = Integer.valueOf(builder.toString());
-			pl.getLogger().info("Data Version: " + DATA_VERSION);
-		} catch (Exception e) {
-			// pl.getLogger().log(Level.SEVERE, "Could not determine data version", e);
-		}
-	}
+//	private static int DATA_VERSION;
+//
+//	public static void checkDataVersions(ILibrary pl) {
+//		try {
+//			String str = itemStackToString(new ItemStack(Material.DIRT));
+//			str = str.split("v: ")[1];
+//			int pos = 0;
+//			char c = str.charAt(pos);
+//			StringBuilder builder = new StringBuilder();
+//			while (c >= 48 && c <= 57) {
+//				builder.append(c);
+//				pos++;
+//				c = str.charAt(pos);
+//			}
+//
+//			DATA_VERSION = Integer.valueOf(builder.toString());
+//			pl.getLogger().info("Data Version: " + DATA_VERSION);
+//		} catch (Exception e) {
+//			// pl.getLogger().log(Level.SEVERE, "Could not determine data version", e);
+//		}
+//	}
 
 	public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
 		try {
@@ -82,23 +82,23 @@ public class ItemStackUtils {
 		}
 	}
 
-	public static ItemStack itemStackFromString(String str) throws IOException, InvalidConfigurationException {
-		File file = new File(System.nanoTime() + "");
-		try {
-			file.createNewFile();
-			YamlConfiguration fc = YamlConfiguration.loadConfiguration(file);
-
-			try {
-				fc.loadFromString(str);
-				return getItemStack(fc, "item");
-			} catch (Exception ex) {
-				fc.loadFromString(replaceDataVersion(str, DATA_VERSION));
-				return getItemStack(fc, "item");
-			}
-		} finally {
-			file.delete();
-		}
-	}
+//	public static ItemStack itemStackFromString(String str) throws IOException, InvalidConfigurationException {
+//		File file = new File(System.nanoTime() + "");
+//		try {
+//			file.createNewFile();
+//			YamlConfiguration fc = YamlConfiguration.loadConfiguration(file);
+//
+//			try {
+//				fc.loadFromString(str);
+//				return getItemStack(fc, "item");
+//			} catch (Exception ex) {
+//				fc.loadFromString(replaceDataVersion(str, DATA_VERSION));
+//				return getItemStack(fc, "item");
+//			}
+//		} finally {
+//			file.delete();
+//		}
+//	}
 
 	private static String replaceDataVersion(String from, int i) {
 		StringBuilder builder = new StringBuilder();
@@ -156,7 +156,7 @@ public class ItemStackUtils {
 	}
 
 	public static String getDisplayName(ItemStack item) {
-		return item.getItemMeta().hasDisplayName() ? XMaterial.matchXMaterial(item).toString()
+		return !item.getItemMeta().hasDisplayName() ? XMaterial.matchXMaterial(item).toString()
 				: item.getItemMeta().getDisplayName();
 	}
 
