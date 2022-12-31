@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Material;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemFlag;
@@ -27,12 +25,26 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import de.ancash.ILibrary;
 import de.ancash.minecraft.cryptomorin.xseries.XMaterial;
 import de.ancash.minecraft.nbt.utils.MinecraftVersion;
 import net.md_5.bungee.api.ChatColor;
 
+@SuppressWarnings("nls")
 public class ItemStackUtils {
+	
+	private static Field profileField;
+	private static Field gameProfileIdField;
+	
+	static {
+		try {
+			gameProfileIdField = GameProfile.class.getDeclaredField("id");
+			gameProfileIdField.setAccessible(true);
+			profileField = ((SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta()).getClass().getDeclaredField("profile");
+			profileField.setAccessible(true);
+		} catch (NoSuchFieldException | SecurityException e) {
+			e.printStackTrace();
+		}
+	}
 
 //	private static int DATA_VERSION;
 //
@@ -100,14 +112,14 @@ public class ItemStackUtils {
 //		}
 //	}
 
-	private static String replaceDataVersion(String from, int i) {
-		StringBuilder builder = new StringBuilder();
-		builder.append(from.split("v: ")[0]);
-		from = from.split("v: ")[1];
-		while (from.charAt(0) >= 48 && from.charAt(0) <= 57)
-			from = from.substring(1);
-		return builder.append(i).append(from).toString();
-	}
+//	private static String replaceDataVersion(String from, int i) {
+//		StringBuilder builder = new StringBuilder();
+//		builder.append(from.split("v: ")[0]);
+//		from = from.split("v: ")[1];
+//		while (from.charAt(0) >= 48 && from.charAt(0) <= 57)
+//			from = from.substring(1);
+//		return builder.append(i).append(from).toString();
+//	}
 
 	public static ItemStack[] itemStackArrayFromBase64(String data) throws IOException {
 		try {
@@ -196,7 +208,7 @@ public class ItemStackUtils {
 		return is;
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation" })
 	public static void setItemStack(FileConfiguration fc, String path, ItemStack item) {
 		item = item.clone();
 		if (item.getItemMeta() instanceof SkullMeta) {
@@ -249,10 +261,7 @@ public class ItemStackUtils {
 	public static ItemStack setProfileName(ItemStack is, String name) {
 		SkullMeta hm = (SkullMeta) is.getItemMeta().clone();
 		try {
-			GameProfile profile = null;
-			Field field = hm.getClass().getDeclaredField("profile");
-			field.setAccessible(true);
-			profile = (GameProfile) field.get(hm);
+			GameProfile profile = getGameProfile(is);
 			Field nameField = profile.getClass().getDeclaredField("name");
 			nameField.setAccessible(true);
 			nameField.set(profile, name);
@@ -266,15 +275,31 @@ public class ItemStackUtils {
 	public static String getTexure(ItemStack is)
 			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		String texture = null;
-
-		SkullMeta sm = (SkullMeta) is.getItemMeta();
-		Field profileField = sm.getClass().getDeclaredField("profile");
-		profileField.setAccessible(true);
-		GameProfile profile = (GameProfile) profileField.get(sm);
+		GameProfile profile = getGameProfile(is);
 		Collection<Property> textures = profile.getProperties().get("textures");
 		for (Property p : textures)
 			texture = p.getValue();
 		return texture;
+	}
+
+	public static GameProfile getGameProfile(ItemStack is) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		return getGameProfile(is.getItemMeta());
+	}
+	
+	public static GameProfile getGameProfile(ItemMeta im) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		return (GameProfile) profileField.get(im);
+	}
+
+	public static ItemStack setGameProfileId(ItemStack item, UUID id) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		item.setItemMeta(setGameProfileId(item.getItemMeta(), id));
+		return item;
+	}
+	
+	public static ItemMeta setGameProfileId(ItemMeta im, UUID id) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		GameProfile gameProfile = getGameProfile(im);
+		gameProfileIdField.set(gameProfile, id);
+		profileField.set(im, gameProfile);
+		return im;
 	}
 
 	public static ItemStack setTexture(ItemStack is, String texture) {

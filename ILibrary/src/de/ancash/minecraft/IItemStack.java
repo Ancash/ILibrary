@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import de.ancash.datastructures.tuples.Duplet;
 import de.ancash.datastructures.tuples.Tuple;
@@ -27,17 +29,17 @@ public class IItemStack {
 
 	public IItemStack(ItemStack original) {
 		this.original = original.clone();
-		ReadWriteNBT nbt = NBT.itemStackToNBT(original);
+		ReadWriteNBT nbt = NBT.itemStackToNBT(original.clone());
 		if (nbt.hasTag("ILibrary-temp-texture")) {
 			nbt.removeKey("ILibrary-temp-texture");
 			original = NBT.itemStackFromNBT(nbt);
 		}
 		Duplet<ItemStack, Map<String, Object>> duplet = split(this.original.clone());
 		this.withoutNBT = duplet.getFirst();
-		this.withoutNBT.setAmount(1);
+		withoutNBT.setAmount(1);
 		this.nbtValues = duplet.getSecond();
 		ItemStack temp = this.original.clone();
-		if (nbtValues.containsKey("SkullOwner")) {
+		if (temp.getItemMeta() instanceof SkullMeta) {
 			try {
 				String txt = ItemStackUtils.getTexure(temp);
 				if (txt != null && !txt.isEmpty()) {
@@ -93,16 +95,29 @@ public class IItemStack {
 	public boolean isSimilar(IItemStack compareTo) {
 		return withoutNBT.isSimilar(compareTo.withoutNBT) && nbtValues.equals(compareTo.nbtValues);
 	}
-
-	private static Duplet<ItemStack, Map<String, Object>> split(ItemStack original) {
-		original.setAmount(1);
+	
+	private static Duplet<ItemStack, Map<String, Object>> split(ItemStack item) {
+		item.setAmount(1);
 		HashMap<String, Object> nbtValues = new HashMap<>();
-		NBTContainer nbt = (NBTContainer) NBT.itemStackToNBT(original);
+
+		if (item.getItemMeta() instanceof SkullMeta) {
+			try {
+				String txt = ItemStackUtils.getTexure(item);
+				if (txt != null) {
+					item = ItemStackUtils.setGameProfileId(item, new UUID(txt.hashCode(), txt.hashCode()));
+				}
+			} catch (Exception e) {
+
+			}
+
+		}
+
+		NBTContainer nbt = (NBTContainer) NBT.itemStackToNBT(item);
 		Set<String> keys = nbt.getKeys().stream().collect(Collectors.toSet());
 		keys.forEach(key -> nbtValues.put(key, nbt.getObject(key)));
 		if (keys.contains("SkullOwner") || keys.contains("skull-owner")) {
 			try {
-				String txt = ItemStackUtils.getTexure(original);
+				String txt = ItemStackUtils.getTexure(item);
 				if (txt != null && !txt.isEmpty()) {
 
 					nbtValues.put("ILibrary-temp-texture", txt);
@@ -112,8 +127,12 @@ public class IItemStack {
 			}
 		}
 		for (String key : keys) {
-			if ("id".equals(key) || "Count".equals(key))
+			if ("Count".equals(key)) {
+				nbtValues.remove(key);
 				continue;
+			} else if ("id".equals(key)) {
+				continue;
+			}
 			nbt.removeKey(key);
 		}
 		return Tuple.of(NBT.itemStackFromNBT(nbt), nbtValues);
