@@ -9,7 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import de.ancash.datastructures.tuples.Duplet;
 import de.ancash.datastructures.tuples.Tuple;
-import de.ancash.minecraft.anvilgui.AnvilGUI;
+import net.wesjd.anvilgui.AnvilGUI;
 
 public class StringInputGUI {
 
