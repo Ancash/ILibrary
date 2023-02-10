@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import de.ancash.minecraft.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XMaterial;
 import de.ancash.minecraft.nbt.NBTItem;
 import net.md_5.bungee.api.ChatColor;
 

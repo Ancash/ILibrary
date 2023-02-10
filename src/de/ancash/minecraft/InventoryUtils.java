@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import de.ancash.minecraft.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XMaterial;
 
 public class InventoryUtils {
 

@@ -6,7 +6,7 @@ import java.util.List;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import de.ancash.minecraft.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XMaterial;
 
 public class ItemBuilder {
 

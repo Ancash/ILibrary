@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 
 import de.ancash.ILibrary;
-import de.ancash.minecraft.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XMaterial;
 import de.ancash.minecraft.nbt.utils.MinecraftVersion;
 
 public class ComplexRecipeWrapper extends ShapedRecipe implements WrappedRecipe {
