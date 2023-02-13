@@ -55,14 +55,6 @@
             </configuration>
           </execution>
         </executions>
-        <configuration>
-          <relocations>
-            <relocation>
-              <pattern>com.cryptomorin.xseries</pattern>
-              <shadedPattern>de.ancash.minecraft.cryptomorin.xseries</shadedPattern>
-            </relocation>
-          </relocations>
-        </configuration>
       </plugin>
     </plugins>
   </build>
