@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.input;
+package de.ancash.minecraft.chat.input;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -9,14 +9,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.ancash.datastructures.tuples.Duplet;
 import de.ancash.datastructures.tuples.Tuple;
 import de.ancash.minecraft.input.INumberInput;
 
-public class NumberInputGUI<T extends Number> implements INumberInput<T> {
+public class NumberChatInput<T extends Number> implements INumberInput<T> {
 
 	private static final Map<Class<? extends Number>, Method> valueOf = new HashMap<>();
 
@@ -36,72 +35,53 @@ public class NumberInputGUI<T extends Number> implements INumberInput<T> {
 		}
 	}
 
-	private final Class<T> clazz;
-	private T t;
-	private final StringInputGUI sig;
-	private Function<T, Duplet<Boolean, String>> isValid;
+	private final Class<? extends Number> clazz;
+
 	private Consumer<T> onComplete;
+	private final StringChatInput sci;
+	private Function<T, Duplet<Boolean, String>> isNumValid;
+	private T t;
 
-	public NumberInputGUI(JavaPlugin plugin, Player player, Class<T> clazz, Consumer<T> onComplete) {
-		this(plugin, player, clazz, onComplete, (t) -> Tuple.of(true, null));
+	public NumberChatInput(JavaPlugin pl, Player player, Class<T> clazz, Consumer<T> onComplete) {
+		this(pl, player, clazz, onComplete, (c) -> Tuple.of(true, null));
 	}
 
-	public NumberInputGUI(JavaPlugin plugin, Player player, Class<T> clazz, Consumer<T> onComplete,
+	public NumberChatInput(JavaPlugin pl, Player player, Class<T> clazz, Consumer<T> onComplete,
 			Function<T, Duplet<Boolean, String>> isValid) {
-		this.clazz = clazz;
-		this.isValid = isValid;
-		sig = new StringInputGUI(plugin, player);
-		sig.isValid(this::isNumber);
+		this.sci = new StringChatInput(pl, player);
+		this.isNumValid = isValid;
+		sci.isValid(this::onInput);
 		onComplete(onComplete);
+		this.clazz = clazz;
 	}
 
-	private Duplet<Boolean, String> isNumber(String str) {
+	private Duplet<Boolean, String> onInput(String in) {
 		try {
-			get(str);
-		} catch (Exception ex) {
+			t = get(in);
+		} catch (Exception e) {
 			t = null;
 		}
-		return isValid.apply(t);
-	}
-
-	public NumberInputGUI<T> setLeft(ItemStack left) {
-		sig.setLeft(left);
-		return this;
-	}
-
-	public NumberInputGUI<T> setRight(ItemStack right) {
-		sig.setRight(right);
-		return this;
-	}
-
-	public NumberInputGUI<T> setTitle(String title) {
-		sig.setTitle(title);
-		return this;
-	}
-
-	public NumberInputGUI<T> setText(String text) {
-		sig.setText(text);
-		return this;
+		return isNumValid.apply(t);
 	}
 
 	@SuppressWarnings("unchecked")
 	private T get(String str) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		return t = (T) valueOf.get(clazz).invoke(null, str);
+		return (T) valueOf.get(clazz).invoke(null, str);
 	}
 
 	@Override
 	public void onComplete(Consumer<T> c) {
 		this.onComplete = c;
-		sig.onComplete(str -> this.onComplete.accept(t));
+		sci.onComplete(r -> this.onComplete.accept(t));
 	}
 
 	@Override
 	public void isValid(Function<T, Duplet<Boolean, String>> f) {
-		this.isValid = f;
+		this.isNumValid = f;
 	}
 
 	@Override
 	public void start() {
-		sig.start();
+		sci.start();
 	}
 }

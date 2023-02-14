@@ -95,7 +95,7 @@ public class IItemStack {
 	public boolean isSimilar(IItemStack compareTo) {
 		return withoutNBT.isSimilar(compareTo.withoutNBT) && nbtValues.equals(compareTo.nbtValues);
 	}
-	
+
 	private static Duplet<ItemStack, Map<String, Object>> split(ItemStack item) {
 		item.setAmount(1);
 		HashMap<String, Object> nbtValues = new HashMap<>();

@@ -9,9 +9,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import de.ancash.datastructures.tuples.Duplet;
 import de.ancash.datastructures.tuples.Tuple;
+import de.ancash.lambda.Lambda;
+import de.ancash.minecraft.input.IStringInput;
 import net.wesjd.anvilgui.AnvilGUI;
 
-public class StringInputGUI {
+public class StringInputGUI implements IStringInput {
 
 	protected final StringInputGUI instance = this;
 	private ItemStack left, right;
@@ -37,10 +39,12 @@ public class StringInputGUI {
 		this.isValid = isValid;
 	}
 
+	@Override
 	public void onComplete(Consumer<String> onComplete) {
 		this.onComplete = onComplete;
 	}
 
+	@Override
 	public void isValid(Function<String, Duplet<Boolean, String>> isValid) {
 		this.isValid = isValid;
 	}
@@ -65,12 +69,18 @@ public class StringInputGUI {
 		return this;
 	}
 
+	@Override
+	public void start() {
+		open();
+	}
+
+	@SuppressWarnings("deprecation")
 	public void open() {
 		new AnvilGUI.Builder().itemLeft(left).itemRight(right).title(title).onComplete((player, text) -> {
 			Duplet<Boolean, String> valid = isValid.apply(text);
 			if (!valid.getFirst())
 				return AnvilGUI.Response.text(valid.getSecond());
-			onComplete.accept(text);
+			Lambda.of(onComplete).execIf(Lambda.notNull(), c -> c.accept(text));
 			return AnvilGUI.Response.close();
 		}).text(text).plugin(plugin).preventClose().open(player);
 	}

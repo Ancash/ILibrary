@@ -17,7 +17,6 @@ import de.ancash.libs.org.bukkit.event.Order;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import de.ancash.libs.org.simpleyaml.configuration.file.YamlFile;
-import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.crafting.ICraftingManager;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.updatechecker.UpdateCheckSource;

@@ -31,15 +31,16 @@ import net.md_5.bungee.api.ChatColor;
 
 @SuppressWarnings("nls")
 public class ItemStackUtils {
-	
+
 	private static Field profileField;
 	private static Field gameProfileIdField;
-	
+
 	static {
 		try {
 			gameProfileIdField = GameProfile.class.getDeclaredField("id");
 			gameProfileIdField.setAccessible(true);
-			profileField = ((SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta()).getClass().getDeclaredField("profile");
+			profileField = ((SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta()).getClass()
+					.getDeclaredField("profile");
 			profileField.setAccessible(true);
 		} catch (NoSuchFieldException | SecurityException e) {
 			e.printStackTrace();
@@ -282,20 +283,24 @@ public class ItemStackUtils {
 		return texture;
 	}
 
-	public static GameProfile getGameProfile(ItemStack is) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public static GameProfile getGameProfile(ItemStack is)
+			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		return getGameProfile(is.getItemMeta());
 	}
-	
-	public static GameProfile getGameProfile(ItemMeta im) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+
+	public static GameProfile getGameProfile(ItemMeta im)
+			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		return (GameProfile) profileField.get(im);
 	}
 
-	public static ItemStack setGameProfileId(ItemStack item, UUID id) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public static ItemStack setGameProfileId(ItemStack item, UUID id)
+			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		item.setItemMeta(setGameProfileId(item.getItemMeta(), id));
 		return item;
 	}
-	
-	public static ItemMeta setGameProfileId(ItemMeta im, UUID id) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+
+	public static ItemMeta setGameProfileId(ItemMeta im, UUID id)
+			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		GameProfile gameProfile = getGameProfile(im);
 		gameProfileIdField.set(gameProfile, id);
 		profileField.set(im, gameProfile);
