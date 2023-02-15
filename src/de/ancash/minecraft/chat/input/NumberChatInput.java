@@ -70,14 +70,21 @@ public class NumberChatInput<T extends Number> implements INumberInput<T> {
 	}
 
 	@Override
-	public void onComplete(Consumer<T> c) {
+	public NumberChatInput<T> onComplete(Consumer<T> c) {
 		this.onComplete = c;
 		sci.onComplete(r -> this.onComplete.accept(t));
+		return this;
 	}
 
 	@Override
-	public void isValid(Function<T, Duplet<Boolean, String>> f) {
+	public NumberChatInput<T> isValid(Function<T, Duplet<Boolean, String>> f) {
 		this.isNumValid = f;
+		return this;
+	}
+	
+	public NumberChatInput<T> setInputMessage(String s) {
+		sci.setInitialInputMessage(s);
+		return this;
 	}
 
 	@Override

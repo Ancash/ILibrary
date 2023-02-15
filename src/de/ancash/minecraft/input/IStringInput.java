@@ -7,9 +7,9 @@ import de.ancash.datastructures.tuples.Duplet;
 
 public interface IStringInput {
 
-	public void onComplete(Consumer<String> c);
+	public IStringInput onComplete(Consumer<String> c);
 
-	public void isValid(Function<String, Duplet<Boolean, String>> f);
+	public IStringInput isValid(Function<String, Duplet<Boolean, String>> f);
 
 	public void start();
 }

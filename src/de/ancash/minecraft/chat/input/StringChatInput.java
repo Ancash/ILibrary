@@ -26,6 +26,7 @@ public class StringChatInput implements Listener, IStringInput {
 	private Function<String, Duplet<Boolean, String>> isValid;
 	protected Runnable onAllChancesUsed;
 	protected final JavaPlugin pl;
+	protected String initialInputMessage;
 
 	public StringChatInput(JavaPlugin pl, Player player) {
 		this(pl, player, null);
@@ -44,34 +45,45 @@ public class StringChatInput implements Listener, IStringInput {
 	}
 
 	@Override
-	public void onComplete(Consumer<String> onInput) {
+	public StringChatInput onComplete(Consumer<String> onInput) {
 		this.onComplete = onInput;
+		return this;
 	}
 
 	@Override
-	public void isValid(Function<String, Duplet<Boolean, String>> isValid) {
+	public StringChatInput isValid(Function<String, Duplet<Boolean, String>> isValid) {
 		this.isValid = isValid;
+		return this;
 	}
 
+	public StringChatInput setInitialInputMessage(String s) {
+		this.initialInputMessage = s;
+		return this;
+	}
+	
 	public int remainingInputs() {
 		return inputs;
 	}
 
-	public void setAllowedMisInputs(int i) {
+	public StringChatInput setAllowedMisInputs(int i) {
 		this.allowedMisInputs = i;
+		return this;
 	}
 
-	public void setInputs(int i) {
+	public StringChatInput setInputs(int i) {
 		this.inputs = i;
+		return this;
 	}
 
-	public void onAllChancesUsed(Runnable r) {
+	public StringChatInput onAllChancesUsed(Runnable r) {
 		this.onAllChancesUsed = r;
+		return this;
 	}
 
 	@Override
 	public void start() {
 		Bukkit.getPluginManager().registerEvents(this, pl);
+		Lambda.of(initialInputMessage).execIf(Lambda.notNull(), player::sendMessage);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)

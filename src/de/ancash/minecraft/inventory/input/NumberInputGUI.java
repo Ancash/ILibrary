@@ -90,14 +90,16 @@ public class NumberInputGUI<T extends Number> implements INumberInput<T> {
 	}
 
 	@Override
-	public void onComplete(Consumer<T> c) {
+	public NumberInputGUI<T> onComplete(Consumer<T> c) {
 		this.onComplete = c;
 		sig.onComplete(str -> this.onComplete.accept(t));
+		return this;
 	}
 
 	@Override
-	public void isValid(Function<T, Duplet<Boolean, String>> f) {
+	public NumberInputGUI<T> isValid(Function<T, Duplet<Boolean, String>> f) {
 		this.isValid = f;
+		return this;
 	}
 
 	@Override

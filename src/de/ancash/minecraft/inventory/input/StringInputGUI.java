@@ -1,5 +1,6 @@
 package de.ancash.minecraft.inventory.input;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -40,13 +41,15 @@ public class StringInputGUI implements IStringInput {
 	}
 
 	@Override
-	public void onComplete(Consumer<String> onComplete) {
+	public StringInputGUI onComplete(Consumer<String> onComplete) {
 		this.onComplete = onComplete;
+		return this;
 	}
 
 	@Override
-	public void isValid(Function<String, Duplet<Boolean, String>> isValid) {
+	public StringInputGUI isValid(Function<String, Duplet<Boolean, String>> isValid) {
 		this.isValid = isValid;
+		return this;
 	}
 
 	public StringInputGUI setLeft(ItemStack left) {
@@ -74,14 +77,14 @@ public class StringInputGUI implements IStringInput {
 		open();
 	}
 
-	@SuppressWarnings("deprecation")
 	public void open() {
-		new AnvilGUI.Builder().itemLeft(left).itemRight(right).title(title).onComplete((player, text) -> {
-			Duplet<Boolean, String> valid = isValid.apply(text);
-			if (!valid.getFirst())
-				return AnvilGUI.Response.text(valid.getSecond());
-			Lambda.of(onComplete).execIf(Lambda.notNull(), c -> c.accept(text));
-			return AnvilGUI.Response.close();
-		}).text(text).plugin(plugin).preventClose().open(player);
+		new AnvilGUI.Builder().itemLeft(left).itemRight(right).title(title).text(text).plugin(plugin).preventClose()
+				.onComplete(complete -> {
+					Duplet<Boolean, String> valid = isValid.apply(complete.getText());
+					if (!valid.getFirst())
+						return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText(valid.getSecond()));
+					Lambda.of(onComplete).execIf(Lambda.notNull(), c -> c.accept(text));
+					return Arrays.asList(AnvilGUI.ResponseAction.close());
+				}).open(player);
 	}
 }
