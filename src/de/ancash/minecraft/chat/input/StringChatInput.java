@@ -60,7 +60,7 @@ public class StringChatInput implements Listener, IStringInput {
 		this.initialInputMessage = s;
 		return this;
 	}
-	
+
 	public int remainingInputs() {
 		return inputs;
 	}

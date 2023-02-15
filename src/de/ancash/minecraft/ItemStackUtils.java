@@ -22,10 +22,10 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import com.cryptomorin.xseries.XMaterial;
 import de.ancash.minecraft.nbt.utils.MinecraftVersion;
 import net.md_5.bungee.api.ChatColor;
 

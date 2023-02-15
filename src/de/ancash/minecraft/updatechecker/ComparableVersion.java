@@ -19,7 +19,14 @@
 package de.ancash.minecraft.updatechecker;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
 
 class ComparableVersion implements Comparable<ComparableVersion> {
 	private String value;

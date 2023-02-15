@@ -81,7 +81,7 @@ public class NumberChatInput<T extends Number> implements INumberInput<T> {
 		this.isNumValid = f;
 		return this;
 	}
-	
+
 	public NumberChatInput<T> setInputMessage(String s) {
 		sci.setInitialInputMessage(s);
 		return this;

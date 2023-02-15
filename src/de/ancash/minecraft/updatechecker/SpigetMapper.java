@@ -18,11 +18,11 @@
 
 package de.ancash.minecraft.updatechecker;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 class SpigetMapper implements ThrowingFunction<BufferedReader, String, IOException> {
 	@Override

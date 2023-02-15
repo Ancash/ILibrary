@@ -18,12 +18,12 @@
 
 package de.ancash.minecraft.updatechecker;
 
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 /**
  * Creates a User-Agent string. Always starts with

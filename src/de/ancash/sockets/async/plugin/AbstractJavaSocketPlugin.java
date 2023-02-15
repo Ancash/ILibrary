@@ -9,13 +9,13 @@ import de.ancash.ILibrary;
 import de.ancash.libs.org.bukkit.event.EventHandler;
 import de.ancash.libs.org.bukkit.event.EventManager;
 import de.ancash.libs.org.bukkit.event.Listener;
-import de.ancash.sockets.async.impl.packet.client.AsyncPacketClient;
-import de.ancash.sockets.packet.PacketFuture;
 import de.ancash.sockets.async.client.AbstractAsyncClient;
+import de.ancash.sockets.async.impl.packet.client.AsyncPacketClient;
 import de.ancash.sockets.events.ClientConnectEvent;
 import de.ancash.sockets.events.ClientDisconnectEvent;
 import de.ancash.sockets.events.ClientPacketReceiveEvent;
 import de.ancash.sockets.packet.Packet;
+import de.ancash.sockets.packet.PacketFuture;
 
 public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Listener {
 

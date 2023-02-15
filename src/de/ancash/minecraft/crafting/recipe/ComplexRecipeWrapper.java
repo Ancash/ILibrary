@@ -11,8 +11,9 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 
-import de.ancash.ILibrary;
 import com.cryptomorin.xseries.XMaterial;
+
+import de.ancash.ILibrary;
 import de.ancash.minecraft.nbt.utils.MinecraftVersion;
 
 public class ComplexRecipeWrapper extends ShapedRecipe implements WrappedRecipe {
