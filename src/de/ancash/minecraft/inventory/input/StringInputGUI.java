@@ -83,7 +83,7 @@ public class StringInputGUI implements IStringInput {
 					Duplet<Boolean, String> valid = isValid.apply(complete.getText());
 					if (!valid.getFirst())
 						return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText(valid.getSecond()));
-					Lambda.of(onComplete).execIf(Lambda.notNull(), c -> c.accept(text));
+					Lambda.of(onComplete).execIf(Lambda.notNull(), c -> c.accept(complete.getText()));
 					return Arrays.asList(AnvilGUI.ResponseAction.close());
 				}).open(player);
 	}
