@@ -47,6 +47,9 @@ public class ICraftingManager {
 			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_19_R2)) {
 				ContainerWorkbench_1_19_R2.initReflection();
 				clazz = ContainerWorkbench_1_19_R2.class;
+			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_19_R3)) {
+				ContainerWorkbench_1_19_R3.initReflection();
+				clazz = ContainerWorkbench_1_19_R3.class;
 			} else {
 				il.getLogger().severe("No compatible " + IContainerWorkbench.class.getSimpleName() + " impl for "
 						+ MinecraftVersion.getVersion() + " found!");

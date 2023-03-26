@@ -12,6 +12,6 @@ import de.ancash.minecraft.nbt.utils.MinecraftVersion;
 @Target({ METHOD })
 public @interface AvailableSince {
 
-	MinecraftVersion version();
+    MinecraftVersion version();
 
 }
