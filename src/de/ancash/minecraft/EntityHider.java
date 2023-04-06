@@ -254,8 +254,13 @@ public class EntityHider implements Listener {
         boolean visibleBefore = setVisibility(observer, entity.getEntityId(), false);
         
         if (visibleBefore) {
-            PacketContainer destroyEntity = new PacketContainer(ENTITY_DESTROY);
-            destroyEntity.getIntegerArrays().write(0, new int[] { entity.getEntityId() });
+            PacketContainer destroyEntity = manager.createPacket(ENTITY_DESTROY, true);
+            try {
+            	destroyEntity = manager.createPacketConstructor(ENTITY_DESTROY, int[].class).createPacket(new int[] {entity.getEntityId()});
+            } catch(Exception e) {
+            	e.printStackTrace();
+                destroyEntity.getIntegerArrays().write(0, new int[] { entity.getEntityId() });
+            }
             
             // Make the entity disappear
             try {
