@@ -47,27 +47,13 @@ public class ItemStackUtils {
 		}
 	}
 
-//	private static int DATA_VERSION;
-//
-//	public static void checkDataVersions(ILibrary pl) {
-//		try {
-//			String str = itemStackToString(new ItemStack(Material.DIRT));
-//			str = str.split("v: ")[1];
-//			int pos = 0;
-//			char c = str.charAt(pos);
-//			StringBuilder builder = new StringBuilder();
-//			while (c >= 48 && c <= 57) {
-//				builder.append(c);
-//				pos++;
-//				c = str.charAt(pos);
-//			}
-//
-//			DATA_VERSION = Integer.valueOf(builder.toString());
-//			pl.getLogger().info("Data Version: " + DATA_VERSION);
-//		} catch (Exception e) {
-//			// pl.getLogger().log(Level.SEVERE, "Could not determine data version", e);
-//		}
-//	}
+	public static String translateChatColor(String textToTranslate, char to) {
+		char[] b = textToTranslate.toCharArray();
+		for (int i = 0; i < b.length - 1; i++)
+			if (b[i] == ChatColor.COLOR_CHAR && ChatColor.ALL_CODES.indexOf(b[i + 1]) > -1)
+				b[i] = to;
+		return new String(b);
+	}
 
 	public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
 		try {
@@ -94,33 +80,6 @@ public class ItemStackUtils {
 			file.delete();
 		}
 	}
-
-//	public static ItemStack itemStackFromString(String str) throws IOException, InvalidConfigurationException {
-//		File file = new File(System.nanoTime() + "");
-//		try {
-//			file.createNewFile();
-//			YamlConfiguration fc = YamlConfiguration.loadConfiguration(file);
-//
-//			try {
-//				fc.loadFromString(str);
-//				return getItemStack(fc, "item");
-//			} catch (Exception ex) {
-//				fc.loadFromString(replaceDataVersion(str, DATA_VERSION));
-//				return getItemStack(fc, "item");
-//			}
-//		} finally {
-//			file.delete();
-//		}
-//	}
-
-//	private static String replaceDataVersion(String from, int i) {
-//		StringBuilder builder = new StringBuilder();
-//		builder.append(from.split("v: ")[0]);
-//		from = from.split("v: ")[1];
-//		while (from.charAt(0) >= 48 && from.charAt(0) <= 57)
-//			from = from.substring(1);
-//		return builder.append(i).append(from).toString();
-//	}
 
 	public static ItemStack[] itemStackArrayFromBase64(String data) throws IOException {
 		try {

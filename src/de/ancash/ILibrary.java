@@ -16,6 +16,7 @@ import de.ancash.libs.org.bukkit.event.HandlerList;
 import de.ancash.libs.org.bukkit.event.Listener;
 import de.ancash.libs.org.bukkit.event.Order;
 import de.ancash.libs.org.simpleyaml.configuration.file.YamlFile;
+import de.ancash.minecraft.commands.FEditCommand;
 import de.ancash.minecraft.crafting.ICraftingManager;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.updatechecker.UpdateCheckSource;
@@ -51,6 +52,7 @@ public class ILibrary extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		Bukkit.getScheduler().runTaskTimer(plugin, () -> TICK.incrementAndGet(), 0, 1);
+		getCommand("fedit").setExecutor(new FEditCommand());
 		ICraftingManager.getSingleton().init(this);
 		if (f.getBoolean("chat-client")) {
 			new BukkitRunnable() {

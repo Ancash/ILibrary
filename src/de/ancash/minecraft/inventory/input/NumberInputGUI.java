@@ -60,6 +60,7 @@ public class NumberInputGUI<T extends Number> implements INumberInput<T> {
 			get(str);
 		} catch (Exception ex) {
 			t = null;
+			return Tuple.of(false, sig.getText());
 		}
 		return isValid.apply(t);
 	}

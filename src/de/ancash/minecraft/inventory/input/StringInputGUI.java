@@ -87,4 +87,8 @@ public class StringInputGUI implements IStringInput {
 					return Arrays.asList(AnvilGUI.ResponseAction.close());
 				}).open(player);
 	}
+
+	public String getText() {
+		return text;
+	}
 }

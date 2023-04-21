@@ -3,3 +3,7 @@ version: 3.7.6
 main: de.ancash.ILibrary
 api-version: 1.13
 author: Ancash
+
+commands:
+   fedit:
+      usage: "§7/fedit <file>"
