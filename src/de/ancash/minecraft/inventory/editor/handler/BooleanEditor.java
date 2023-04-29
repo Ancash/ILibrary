@@ -1,23 +1,29 @@
 package de.ancash.minecraft.inventory.editor.handler;
 
+import java.util.UUID;
+import java.util.function.Supplier;
+
 import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.InventoryItem;
-import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.EditorSettings;
 
-public class BooleanEditor extends ValueEditor {
+public class BooleanEditor extends ValueEditor<Boolean> {
 
-	public BooleanEditor(ConfigurationSectionEditor editor, String key) {
-		super(36, editor, key);
+	protected final Runnable onToggle;
+
+	public BooleanEditor(UUID id, String title, EditorSettings settings, Runnable onToggle, Supplier<Boolean> valSup,
+			Runnable onBack) {
+		super(id, title, 36, settings, valSup, onBack);
+		this.onToggle = onToggle;
 		addInventoryItem(
 				new InventoryItem(this, getEditorItem(), 13, (a, b, c, top) -> Lambda.execIf(top, this::toggle)));
 	}
 
 	protected void toggle() {
-		section.set(key, !section.getBoolean(key));
+		onToggle.run();
 		addInventoryItem(new InventoryItem(this,
-				ItemStackUtils.setDisplayname(editor.getSettings().getBooleanItem(),
-						String.valueOf(section.getBoolean(key))),
-				13, (a, b, c, top) -> Lambda.execIf(top, this::toggle)));
+				ItemStackUtils.setDisplayname(settings.getBooleanItem(), String.valueOf(valSup.get())), 13,
+				(a, b, c, top) -> Lambda.execIf(top, this::toggle)));
 	}
 }

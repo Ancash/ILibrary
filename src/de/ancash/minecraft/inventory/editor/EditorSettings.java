@@ -8,7 +8,7 @@ import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.editor.handler.IValueHandler;
 
-public interface YamlFileEditorSettings {
+public interface EditorSettings {
 
 	public default ItemStack getBackgroundItem() {
 		return XMaterial.BEDROCK.parseItem();
@@ -36,5 +36,15 @@ public interface YamlFileEditorSettings {
 	@SuppressWarnings("nls")
 	public default ItemStack getBackItem() {
 		return new ItemBuilder(XMaterial.ARROW).setDisplayname("Back").build();
+	}
+
+	@SuppressWarnings("nls")
+	public default ItemStack getNextItem() {
+		return new ItemBuilder(XMaterial.ARROW).setDisplayname("Next").build();
+	}
+
+	@SuppressWarnings("nls")
+	public default ItemStack getPrevItem() {
+		return new ItemBuilder(XMaterial.ARROW).setDisplayname("Prev").build();
 	}
 }

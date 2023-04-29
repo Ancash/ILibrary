@@ -1,7 +1,17 @@
 package de.ancash.minecraft.inventory.editor.handler;
 
+import java.util.Collection;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import org.bukkit.Bukkit;
+
+import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.EditorSettings;
+import de.ancash.minecraft.inventory.editor.YamlFileEditor;
 
 public class ConfigurationSectionHandler implements IValueHandler<ConfigurationSection> {
 
@@ -38,13 +48,29 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		editor.setCurrentConfigurationSection(get(editor.getCurrentConfigurationSection(), key));
-		editor.newInventory();
-		editor.open();
+		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
+				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
+						editor.getHandler(key).getClass(), 32),
+				editor.settings, () -> editor.getCurrent().getConfigurationSection(key), k -> {
+					throw new UnsupportedOperationException();
+				}, () -> editor.open());
 	}
 
 	@Override
 	public boolean isValid(Object o) {
 		return o instanceof ConfigurationSection;
+	}
+
+	@Override
+	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
+			EditorSettings settings, Supplier<ConfigurationSection> valSup, Consumer<ConfigurationSection> onEdit,
+			Runnable onBack) {
+		yfe.closeAll();
+		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> {
+			ConfigurationSectionEditor e = new ConfigurationSectionEditor(yfe, Bukkit.getPlayer(id), valSup.get(),
+					valSup.get());
+			e.addRootBackItem(onBack);
+			e.open();
+		}, 1);
 	}
 }

@@ -13,15 +13,14 @@ import org.bukkit.inventory.ItemStack;
 
 import de.ancash.lambda.Lambda;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
-import de.ancash.minecraft.inventory.IGUI;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
 import de.ancash.minecraft.inventory.editor.handler.IValueHandler;
+import de.ancash.minecraft.inventory.editor.handler.ValueEditor;
 
-public class ConfigurationSectionEditor extends IGUI {
+public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection> {
 
 	protected final YamlFileEditor editor;
-	protected final YamlFileEditorSettings settings;
 	protected final ConfigurationSection root;
 	protected ConfigurationSection current;
 	protected Runnable onSave;
@@ -29,6 +28,7 @@ public class ConfigurationSectionEditor extends IGUI {
 	protected int keysPage;
 	protected final List<IValueHandler<?>> handler;
 	protected final Map<String, IValueHandler<?>> mappedTypes = new HashMap<String, IValueHandler<?>>();
+	protected boolean finishedConstructor = false;
 
 	public ConfigurationSectionEditor(YamlFileEditor editor, Player player, ConfigurationSection root,
 			ConfigurationSection current) {
@@ -37,12 +37,21 @@ public class ConfigurationSectionEditor extends IGUI {
 
 	public ConfigurationSectionEditor(YamlFileEditor editor, Player player, ConfigurationSection root,
 			ConfigurationSection current, List<IValueHandler<?>> handler) {
-		super(player.getUniqueId(), 54, YamlFileEditor.createTitle(root, current));
+		super(player.getUniqueId(), YamlFileEditor.createTitle(root, current), 54, editor.settings, null, null);
+		finishedConstructor = true;
 		this.handler = handler;
 		this.root = root;
 		this.current = current;
 		this.editor = editor;
-		this.settings = editor.settings;
+		open();
+	}
+
+	public void addRootBackItem(Runnable r) {
+		onBack = r;
+	}
+
+	public YamlFileEditor getFile() {
+		return editor;
 	}
 
 	public IValueHandler<?> getHandler(String key) {
@@ -51,6 +60,8 @@ public class ConfigurationSectionEditor extends IGUI {
 
 	@Override
 	public void open() {
+		if (!finishedConstructor)
+			return;
 		loadConfiguration();
 		mapTypes();
 		loadPage();
@@ -64,14 +75,14 @@ public class ConfigurationSectionEditor extends IGUI {
 	@SuppressWarnings("nls")
 	protected void mapTypes() {
 		mappedTypes.clear();
-		for (String key : getCurrentConfigurationSection().getKeys(false)) {
+		for (String key : getCurrent().getKeys(false)) {
 			IValueHandler<?> ivh = null;
 			for (IValueHandler<?> h : handler) {
-				if (h.isValid(getCurrentConfigurationSection(), key)) {
+				if (h.isValid(getCurrent(), key)) {
 					if (ivh != null)
-						throw new IllegalStateException("multiple matches for " + key + " in "
-								+ getCurrentConfigurationSection().getCurrentPath() + ": "
-								+ ivh.getClass().getCanonicalName() + " & " + h.getClazz().getCanonicalName());
+						throw new IllegalStateException(
+								"multiple matches for " + key + " in " + getCurrent().getCurrentPath() + ": "
+										+ ivh.getClass().getCanonicalName() + " & " + h.getClazz().getCanonicalName());
 					else
 						ivh = h;
 				}
@@ -79,31 +90,25 @@ public class ConfigurationSectionEditor extends IGUI {
 			if (ivh != null)
 				mappedTypes.put(key, ivh);
 			else
-				throw new IllegalStateException(
-						"unknown type at " + String.join(".", getCurrentConfigurationSection().getCurrentPath(), key)
-								+ ": " + getCurrentConfigurationSection().get(key));
+				throw new IllegalStateException("unknown type at "
+						+ String.join(".", getCurrent().getCurrentPath(), key) + ": " + getCurrent().get(key));
 		}
 	}
 
 	protected void loadConfiguration() {
 		newInventory(getTitle(), getSize());
-		for (int i = 0; i < inv.getSize() % 9; i++)
-			setItem(getSettings().getBackgroundItem(), i * 9 + 4);
-		for (int i = inv.getSize() - 9; i < inv.getSize(); i++)
-			setItem(getSettings().getBackgroundItem(), i);
 		keysPage = 0;
 		keys.clear();
-		keys.addAll(getCurrentConfigurationSection().getKeys(false));
+		keys.addAll(getCurrent().getKeys(false));
 	}
 
 	public void loadPage() {
-		for (int a = 0; a < inv.getSize() % 9 - 1; a++) {
-			for (int b = 0; b < 9; b++) {
-				if (b == 4)
-					continue;
-				setItem(null, a * 9 + b);
-			}
+		for (int i = 0; i < getSize() - 9; i++) {
+			setItem(null, i);
+			removeInventoryItem(i);
 		}
+		for (int i = inv.getSize() - 9; i < inv.getSize(); i++)
+			setItem(getSettings().getBackgroundItem(), i);
 		int pos = 0;
 
 		for (int k = keysPage * (getSize() - 9); k < (keysPage + 1) * (getSize() - 9); k++) {
@@ -115,9 +120,37 @@ public class ConfigurationSectionEditor extends IGUI {
 			addInventoryItem(new InventoryItem(this, item, pos++,
 					(a, b, c, top) -> Lambda.execIf(top, () -> handler.edit(this, key))));
 		}
-		if (current.getParent() != null && !current.equals(root))
-			addInventoryItem(new InventoryItem(this, settings.getBackItem(), 45,
-					(a, b, c, top) -> Lambda.execIf(top, this::back)));
+		if (onBack != null)
+			addInventoryItem(new InventoryItem(this, settings.getBackItem(), getSize() - 9,
+					(a, b, c, top) -> Lambda.execIf(top, onBack)));
+		if (hasPrevPage())
+			addInventoryItem(new InventoryItem(this, settings.getPrevItem(), getSize() - 2,
+					(a, b, c, top) -> Lambda.execIf(top, this::prevPage)));
+		if (hasNextPage())
+			addInventoryItem(new InventoryItem(this, settings.getNextItem(), getSize() - 1,
+					(a, b, c, top) -> Lambda.execIf(top, this::nextPage)));
+	}
+
+	public void prevPage() {
+		if (keysPage >= 1) {
+			keysPage--;
+			loadPage();
+		}
+	}
+
+	public boolean hasPrevPage() {
+		return keysPage >= 1;
+	}
+
+	public boolean hasNextPage() {
+		return (keysPage + 1) * (getSize() - 9) < keys.size();
+	}
+
+	public void nextPage() {
+		if ((keysPage + 1) * (getSize() - 9) < keys.size()) {
+			keysPage++;
+			loadPage();
+		}
 	}
 
 	public void onSave(Runnable r) {
@@ -139,7 +172,7 @@ public class ConfigurationSectionEditor extends IGUI {
 		event.setCancelled(true);
 	}
 
-	public ConfigurationSection getCurrentConfigurationSection() {
+	public ConfigurationSection getCurrent() {
 		return current;
 	}
 
@@ -150,7 +183,7 @@ public class ConfigurationSectionEditor extends IGUI {
 		current = section;
 	}
 
-	public YamlFileEditorSettings getSettings() {
+	public EditorSettings getSettings() {
 		return settings;
 	}
 
@@ -158,14 +191,7 @@ public class ConfigurationSectionEditor extends IGUI {
 		return root;
 	}
 
-	public void back() {
-		if (!current.equals(root))
-			current = current.getParent();
-		newInventory();
-		open();
-	}
-
-	public List<IValueHandler<?>> getAllHandler() {
+	public List<IValueHandler<?>> getValueHandler() {
 		return handler;
 	}
 }

@@ -1,10 +1,19 @@
 package de.ancash.minecraft.inventory.editor.handler;
 
-import org.bukkit.Bukkit;
+import java.util.Collection;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
-import de.ancash.ILibrary;
+import org.bukkit.inventory.ItemStack;
+
+import com.cryptomorin.xseries.XMaterial;
+
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.EditorSettings;
+import de.ancash.minecraft.inventory.editor.YamlFileEditor;
 
 public class BooleanHandler implements IValueHandler<Boolean> {
 
@@ -34,9 +43,23 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 	}
 
 	@Override
+	public ItemStack getEditItem(ConfigurationSectionEditor editor, String key) {
+		ItemStack item = IValueHandler.super.getEditItem(editor, key);
+		item.setType(XMaterial.REDSTONE_TORCH.parseMaterial());
+		return item;
+	}
+	
+	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		editor.closeAll();
-		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> new BooleanEditor(editor, key), 1);
+		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
+				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
+						editor.getHandler(key).getClazz(), 32),
+				editor.settings, () -> editor.getCurrent().getBoolean(key), b -> editor.getCurrent().set(key, b),
+				editor::open);
+	}
+
+	public void replaceValue(int[] arr, int find, int replace) {
+		IntStream.range(0, arr.length).boxed().filter(pos -> arr[pos] == find).forEach(pos -> arr[pos] = replace);
 	}
 
 	@Override
@@ -47,6 +70,13 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 	@Override
 	public boolean isValid(Object o) {
 		return o instanceof Boolean;
+	}
+
+	@Override
+	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
+			EditorSettings settings, Supplier<Boolean> valSup, Consumer<Boolean> onEdit, Runnable onBack) {
+		yfe.closeAll();
+		new BooleanEditor(id, title, settings, () -> onEdit.accept(!valSup.get()), valSup, onBack);
 	}
 
 }

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,27 +32,27 @@ public class YamlFileEditor {
 	protected final File file;
 	protected final Player p;
 	protected final YamlFile yamlFile = new YamlFile();
-	protected final YamlFileEditorSettings settings;
+	protected final EditorSettings settings;
 	protected final List<IValueHandler<?>> handler;
 
 	public YamlFileEditor(File file, Player p)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
-		this(new YamlFileEditorSettings() {
+		this(new EditorSettings() {
 		}, file, p);
 	}
 
 	public YamlFileEditor(File file, Player p, List<IValueHandler<?>> handler)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
-		this(new YamlFileEditorSettings() {
+		this(new EditorSettings() {
 		}, file, p, handler);
 	}
 
-	public YamlFileEditor(YamlFileEditorSettings settings, File file, Player p)
+	public YamlFileEditor(EditorSettings settings, File file, Player p)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this(settings, file, p, DEFAULT_VALUE_HANDLER);
 	}
 
-	public YamlFileEditor(YamlFileEditorSettings settings, File file, Player p, List<IValueHandler<?>> handler)
+	public YamlFileEditor(EditorSettings settings, File file, Player p, List<IValueHandler<?>> handler)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this.file = file;
 		this.p = p;
@@ -72,14 +73,20 @@ public class YamlFileEditor {
 		editor.open();
 	}
 
+	public void closeAll() {
+		p.closeInventory();
+	}
+	
+	public Collection<IValueHandler<?>> getValHandler() {
+		return handler;
+	}
+	
 	public static String createTitle(ConfigurationSection root, ConfigurationSection to) {
 		return createTitle(root, to, 32);
 	}
 
-	@SuppressWarnings("nls")
 	public static String createTitle(ConfigurationSection root, ConfigurationSection to, int max) {
-		return cut(to.equals(root) ? "~"
-				: String.join(":", "~", to.getCurrentPath().replaceFirst(root.getCurrentPath(), "")), max);
+		return cut(root.getCurrentPath(), max);
 	}
 
 	public static String createTitle(ConfigurationSection root, ConfigurationSection to, String key) {
@@ -89,6 +96,12 @@ public class YamlFileEditor {
 	@SuppressWarnings("nls")
 	public static String createTitle(ConfigurationSection root, ConfigurationSection to, String key, int max) {
 		return cut(String.join(":", YamlFileEditor.createTitle(root, to), key), max);
+	}
+
+	public static String createTitle(ConfigurationSection root, ConfigurationSection to, String key, Class<?> clazz,
+			int max) {
+		return YamlFileEditor.cut(String.join(":", YamlFileEditor.createTitle(root, to, key), clazz.getSimpleName()),
+				32);
 	}
 
 	public static String cut(String s, int max) {
