@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.EditorSettings;
 import de.ancash.minecraft.inventory.editor.YamlFileEditor;
 
 public interface IValueHandler<T> {
@@ -36,5 +35,7 @@ public interface IValueHandler<T> {
 	public String valueToString(ConfigurationSection section, String s);
 
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			EditorSettings settings, Supplier<T> valSup, Consumer<T> onEdit, Runnable onBack);
+			Supplier<T> valSup, Consumer<T> onEdit, Runnable onBack);
+
+	public T defaultValue();
 }

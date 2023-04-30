@@ -14,7 +14,7 @@ import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.EditorSettings;
+import de.ancash.minecraft.inventory.editor.StringEditor;
 import de.ancash.minecraft.inventory.editor.YamlFileEditor;
 
 public class StringHandler implements IValueHandler<String> {
@@ -61,8 +61,7 @@ public class StringHandler implements IValueHandler<String> {
 		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
 				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
 						editor.getHandler(key).getClazz(), 32),
-				editor.settings, () -> editor.getCurrent().getString(key), s -> editor.getCurrent().set(key, s),
-				editor::open);
+				() -> editor.getCurrent().getString(key), s -> editor.getCurrent().set(key, s), editor::open);
 	}
 
 	@Override
@@ -72,9 +71,15 @@ public class StringHandler implements IValueHandler<String> {
 
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			EditorSettings settings, Supplier<String> valSup, Consumer<String> onEdit, Runnable onBack) {
+			Supplier<String> valSup, Consumer<String> onEdit, Runnable onBack) {
 		yfe.closeAll();
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
-				() -> new StringEditor(id, title, settings, valSup, onEdit, onBack), 1);
+				() -> new StringEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack), 1);
+	}
+
+	@SuppressWarnings("nls")
+	@Override
+	public String defaultValue() {
+		return "";
 	}
 }

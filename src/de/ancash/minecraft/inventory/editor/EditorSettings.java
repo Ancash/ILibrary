@@ -23,6 +23,31 @@ public interface EditorSettings {
 	}
 
 	@SuppressWarnings("nls")
+	public default ItemStack addStringItem() {
+		return new ItemBuilder(XMaterial.OAK_SIGN).setDisplayname("§7Add String").build();
+	}
+
+	@SuppressWarnings("nls")
+	public default ItemStack addBooleanItem() {
+		return new ItemBuilder(XMaterial.REDSTONE_TORCH).setDisplayname("§7Add Boolean").build();
+	}
+
+	@SuppressWarnings("nls")
+	public default ItemStack addDoubleItem() {
+		return new ItemBuilder(XMaterial.LADDER).setDisplayname("§7Add Double").build();
+	}
+
+	@SuppressWarnings("nls")
+	public default ItemStack addLongItem() {
+		return new ItemBuilder(XMaterial.STICK).setDisplayname("§7Add Long").build();
+	}
+
+	@SuppressWarnings("nls")
+	public default ItemStack addConfigurationSectionItem() {
+		return new ItemBuilder(XMaterial.CHEST).setDisplayname("§7Add ConfigurationSection").build();
+	}
+
+	@SuppressWarnings("nls")
 	public default ItemStack getKeyValueItem(ConfigurationSection section, String key, IValueHandler<?> type) {
 		StringBuilder b = new StringBuilder();
 		b.append("§7Key: ").append(key).append("\n").append("§7Type: ").append(type.getClazz().getSimpleName())

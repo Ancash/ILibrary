@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.handler;
+package de.ancash.minecraft.inventory.editor;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -15,7 +15,6 @@ import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.IGUI;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
-import de.ancash.minecraft.inventory.editor.EditorSettings;
 
 public abstract class ValueEditor<T> extends IGUI {
 

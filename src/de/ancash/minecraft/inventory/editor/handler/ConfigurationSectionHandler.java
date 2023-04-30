@@ -9,8 +9,8 @@ import org.bukkit.Bukkit;
 
 import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
+import de.ancash.libs.org.simpleyaml.configuration.MemoryConfiguration;
 import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.EditorSettings;
 import de.ancash.minecraft.inventory.editor.YamlFileEditor;
 
 public class ConfigurationSectionHandler implements IValueHandler<ConfigurationSection> {
@@ -51,7 +51,7 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
 				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
 						editor.getHandler(key).getClass(), 32),
-				editor.settings, () -> editor.getCurrent().getConfigurationSection(key), k -> {
+				() -> editor.getCurrent().getConfigurationSection(key), k -> {
 					throw new UnsupportedOperationException();
 				}, () -> editor.open());
 	}
@@ -63,8 +63,7 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			EditorSettings settings, Supplier<ConfigurationSection> valSup, Consumer<ConfigurationSection> onEdit,
-			Runnable onBack) {
+			Supplier<ConfigurationSection> valSup, Consumer<ConfigurationSection> onEdit, Runnable onBack) {
 		yfe.closeAll();
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> {
 			ConfigurationSectionEditor e = new ConfigurationSectionEditor(yfe, Bukkit.getPlayer(id), valSup.get(),
@@ -72,5 +71,10 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 			e.addRootBackItem(onBack);
 			e.open();
 		}, 1);
+	}
+
+	@Override
+	public ConfigurationSection defaultValue() {
+		return new MemoryConfiguration();
 	}
 }

@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.handler;
+package de.ancash.minecraft.inventory.editor;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.InventoryItem;
-import de.ancash.minecraft.inventory.editor.EditorSettings;
 
 public class BooleanEditor extends ValueEditor<Boolean> {
 
@@ -20,7 +19,7 @@ public class BooleanEditor extends ValueEditor<Boolean> {
 				new InventoryItem(this, getEditorItem(), 13, (a, b, c, top) -> Lambda.execIf(top, this::toggle)));
 	}
 
-	protected void toggle() {
+	public void toggle() {
 		onToggle.run();
 		addInventoryItem(new InventoryItem(this,
 				ItemStackUtils.setDisplayname(settings.getBooleanItem(), String.valueOf(valSup.get())), 13,

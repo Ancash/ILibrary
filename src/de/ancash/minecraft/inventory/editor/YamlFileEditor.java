@@ -8,7 +8,8 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
@@ -21,19 +22,20 @@ import de.ancash.minecraft.inventory.editor.handler.DoubleHandler;
 import de.ancash.minecraft.inventory.editor.handler.IValueHandler;
 import de.ancash.minecraft.inventory.editor.handler.ListHandler;
 import de.ancash.minecraft.inventory.editor.handler.LongHandler;
+import de.ancash.minecraft.inventory.editor.handler.MapHandler;
 import de.ancash.minecraft.inventory.editor.handler.StringHandler;
 
 public class YamlFileEditor {
 
-	public static final List<IValueHandler<?>> DEFAULT_VALUE_HANDLER = Collections
-			.unmodifiableList(Arrays.asList(BooleanHandler.INSTANCE, ConfigurationSectionHandler.INSTANCE,
-					LongHandler.INSTANCE, DoubleHandler.INSTANCE, ListHandler.INSTANCE, StringHandler.INSTANCE));
+	public static final Set<IValueHandler<?>> DEFAULT_VALUE_HANDLER = Collections.unmodifiableSet(new HashSet<>(
+			Arrays.asList(ConfigurationSectionHandler.INSTANCE, MapHandler.INSTANCE, BooleanHandler.INSTANCE,
+					LongHandler.INSTANCE, DoubleHandler.INSTANCE, ListHandler.INSTANCE, StringHandler.INSTANCE)));
 
 	protected final File file;
 	protected final Player p;
 	protected final YamlFile yamlFile = new YamlFile();
 	protected final EditorSettings settings;
-	protected final List<IValueHandler<?>> handler;
+	protected final Set<IValueHandler<?>> handler;
 
 	public YamlFileEditor(File file, Player p)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
@@ -41,7 +43,7 @@ public class YamlFileEditor {
 		}, file, p);
 	}
 
-	public YamlFileEditor(File file, Player p, List<IValueHandler<?>> handler)
+	public YamlFileEditor(File file, Player p, Set<IValueHandler<?>> handler)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this(new EditorSettings() {
 		}, file, p, handler);
@@ -52,7 +54,7 @@ public class YamlFileEditor {
 		this(settings, file, p, DEFAULT_VALUE_HANDLER);
 	}
 
-	public YamlFileEditor(EditorSettings settings, File file, Player p, List<IValueHandler<?>> handler)
+	public YamlFileEditor(EditorSettings settings, File file, Player p, Set<IValueHandler<?>> handler)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this.file = file;
 		this.p = p;
@@ -76,11 +78,15 @@ public class YamlFileEditor {
 	public void closeAll() {
 		p.closeInventory();
 	}
-	
+
+	public EditorSettings getSettings() {
+		return settings;
+	}
+
 	public Collection<IValueHandler<?>> getValHandler() {
 		return handler;
 	}
-	
+
 	public static String createTitle(ConfigurationSection root, ConfigurationSection to) {
 		return createTitle(root, to, 32);
 	}

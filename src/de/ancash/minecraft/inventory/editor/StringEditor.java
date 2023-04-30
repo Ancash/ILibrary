@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.handler;
+package de.ancash.minecraft.inventory.editor;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -13,8 +13,8 @@ import de.ancash.ILibrary;
 import de.ancash.datastructures.tuples.Tuple;
 import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemBuilder;
+import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
-import de.ancash.minecraft.inventory.editor.EditorSettings;
 import de.ancash.minecraft.inventory.input.StringInputGUI;
 
 public class StringEditor extends ValueEditor<String> {
@@ -36,7 +36,6 @@ public class StringEditor extends ValueEditor<String> {
 	public void acceptInput() {
 		StringInputGUI sig = new StringInputGUI(ILibrary.getInstance(), Bukkit.getPlayer(getId()), s -> {
 			onEdit.accept(s);
-			closeAll();
 			Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
 					() -> new StringEditor(getId(), title, settings, valSup, onEdit, onBack), 1);
 		});
@@ -45,6 +44,7 @@ public class StringEditor extends ValueEditor<String> {
 		sig.setText(valSup.get().toString());
 		sig.isValid(str -> Tuple.of(str != null, null));
 		closeAll();
+		IGUIManager.remove(id);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> sig.open(), 1);
 	}
 }

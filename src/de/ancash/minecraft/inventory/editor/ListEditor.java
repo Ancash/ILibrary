@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.handler;
+package de.ancash.minecraft.inventory.editor;
 
 import java.util.Collection;
 import java.util.List;
@@ -12,8 +12,8 @@ import com.cryptomorin.xseries.XMaterial;
 
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.InventoryItem;
-import de.ancash.minecraft.inventory.editor.EditorSettings;
-import de.ancash.minecraft.inventory.editor.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.handler.IValueHandler;
+import de.ancash.minecraft.inventory.editor.handler.ListHandler;
 import net.md_5.bungee.api.ChatColor;
 
 @SuppressWarnings("rawtypes")
@@ -28,11 +28,7 @@ public class ListEditor<T> extends ValueEditor<List> {
 	@SuppressWarnings({ "unchecked", "nls" })
 	public ListEditor(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
 			EditorSettings settings, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack) {
-		super(id,
-				YamlFileEditor.cut(title + "<"
-						+ ListHandler.INSTANCE.getListType(valSup.get(), valHandler).getClazz().getSimpleName() + ">",
-						32),
-				36, settings, valSup, onBack);
+		super(id, title, 36, settings, valSup, onBack);
 		this.onEdit = onEdit;
 		type = (IValueHandler<T>) ListHandler.INSTANCE.getListType(valSup.get(), valHandler);
 		if (type == null) {
@@ -50,9 +46,10 @@ public class ListEditor<T> extends ValueEditor<List> {
 		if (l.size() <= pos)
 			return;
 		type.edit(yfe, yfe.getValHandler(), getId(),
-				YamlFileEditor.cut(String.join(":", title, String.valueOf(pos)), 32), settings, () -> (T) l.get(pos),
-				e -> l.set(pos, e),
-				() -> ListHandler.INSTANCE.edit(yfe, valHandler, id, title, settings, valSup, onEdit, onBack));
+				YamlFileEditor.cut(String.join(":", title, String.valueOf(pos)), 32), () -> (T) l.get(pos), e -> {
+					l.set(pos, e);
+					onEdit.accept(l);
+				}, () -> ListHandler.INSTANCE.edit(yfe, valHandler, id, title, valSup, onEdit, onBack));
 	}
 
 	protected void addMainItem() {
@@ -111,16 +108,15 @@ public class ListEditor<T> extends ValueEditor<List> {
 		StringBuilder builder = new StringBuilder();
 		builder.append("§eLeft click to go down").append("\n")
 				.append("§eClick mouse wheel to delete the selected element").append("\n")
-				.append("§eShift click to edit the selected element").append("\n");
+				.append("§eShift click to edit the selected element").append("\n")
+				.append("§7Type: " + type.getClazz().getSimpleName()).append("\n");
 		for (int i = pos; i - pos < getList().size(); i++) {
 			builder.append(ChatColor.WHITE.toString());
 			if (i == pos)
 				builder.append(">");
-			builder.append(getList().get(i % getList().size()));
-			builder.append('\n');
-			if (i == getList().size() - 1) {
-				builder.append("§f§l^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^").append("\n");
-			}
+			builder.append("[").append(i % getList().size()).append("]=");
+			String s = getList().get(i % getList().size()).toString().replace("\n", "\\n");
+			builder.append(s).append('\n');
 		}
 		return new ItemBuilder(XMaterial.CHEST).setDisplayname(title).setLore(builder.toString().split("\n")).build();
 	}

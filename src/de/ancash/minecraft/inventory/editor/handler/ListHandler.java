@@ -6,18 +6,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
 import com.cryptomorin.xseries.XMaterial;
 
+import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.EditorSettings;
+import de.ancash.minecraft.inventory.editor.ListEditor;
 import de.ancash.minecraft.inventory.editor.YamlFileEditor;
 
 @SuppressWarnings("rawtypes")
@@ -62,7 +64,7 @@ public class ListHandler implements IValueHandler<List> {
 	}
 
 	@SuppressWarnings("nls")
-	public IValueHandler<?> getListType(List l, Collection<IValueHandler<?>> valHandler) {
+	public IValueHandler<?> getListType(List<?> l, Collection<IValueHandler<?>> valHandler) {
 		List<IValueHandler<?>> handler = new ArrayList<>(valHandler);
 		for (Object o : l) {
 			Iterator<IValueHandler<?>> iter = handler.iterator();
@@ -74,7 +76,8 @@ public class ListHandler implements IValueHandler<List> {
 			}
 		}
 		if (handler.isEmpty())
-			throw new IllegalStateException("could not determin list type of: \n" + valueToString(l));
+			throw new IllegalStateException("could not determin list type of: \n"
+					+ l.stream().filter(i -> i != null).map(Object::getClass).collect(Collectors.toList()));
 
 		return handler.get(0);
 	}
@@ -102,15 +105,20 @@ public class ListHandler implements IValueHandler<List> {
 		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
 				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
 						editor.getHandler(key).getClazz(), 32),
-				editor.settings, () -> editor.getCurrent().getList(key), k -> Function.identity(), editor::open);
+				() -> editor.getCurrent().getList(key), k -> editor.getCurrent().set(key, k), editor::open);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			EditorSettings settings, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack) {
+			Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack) {
 		yfe.closeAll();
-		new ListEditor(yfe, valHandler, id, title, settings, valSup, onEdit, onBack);
+		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
+				() -> new ListEditor(yfe, valHandler, id, title, yfe.getSettings(), valSup, onEdit, onBack), 1);
 	}
 
+	@Override
+	public List defaultValue() {
+		return new ArrayList<>();
+	}
 }

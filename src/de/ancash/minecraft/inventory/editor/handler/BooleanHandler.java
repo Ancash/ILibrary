@@ -6,13 +6,15 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import com.cryptomorin.xseries.XMaterial;
 
+import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
+import de.ancash.minecraft.inventory.editor.BooleanEditor;
 import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.EditorSettings;
 import de.ancash.minecraft.inventory.editor.YamlFileEditor;
 
 public class BooleanHandler implements IValueHandler<Boolean> {
@@ -48,14 +50,13 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 		item.setType(XMaterial.REDSTONE_TORCH.parseMaterial());
 		return item;
 	}
-	
+
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
 		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
 				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
 						editor.getHandler(key).getClazz(), 32),
-				editor.settings, () -> editor.getCurrent().getBoolean(key), b -> editor.getCurrent().set(key, b),
-				editor::open);
+				() -> editor.getCurrent().getBoolean(key), b -> editor.getCurrent().set(key, b), editor::open);
 	}
 
 	public void replaceValue(int[] arr, int find, int replace) {
@@ -74,9 +75,15 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			EditorSettings settings, Supplier<Boolean> valSup, Consumer<Boolean> onEdit, Runnable onBack) {
+			Supplier<Boolean> valSup, Consumer<Boolean> onEdit, Runnable onBack) {
 		yfe.closeAll();
-		new BooleanEditor(id, title, settings, () -> onEdit.accept(!valSup.get()), valSup, onBack);
+		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> new BooleanEditor(id, title, yfe.getSettings(),
+				() -> onEdit.accept(!valSup.get()), valSup, onBack), 1);
+	}
+
+	@Override
+	public Boolean defaultValue() {
+		return true;
 	}
 
 }

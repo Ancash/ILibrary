@@ -13,7 +13,7 @@ import com.cryptomorin.xseries.XMaterial;
 import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.EditorSettings;
+import de.ancash.minecraft.inventory.editor.DoubleEditor;
 import de.ancash.minecraft.inventory.editor.YamlFileEditor;
 
 public class DoubleHandler implements IValueHandler<Double> {
@@ -60,8 +60,7 @@ public class DoubleHandler implements IValueHandler<Double> {
 		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
 				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
 						editor.getHandler(key).getClazz(), 32),
-				editor.getSettings(), () -> editor.getCurrent().getDouble(key), d -> editor.getCurrent().set(key, d),
-				editor::open);
+				() -> editor.getCurrent().getDouble(key), d -> editor.getCurrent().set(key, d), editor::open);
 	}
 
 	@Override
@@ -71,9 +70,14 @@ public class DoubleHandler implements IValueHandler<Double> {
 
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			EditorSettings settings, Supplier<Double> valSup, Consumer<Double> onEdit, Runnable onBack) {
+			Supplier<Double> valSup, Consumer<Double> onEdit, Runnable onBack) {
 		yfe.closeAll();
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
-				() -> new DoubleEditor(id, title, settings, valSup, onEdit, onBack), 1);
+				() -> new DoubleEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack), 1);
+	}
+
+	@Override
+	public Double defaultValue() {
+		return 0d;
 	}
 }

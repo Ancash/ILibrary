@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.handler;
+package de.ancash.minecraft.inventory.editor;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -12,8 +12,8 @@ import com.cryptomorin.xseries.XMaterial;
 import de.ancash.ILibrary;
 import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemBuilder;
+import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
-import de.ancash.minecraft.inventory.editor.EditorSettings;
 import de.ancash.minecraft.inventory.input.NumberInputGUI;
 
 public class DoubleEditor extends ValueEditor<Double> {
@@ -36,7 +36,6 @@ public class DoubleEditor extends ValueEditor<Double> {
 		NumberInputGUI<Double> nig = new NumberInputGUI<>(ILibrary.getInstance(), Bukkit.getPlayer(getId()),
 				Double.class, s -> {
 					onEdit.accept(s);
-					closeAll();
 					Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
 							() -> new DoubleEditor(getId(), title, settings, valSup, onEdit, onBack), 1);
 				});
@@ -44,6 +43,7 @@ public class DoubleEditor extends ValueEditor<Double> {
 		nig.setTitle(title);
 		nig.setText(valSup.get().toString());
 		closeAll();
+		IGUIManager.remove(id);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> nig.start(), 1);
 	}
 }
