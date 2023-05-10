@@ -49,11 +49,10 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
 		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
-				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
-						editor.getHandler(key).getClass(), 32),
+				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent().getConfigurationSection(key), 32),
 				() -> editor.getCurrent().getConfigurationSection(key), k -> {
 					throw new UnsupportedOperationException();
-				}, () -> editor.open());
+				}, () -> editor.open(), () -> editor.getCurrent().remove(key));
 	}
 
 	@Override
@@ -63,11 +62,11 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<ConfigurationSection> valSup, Consumer<ConfigurationSection> onEdit, Runnable onBack) {
-		yfe.closeAll();
+			Supplier<ConfigurationSection> valSup, Consumer<ConfigurationSection> onEdit, Runnable onBack,
+			Runnable onDelete) {
+		ConfigurationSectionEditor e = new ConfigurationSectionEditor(yfe, Bukkit.getPlayer(id), yfe.getRoot(),
+				valSup.get(), onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> {
-			ConfigurationSectionEditor e = new ConfigurationSectionEditor(yfe, Bukkit.getPlayer(id), valSup.get(),
-					valSup.get());
 			e.addRootBackItem(onBack);
 			e.open();
 		}, 1);

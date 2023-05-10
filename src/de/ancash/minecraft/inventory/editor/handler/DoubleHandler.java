@@ -60,7 +60,8 @@ public class DoubleHandler implements IValueHandler<Double> {
 		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
 				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
 						editor.getHandler(key).getClazz(), 32),
-				() -> editor.getCurrent().getDouble(key), d -> editor.getCurrent().set(key, d), editor::open);
+				() -> editor.getCurrent().getDouble(key), d -> editor.getCurrent().set(key, d), editor::open,
+				() -> editor.getCurrent().remove(key));
 	}
 
 	@Override
@@ -70,10 +71,9 @@ public class DoubleHandler implements IValueHandler<Double> {
 
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<Double> valSup, Consumer<Double> onEdit, Runnable onBack) {
-		yfe.closeAll();
-		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
-				() -> new DoubleEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack), 1);
+			Supplier<Double> valSup, Consumer<Double> onEdit, Runnable onBack, Runnable onDelete) {
+		DoubleEditor de = new DoubleEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack, onDelete);
+		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> de.open(), 1);
 	}
 
 	@Override

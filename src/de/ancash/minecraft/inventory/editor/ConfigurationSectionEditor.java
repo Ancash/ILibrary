@@ -39,16 +39,18 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	protected final Set<IValueHandler<?>> handler;
 	protected final Map<String, IValueHandler<?>> mappedTypes = new HashMap<String, IValueHandler<?>>();
 	protected boolean finishedConstructor = false;
+	protected final Runnable onDelete;
 
 	public ConfigurationSectionEditor(YamlFileEditor editor, Player player, ConfigurationSection root,
-			ConfigurationSection current) {
-		this(editor, player, root, current, YamlFileEditor.DEFAULT_VALUE_HANDLER);
+			ConfigurationSection current, Runnable onDelete) {
+		this(editor, player, root, current, YamlFileEditor.DEFAULT_VALUE_HANDLER, onDelete);
 	}
 
 	public ConfigurationSectionEditor(YamlFileEditor editor, Player player, ConfigurationSection root,
-			ConfigurationSection current, Set<IValueHandler<?>> handler) {
+			ConfigurationSection current, Set<IValueHandler<?>> handler, Runnable onDelete) {
 		super(player.getUniqueId(), YamlFileEditor.createTitle(root, current), 54, editor.settings, null, null);
 		finishedConstructor = true;
+		this.onDelete = onDelete;
 		this.handler = handler;
 		this.root = root;
 		this.current = current;
@@ -72,13 +74,16 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	public void open() {
 		if (!finishedConstructor)
 			return;
+		if (!root.getCurrentPath().isEmpty() && !current.getCurrentPath().startsWith(root.getCurrentPath())) {
+			return;
+		}
 		loadConfiguration();
 		mapTypes();
 		loadPage();
 		super.open();
 	}
 
-	protected void loadAddOptions() {
+	protected void loadOptions() {
 		addInventoryItem(new InventoryItem(this, settings.addStringItem(), 46,
 				(a, b, c, top) -> Lambda.execIf(top, () -> createKey(StringHandler.INSTANCE,
 						XMaterial.matchXMaterial(settings.addStringItem()).parseItem()))));
@@ -93,6 +98,16 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 		addInventoryItem(new InventoryItem(this, settings.addConfigurationSectionItem(), 50,
 				(a, b, c, top) -> Lambda.execIf(top, () -> createKey(ConfigurationSectionHandler.INSTANCE,
 						XMaterial.matchXMaterial(settings.addConfigurationSectionItem()).parseItem()))));
+		if (onDelete != null)
+			addInventoryItem(
+					new InventoryItem(this, settings.deleteItem(), 51, (a, b, c, top) -> Lambda.execIf(top, () -> {
+						onDelete.run();
+						super.back();
+					})));
+		addInventoryItem(new InventoryItem(this, settings.saveItem(), 52, (a, b, c, top) -> Lambda.execIf(top, () -> {
+			editor.onSave.accept(editor);
+			closeAll();
+		})));
 	}
 
 	protected void createKey(IValueHandler<?> type, ItemStack item) {
@@ -172,7 +187,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 		if (hasNextPage())
 			addInventoryItem(new InventoryItem(this, settings.getNextItem(), getSize() - 1,
 					(a, b, c, top) -> Lambda.execIf(top, this::nextPage)));
-		loadAddOptions();
+		loadOptions();
 	}
 
 	public void prevPage() {

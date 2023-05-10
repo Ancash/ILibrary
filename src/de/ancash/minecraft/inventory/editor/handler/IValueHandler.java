@@ -35,7 +35,7 @@ public interface IValueHandler<T> {
 	public String valueToString(ConfigurationSection section, String s);
 
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<T> valSup, Consumer<T> onEdit, Runnable onBack);
+			Supplier<T> valSup, Consumer<T> onEdit, Runnable onBack, Runnable onDelete);
 
 	public T defaultValue();
 }

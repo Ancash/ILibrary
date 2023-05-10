@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.cryptomorin.xseries.XMaterial;
 
+import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.InventoryItem;
 import de.ancash.minecraft.inventory.editor.handler.IValueHandler;
@@ -24,19 +25,27 @@ public class ListEditor<T> extends ValueEditor<List> {
 	protected final Consumer<List> onEdit;
 	protected final YamlFileEditor yfe;
 	protected final IValueHandler<T> type;
+	protected final Runnable onDelete;
 
 	@SuppressWarnings({ "unchecked", "nls" })
 	public ListEditor(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			EditorSettings settings, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack) {
+			EditorSettings settings, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack, Runnable onDelete) {
 		super(id, title, 36, settings, valSup, onBack);
 		this.onEdit = onEdit;
 		type = (IValueHandler<T>) ListHandler.INSTANCE.getListType(valSup.get(), valHandler);
+		this.onDelete = onDelete;
 		if (type == null) {
 			closeAll();
 			throw new IllegalStateException("could not match " + valSup.toString().getClass());
 		}
 		this.valHandler = valHandler;
 		this.yfe = yfe;
+		if (onDelete != null)
+			addInventoryItem(
+					new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
+						onDelete.run();
+						super.back();
+					})));
 		addMainItem();
 	}
 
@@ -49,7 +58,7 @@ public class ListEditor<T> extends ValueEditor<List> {
 				YamlFileEditor.cut(String.join(":", title, String.valueOf(pos)), 32), () -> (T) l.get(pos), e -> {
 					l.set(pos, e);
 					onEdit.accept(l);
-				}, () -> ListHandler.INSTANCE.edit(yfe, valHandler, id, title, valSup, onEdit, onBack));
+				}, () -> ListHandler.INSTANCE.edit(yfe, valHandler, id, title, valSup, onEdit, onBack, onDelete), null);
 	}
 
 	protected void addMainItem() {

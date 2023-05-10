@@ -56,7 +56,8 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
 				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
 						editor.getHandler(key).getClazz(), 32),
-				() -> editor.getCurrent().getBoolean(key), b -> editor.getCurrent().set(key, b), editor::open);
+				() -> editor.getCurrent().getBoolean(key), b -> editor.getCurrent().set(key, b), editor::open,
+				() -> editor.getCurrent().remove(key));
 	}
 
 	public void replaceValue(int[] arr, int find, int replace) {
@@ -75,10 +76,10 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<Boolean> valSup, Consumer<Boolean> onEdit, Runnable onBack) {
-		yfe.closeAll();
-		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> new BooleanEditor(id, title, yfe.getSettings(),
-				() -> onEdit.accept(!valSup.get()), valSup, onBack), 1);
+			Supplier<Boolean> valSup, Consumer<Boolean> onEdit, Runnable onBack, Runnable onDelete) {
+		BooleanEditor be = new BooleanEditor(id, title, yfe.getSettings(), () -> onEdit.accept(!valSup.get()), valSup,
+				onBack, onDelete);
+		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> be.open(), 1);
 	}
 
 	@Override

@@ -19,13 +19,21 @@ import de.ancash.minecraft.inventory.input.NumberInputGUI;
 public class LongEditor extends ValueEditor<Long> {
 
 	protected final Consumer<Long> onEdit;
+	protected final Runnable onDelete;
 
 	public LongEditor(UUID id, String title, EditorSettings settings, Supplier<Long> valSup, Consumer<Long> onEdit,
-			Runnable onBack) {
+			Runnable onBack, Runnable onDelete) {
 		super(id, title, 36, settings, valSup, onBack);
 		this.onEdit = onEdit;
+		this.onDelete = onDelete;
 		addInventoryItem(
 				new InventoryItem(this, getEditorItem(), 13, (a, b, c, top) -> Lambda.execIf(top, this::acceptInput)));
+		if (onDelete != null)
+			addInventoryItem(
+					new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
+						onDelete.run();
+						super.back();
+					})));
 	}
 
 	public ItemStack getEditorItem() {
@@ -37,7 +45,7 @@ public class LongEditor extends ValueEditor<Long> {
 				s -> {
 					onEdit.accept(s);
 					Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
-							() -> new LongEditor(getId(), title, settings, valSup, onEdit, onBack), 1);
+							() -> new LongEditor(getId(), title, settings, valSup, onEdit, onBack, onDelete), 1);
 				});
 		nig.setLeft(XMaterial.DIRT.parseItem());
 		nig.setTitle(title);

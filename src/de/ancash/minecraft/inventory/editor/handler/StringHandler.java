@@ -61,7 +61,8 @@ public class StringHandler implements IValueHandler<String> {
 		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
 				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
 						editor.getHandler(key).getClazz(), 32),
-				() -> editor.getCurrent().getString(key), s -> editor.getCurrent().set(key, s), editor::open);
+				() -> editor.getCurrent().getString(key), s -> editor.getCurrent().set(key, s), editor::open,
+				() -> editor.getCurrent().remove(key));
 	}
 
 	@Override
@@ -71,10 +72,9 @@ public class StringHandler implements IValueHandler<String> {
 
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<String> valSup, Consumer<String> onEdit, Runnable onBack) {
-		yfe.closeAll();
-		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
-				() -> new StringEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack), 1);
+			Supplier<String> valSup, Consumer<String> onEdit, Runnable onBack, Runnable onDelete) {
+		StringEditor se = new StringEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack, onDelete);
+		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> se.open(), 1);
 	}
 
 	@SuppressWarnings("nls")

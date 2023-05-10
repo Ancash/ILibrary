@@ -12,11 +12,17 @@ public class BooleanEditor extends ValueEditor<Boolean> {
 	protected final Runnable onToggle;
 
 	public BooleanEditor(UUID id, String title, EditorSettings settings, Runnable onToggle, Supplier<Boolean> valSup,
-			Runnable onBack) {
+			Runnable onBack, Runnable onDelete) {
 		super(id, title, 36, settings, valSup, onBack);
 		this.onToggle = onToggle;
 		addInventoryItem(
 				new InventoryItem(this, getEditorItem(), 13, (a, b, c, top) -> Lambda.execIf(top, this::toggle)));
+		if (onDelete != null)
+			addInventoryItem(
+					new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
+						onDelete.run();
+						super.back();
+					})));
 	}
 
 	public void toggle() {

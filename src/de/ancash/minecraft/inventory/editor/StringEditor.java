@@ -20,13 +20,21 @@ import de.ancash.minecraft.inventory.input.StringInputGUI;
 public class StringEditor extends ValueEditor<String> {
 
 	protected final Consumer<String> onEdit;
+	protected final Runnable onDelete;
 
 	public StringEditor(UUID id, String title, EditorSettings settings, Supplier<String> valSup,
-			Consumer<String> onEdit, Runnable onBack) {
+			Consumer<String> onEdit, Runnable onBack, Runnable onDelete) {
 		super(id, title, 36, settings, valSup, onBack);
 		this.onEdit = onEdit;
+		this.onDelete = onDelete;
 		addInventoryItem(
 				new InventoryItem(this, getEditorItem(), 13, (a, b, c, top) -> Lambda.execIf(top, this::acceptInput)));
+		if (onDelete != null)
+			addInventoryItem(
+					new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
+						onDelete.run();
+						super.back();
+					})));
 	}
 
 	public ItemStack getEditorItem() {
@@ -37,7 +45,7 @@ public class StringEditor extends ValueEditor<String> {
 		StringInputGUI sig = new StringInputGUI(ILibrary.getInstance(), Bukkit.getPlayer(getId()), s -> {
 			onEdit.accept(s);
 			Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
-					() -> new StringEditor(getId(), title, settings, valSup, onEdit, onBack), 1);
+					() -> new StringEditor(getId(), title, settings, valSup, onEdit, onBack, onDelete), 1);
 		});
 		sig.setLeft(XMaterial.DIRT.parseItem());
 		sig.setTitle(title);

@@ -105,16 +105,17 @@ public class ListHandler implements IValueHandler<List> {
 		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
 				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
 						editor.getHandler(key).getClazz(), 32),
-				() -> editor.getCurrent().getList(key), k -> editor.getCurrent().set(key, k), editor::open);
+				() -> editor.getCurrent().getList(key), k -> editor.getCurrent().set(key, k), editor::open,
+				() -> editor.getCurrent().remove(key));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack) {
-		yfe.closeAll();
-		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
-				() -> new ListEditor(yfe, valHandler, id, title, yfe.getSettings(), valSup, onEdit, onBack), 1);
+			Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack, Runnable onDelete) {
+		ListEditor<?> le = new ListEditor(yfe, valHandler, id, title, yfe.getSettings(), valSup, onEdit, onBack,
+				onDelete);
+		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> le.open(), 1);
 	}
 
 	@Override

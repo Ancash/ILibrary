@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
@@ -34,32 +35,59 @@ public class YamlFileEditor {
 	protected final File file;
 	protected final Player p;
 	protected final YamlFile yamlFile = new YamlFile();
+	protected final String root;
 	protected final EditorSettings settings;
 	protected final Set<IValueHandler<?>> handler;
+	protected final Consumer<YamlFileEditor> onSave;
 
-	public YamlFileEditor(File file, Player p)
+	public YamlFileEditor(File file, Player p, Consumer<YamlFileEditor> onSave)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this(new EditorSettings() {
-		}, file, p);
+		}, file, p, onSave);
 	}
 
-	public YamlFileEditor(File file, Player p, Set<IValueHandler<?>> handler)
+	public YamlFileEditor(File file, Player p, String root, Consumer<YamlFileEditor> onSave)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this(new EditorSettings() {
-		}, file, p, handler);
+		}, file, p, root, onSave);
 	}
 
-	public YamlFileEditor(EditorSettings settings, File file, Player p)
+	public YamlFileEditor(File file, Player p, Set<IValueHandler<?>> handler, Consumer<YamlFileEditor> onSave)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
-		this(settings, file, p, DEFAULT_VALUE_HANDLER);
+		this(new EditorSettings() {
+		}, file, p, handler, onSave);
 	}
 
-	public YamlFileEditor(EditorSettings settings, File file, Player p, Set<IValueHandler<?>> handler)
+	public YamlFileEditor(File file, Player p, Set<IValueHandler<?>> handler, String root,
+			Consumer<YamlFileEditor> onSave) throws FileNotFoundException, IOException, InvalidConfigurationException {
+		this(new EditorSettings() {
+		}, file, p, handler, root, onSave);
+	}
+
+	public YamlFileEditor(EditorSettings settings, File file, Player p, Consumer<YamlFileEditor> onSave)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
+		this(settings, file, p, DEFAULT_VALUE_HANDLER, onSave);
+	}
+
+	public YamlFileEditor(EditorSettings settings, File file, Player p, String root, Consumer<YamlFileEditor> onSave)
+			throws FileNotFoundException, IOException, InvalidConfigurationException {
+		this(settings, file, p, DEFAULT_VALUE_HANDLER, root, onSave);
+	}
+
+	@SuppressWarnings("nls")
+	public YamlFileEditor(EditorSettings settings, File file, Player p, Set<IValueHandler<?>> handler,
+			Consumer<YamlFileEditor> onSave) throws FileNotFoundException, IOException, InvalidConfigurationException {
+		this(settings, file, p, handler, "", onSave);
+	}
+
+	public YamlFileEditor(EditorSettings settings, File file, Player p, Set<IValueHandler<?>> handler, String root,
+			Consumer<YamlFileEditor> onSave) throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this.file = file;
+		this.root = root;
 		this.p = p;
 		this.settings = settings;
 		this.handler = handler;
+		this.onSave = onSave;
 		load();
 	}
 
@@ -68,15 +96,23 @@ public class YamlFileEditor {
 		StringBuilder builder = new StringBuilder();
 		Files.lines(file.toPath(), StandardCharsets.UTF_8).forEach(s -> builder.append(s).append('\n'));
 		yamlFile.loadFromString(builder.toString().replace("==: ", "clazz: "));
+		if (!yamlFile.isConfigurationSection(root))
+			throw new IllegalStateException(root + " is not configuration section");
+		yamlFile.setConfigurationFile(file);
 	}
 
 	public void open() {
-		ConfigurationSectionEditor editor = new ConfigurationSectionEditor(this, p, yamlFile, yamlFile, handler);
+		ConfigurationSectionEditor editor = new ConfigurationSectionEditor(this, p,
+				yamlFile.getConfigurationSection(root), yamlFile.getConfigurationSection(root), handler, null);
 		editor.open();
 	}
 
-	public void closeAll() {
-		p.closeInventory();
+	protected Consumer<YamlFileEditor> getOnSave() {
+		return onSave;
+	}
+
+	public YamlFile getYamlFile() {
+		return yamlFile;
 	}
 
 	public EditorSettings getSettings() {
@@ -87,12 +123,22 @@ public class YamlFileEditor {
 		return handler;
 	}
 
+	public ConfigurationSection getRoot() {
+		return yamlFile.getConfigurationSection(root);
+	}
+
 	public static String createTitle(ConfigurationSection root, ConfigurationSection to) {
 		return createTitle(root, to, 32);
 	}
 
+	@SuppressWarnings("nls")
 	public static String createTitle(ConfigurationSection root, ConfigurationSection to, int max) {
-		return cut(root.getCurrentPath(), max);
+		if (root.getCurrentPath().isEmpty()) {
+			if (to.getCurrentPath().isEmpty())
+				return "~";
+			return cut("~." + to.getCurrentPath(), max);
+		}
+		return cut(to.getCurrentPath().replace(root.getCurrentPath(), "~"), max);
 	}
 
 	public static String createTitle(ConfigurationSection root, ConfigurationSection to, String key) {
@@ -104,6 +150,7 @@ public class YamlFileEditor {
 		return cut(String.join(":", YamlFileEditor.createTitle(root, to), key), max);
 	}
 
+	@SuppressWarnings("nls")
 	public static String createTitle(ConfigurationSection root, ConfigurationSection to, String key, Class<?> clazz,
 			int max) {
 		return YamlFileEditor.cut(String.join(":", YamlFileEditor.createTitle(root, to, key), clazz.getSimpleName()),

@@ -60,7 +60,8 @@ public class LongHandler implements IValueHandler<Long> {
 		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
 				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
 						editor.getHandler(key).getClazz(), 32),
-				() -> editor.getCurrent().getLong(key), l -> editor.getCurrent().set(key, l), editor::open);
+				() -> editor.getCurrent().getLong(key), l -> editor.getCurrent().set(key, l), editor::open,
+				() -> editor.getCurrent().remove(key));
 	}
 
 	@Override
@@ -70,10 +71,9 @@ public class LongHandler implements IValueHandler<Long> {
 
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<Long> valSup, Consumer<Long> onEdit, Runnable onBack) {
-		yfe.closeAll();
-		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
-				() -> new LongEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack), 1);
+			Supplier<Long> valSup, Consumer<Long> onEdit, Runnable onBack, Runnable onDelete) {
+		LongEditor le = new LongEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack, onDelete);
+		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> le.open(), 1);
 	}
 
 	@Override

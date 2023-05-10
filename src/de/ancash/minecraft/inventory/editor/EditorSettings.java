@@ -72,4 +72,14 @@ public interface EditorSettings {
 	public default ItemStack getPrevItem() {
 		return new ItemBuilder(XMaterial.ARROW).setDisplayname("Prev").build();
 	}
+
+	@SuppressWarnings("nls")
+	public default ItemStack saveItem() {
+		return new ItemBuilder(XMaterial.GREEN_STAINED_GLASS_PANE).setDisplayname("§aSave").build();
+	}
+
+	@SuppressWarnings("nls")
+	public default ItemStack deleteItem() {
+		return new ItemBuilder(XMaterial.RED_STAINED_GLASS_PANE).setDisplayname("§cDelete").build();
+	}
 }

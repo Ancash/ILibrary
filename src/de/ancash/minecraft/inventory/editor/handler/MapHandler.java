@@ -58,14 +58,14 @@ public class MapHandler implements IValueHandler<Map> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<Map> valSup, Consumer<Map> onEdit, Runnable onBack) {
+			Supplier<Map> valSup, Consumer<Map> onEdit, Runnable onBack, Runnable onDelete) {
 		MemoryConfiguration mc = new MemoryConfiguration();
 		Map<String, Object> m = valSup.get();
 		m.entrySet().forEach(entry -> mc.set(entry.getKey(), entry.getValue()));
 		ConfigurationSectionHandler.INSTANCE.edit(yfe, valHandler, id, title, () -> mc, null, () -> {
 			onEdit.accept(mc.getMapValues(true));
 			onBack.run();
-		});
+		}, onDelete);
 	}
 
 	@Override
