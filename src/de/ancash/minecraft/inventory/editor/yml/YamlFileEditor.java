@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -27,9 +26,17 @@ import de.ancash.minecraft.inventory.editor.yml.handler.StringHandler;
 
 public class YamlFileEditor {
 
-	public static final List<IValueHandler<?>> DEFAULT_VALUE_HANDLER = Collections.unmodifiableList(
-			Arrays.asList(ConfigurationSectionHandler.INSTANCE, MapHandler.INSTANCE, BooleanHandler.INSTANCE,
-					LongHandler.INSTANCE, DoubleHandler.INSTANCE, ListHandler.INSTANCE, StringHandler.INSTANCE));
+	private static final List<IValueHandler<?>> DEFAULT_VALUE_HANDLER = Arrays.asList(
+			ConfigurationSectionHandler.INSTANCE, MapHandler.INSTANCE, BooleanHandler.INSTANCE, LongHandler.INSTANCE,
+			DoubleHandler.INSTANCE, ListHandler.INSTANCE, StringHandler.INSTANCE);
+
+	public static List<IValueHandler<?>> getDefaultHandler() {
+		return Collections.unmodifiableList(DEFAULT_VALUE_HANDLER);
+	}
+
+	public static synchronized void addValueHandler(IValueHandler<?> handler) {
+		DEFAULT_VALUE_HANDLER.add(0, handler);
+	}
 
 	protected final File file;
 	protected final Player p;
@@ -65,12 +72,12 @@ public class YamlFileEditor {
 
 	public YamlFileEditor(EditorSettings settings, File file, Player p, Consumer<YamlFileEditor> onSave)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
-		this(settings, file, p, DEFAULT_VALUE_HANDLER, onSave);
+		this(settings, file, p, Collections.unmodifiableList(DEFAULT_VALUE_HANDLER), onSave);
 	}
 
 	public YamlFileEditor(EditorSettings settings, File file, Player p, String root, Consumer<YamlFileEditor> onSave)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
-		this(settings, file, p, DEFAULT_VALUE_HANDLER, root, onSave);
+		this(settings, file, p, Collections.unmodifiableList(DEFAULT_VALUE_HANDLER), root, onSave);
 	}
 
 	@SuppressWarnings("nls")
@@ -106,6 +113,20 @@ public class YamlFileEditor {
 		editor.open();
 	}
 
+	public IValueHandler<?> getHandler(Object o) {
+		for (IValueHandler<?> ivh : handler)
+			if (ivh.isValid(o))
+				return ivh;
+		return null;
+	}
+
+	public IValueHandler<?> getHandler(ConfigurationSection cs, String key) {
+		for (IValueHandler<?> ivh : handler)
+			if (ivh.isValid(cs, key))
+				return ivh;
+		return null;
+	}
+
 	protected Consumer<YamlFileEditor> getOnSave() {
 		return onSave;
 	}
@@ -118,7 +139,7 @@ public class YamlFileEditor {
 		return settings;
 	}
 
-	public Collection<IValueHandler<?>> getValHandler() {
+	public List<IValueHandler<?>> getValHandler() {
 		return handler;
 	}
 

@@ -1,6 +1,6 @@
 package de.ancash.minecraft.inventory.editor.yml.handler;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -71,7 +71,7 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 	}
 
 	@Override
-	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
+	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
 			Supplier<ConfigurationSection> valSup, Consumer<ConfigurationSection> onEdit, Runnable onBack,
 			Runnable onDelete) {
 		ConfigurationSectionEditor e = new ConfigurationSectionEditor(yfe, Bukkit.getPlayer(id), yfe.getRoot(),

@@ -1,6 +1,6 @@
 package de.ancash.minecraft.inventory.editor.yml.handler;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -23,7 +23,7 @@ public interface IValueHandler<T> {
 
 	public void set(ConfigurationSection section, String key, T value);
 
-	public Class<T> getClazz();
+	public Class<?> getClazz();
 
 	public default ItemStack getEditItem(ConfigurationSectionEditor editor, String key) {
 		return ItemStackUtils.setDisplayname(editor.getSettings().getKeyValueItem(editor.getCurrent(), key, this),
@@ -34,10 +34,16 @@ public interface IValueHandler<T> {
 
 	public String valueToString(ConfigurationSection section, String s);
 
-	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<T> valSup, Consumer<T> onEdit, Runnable onBack, Runnable onDelete);
+	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title, Supplier<T> valSup,
+			Consumer<T> onEdit, Runnable onBack, Runnable onDelete);
 
 	public T defaultValue();
+
+	@SuppressWarnings("unchecked")
+	public default void castEdit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
+			Supplier<?> valSup, Consumer<?> onEdit, Runnable onBack, Runnable onDelete) {
+		edit(yfe, valHandler, id, title, (Supplier<T>) valSup, (Consumer<T>) onEdit, onBack, onDelete);
+	}
 
 	public ItemStack getAddItem();
 }

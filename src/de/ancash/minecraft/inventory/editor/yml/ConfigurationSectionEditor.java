@@ -32,13 +32,13 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	protected final List<String> keys = new ArrayList<>();
 	protected int keysPage;
 	protected final List<IValueHandler<?>> handler;
-	protected final Map<String, IValueHandler<?>> mappedTypes = new HashMap<String, IValueHandler<?>>();
+	protected final Map<String, IValueHandler<?>> mappedHandler = new HashMap<String, IValueHandler<?>>();
 	protected boolean finishedConstructor = false;
 	protected final Runnable onDelete;
 
 	public ConfigurationSectionEditor(YamlFileEditor editor, Player player, ConfigurationSection root,
 			ConfigurationSection current, Runnable onDelete) {
-		this(editor, player, root, current, YamlFileEditor.DEFAULT_VALUE_HANDLER, onDelete);
+		this(editor, player, root, current, YamlFileEditor.getDefaultHandler(), onDelete);
 	}
 
 	public ConfigurationSectionEditor(YamlFileEditor editor, Player player, ConfigurationSection root,
@@ -62,7 +62,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	}
 
 	public IValueHandler<?> getHandler(String key) {
-		return mappedTypes.get(key);
+		return mappedHandler.get(key);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 			return;
 		}
 		loadConfiguration();
-		mapTypes();
+		mapHandler();
 		loadPage();
 		super.open();
 	}
@@ -81,7 +81,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	@SuppressWarnings("nls")
 	protected void addAddItem() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("§eLeft click to go down").append("\n").append("§eRight click to add property").append("\n");
+		builder.append("§eLeft click to select type").append("\n").append("§eRight click to add property").append("\n");
 		for (int i = 0; i < handler.size(); i++) {
 			IValueHandler<?> ivh = handler.get(i);
 			ItemStack add = ivh.getAddItem();
@@ -143,7 +143,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 		sig.setText("key");
 		sig.onComplete(key -> {
 			current.set(key, type.defaultValue());
-			mapTypes();
+			mapHandler();
 			Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> open(), keysPage);
 		});
 		IGUIManager.remove(getId());
@@ -156,22 +156,12 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	}
 
 	@SuppressWarnings("nls")
-	protected void mapTypes() {
-		mappedTypes.clear();
+	protected void mapHandler() {
+		mappedHandler.clear();
 		for (String key : getCurrent().getKeys(false)) {
-			IValueHandler<?> ivh = null;
-			for (IValueHandler<?> h : handler) {
-				if (h.isValid(getCurrent(), key)) {
-					if (ivh != null)
-						throw new IllegalStateException(
-								"multiple matches for " + key + " in " + getCurrent().getCurrentPath() + ": "
-										+ ivh.getClass().getCanonicalName() + " & " + h.getClass().getCanonicalName());
-					else
-						ivh = h;
-				}
-			}
+			IValueHandler<?> ivh = editor.getHandler(getCurrent(), key);
 			if (ivh != null)
-				mappedTypes.put(key, ivh);
+				mappedHandler.put(key, ivh);
 			else
 				throw new IllegalStateException("unknown type at "
 						+ String.join(".", getCurrent().getCurrentPath(), key) + ": " + getCurrent().get(key));
@@ -198,7 +188,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 			if (keys.size() <= k)
 				break;
 			String key = keys.get(k);
-			IValueHandler<?> handler = mappedTypes.get(key);
+			IValueHandler<?> handler = mappedHandler.get(key);
 			ItemStack item = handler.getEditItem(this, key);
 			addInventoryItem(new InventoryItem(this, item, pos++,
 					(a, b, c, top) -> Lambda.execIf(top, () -> handler.edit(this, key))));

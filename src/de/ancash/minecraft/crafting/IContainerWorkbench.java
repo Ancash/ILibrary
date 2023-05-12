@@ -2,6 +2,7 @@ package de.ancash.minecraft.crafting;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,9 +148,14 @@ public abstract class IContainerWorkbench {
 
 	private ItemStack craftRecipe0(Object iComplexRecipe) {
 		try {
-			Object result = getCraftRecipeMethod(iComplexRecipe).invoke(iComplexRecipe, getInventoryCrafting());
-			ItemStack r = (ItemStack) nmsItemStackAsBukkitCopy.invoke(null, result);
-			return r;
+			Method m = getCraftRecipeMethod(iComplexRecipe);
+			Object result = null;
+			if (m.getParameterCount() == 2) {
+				result = m.invoke(iComplexRecipe, getInventoryCrafting(), null);
+			} else {
+				result = m.invoke(iComplexRecipe, getInventoryCrafting());
+			}
+			return (ItemStack) nmsItemStackAsBukkitCopy.invoke(null, result);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new IllegalStateException("Could not assemble IRecipeComplex", e);
 		}
@@ -158,13 +164,30 @@ public abstract class IContainerWorkbench {
 	private Method getCraftRecipeMethod(Object complexRecipe) {
 		Class<?> clazz = complexRecipe.getClass();
 		return craftRecipeMethods.computeIfAbsent(clazz, key -> {
-			for (Method m : clazz.getDeclaredMethods())
-				if (m.getParameterCount() == 1
-						&& m.getParameters()[0].getType().getCanonicalName().endsWith("InventoryCrafting")
-						&& m.getReturnType().getCanonicalName().endsWith("ItemStack")) {
-					m.setAccessible(true);
-					return m;
+			for (Method m : clazz.getDeclaredMethods()) {
+				if (m.getParameterCount() >= 1) {
+					if (m.getParameterCount() == 1
+							&& m.getParameters()[0].getType().getCanonicalName().contains("Inventory")
+							&& m.getReturnType().getCanonicalName().endsWith("ItemStack")) {
+						m.setAccessible(true);
+						return m;
+					}
+					if (m.getParameterCount() == 2
+							&& m.getParameters()[0].getType().getCanonicalName().contains("Inventory")
+							&& m.getParameters()[1].getType().getCanonicalName().contains("RegistryCustom")
+							&& m.getReturnType().getCanonicalName().endsWith("ItemStack")) {
+						m.setAccessible(true);
+						return m;
+					}
 				}
+			}
+
+			System.err
+					.println("could not craft complex recipe, available methods in " + clazz.getCanonicalName() + ":");
+			System.err.println(Stream.of(clazz.getDeclaredMethods())
+					.map(m -> m.getName()
+							+ Stream.of(m.getParameters()).map(Parameter::getType).collect(Collectors.toList()))
+					.collect(Collectors.toList()));
 			throw new IllegalArgumentException("Could not find craft method for: " + complexRecipe.getClass());
 		});
 	}

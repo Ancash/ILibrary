@@ -1,6 +1,6 @@
 package de.ancash.minecraft.inventory.editor.yml.handler;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -82,7 +82,7 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 	}
 
 	@Override
-	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
+	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
 			Supplier<Boolean> valSup, Consumer<Boolean> onEdit, Runnable onBack, Runnable onDelete) {
 		BooleanEditor be = new BooleanEditor(id, title, yfe.getSettings(), () -> onEdit.accept(!valSup.get()), valSup,
 				onBack, onDelete);

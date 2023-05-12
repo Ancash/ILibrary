@@ -1,6 +1,6 @@
 package de.ancash.minecraft.inventory.editor.yml.handler;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -77,7 +77,7 @@ public class LongHandler implements IValueHandler<Long> {
 	}
 
 	@Override
-	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
+	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
 			Supplier<Long> valSup, Consumer<Long> onEdit, Runnable onBack, Runnable onDelete) {
 		LongEditor le = new LongEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack, onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> le.open(), 1);

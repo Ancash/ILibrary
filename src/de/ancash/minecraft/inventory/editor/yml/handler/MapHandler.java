@@ -1,7 +1,7 @@
 package de.ancash.minecraft.inventory.editor.yml.handler;
 
-import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -48,8 +48,8 @@ public class MapHandler implements IValueHandler<Map> {
 	}
 
 	@Override
-	public Class<Map> getClazz() {
-		return Map.class;
+	public Class<?> getClazz() {
+		return ConfigurationSection.class;
 	}
 
 	@Override
@@ -64,8 +64,8 @@ public class MapHandler implements IValueHandler<Map> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void edit(YamlFileEditor yfe, Collection<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<Map> valSup, Consumer<Map> onEdit, Runnable onBack, Runnable onDelete) {
+	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title, Supplier<Map> valSup,
+			Consumer<Map> onEdit, Runnable onBack, Runnable onDelete) {
 		MemoryConfiguration mc = new MemoryConfiguration();
 		Map<String, Object> m = valSup.get();
 		m.entrySet().forEach(entry -> mc.set(entry.getKey(), entry.getValue()));
