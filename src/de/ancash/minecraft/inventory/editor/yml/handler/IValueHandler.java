@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.handler;
+package de.ancash.minecraft.inventory.editor.yml.handler;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -10,8 +10,8 @@ import org.bukkit.inventory.ItemStack;
 
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
-import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
 
 public interface IValueHandler<T> {
 
@@ -38,4 +38,6 @@ public interface IValueHandler<T> {
 			Supplier<T> valSup, Consumer<T> onEdit, Runnable onBack, Runnable onDelete);
 
 	public T defaultValue();
+
+	public ItemStack getAddItem();
 }

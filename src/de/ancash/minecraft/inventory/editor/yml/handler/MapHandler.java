@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.handler;
+package de.ancash.minecraft.inventory.editor.yml.handler;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -7,10 +7,12 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.bukkit.inventory.ItemStack;
+
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.libs.org.simpleyaml.configuration.MemoryConfiguration;
-import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
 
 @SuppressWarnings("rawtypes")
 public class MapHandler implements IValueHandler<Map> {
@@ -28,6 +30,11 @@ public class MapHandler implements IValueHandler<Map> {
 	@Override
 	public boolean isValid(Object o) {
 		return o instanceof Map;
+	}
+
+	@Override
+	public ItemStack getAddItem() {
+		return null;
 	}
 
 	@Override

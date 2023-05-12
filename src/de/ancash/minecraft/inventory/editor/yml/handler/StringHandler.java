@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.handler;
+package de.ancash.minecraft.inventory.editor.yml.handler;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -12,10 +12,11 @@ import com.cryptomorin.xseries.XMaterial;
 
 import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
+import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.ItemStackUtils;
-import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.StringEditor;
-import de.ancash.minecraft.inventory.editor.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.StringEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
 
 public class StringHandler implements IValueHandler<String> {
 
@@ -81,5 +82,11 @@ public class StringHandler implements IValueHandler<String> {
 	@Override
 	public String defaultValue() {
 		return "";
+	}
+
+	@SuppressWarnings("nls")
+	@Override
+	public ItemStack getAddItem() {
+		return new ItemBuilder(XMaterial.OAK_SIGN).setDisplayname("§7Add String").build();
 	}
 }

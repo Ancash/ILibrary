@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.handler;
+package de.ancash.minecraft.inventory.editor.yml.handler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,9 +18,9 @@ import com.cryptomorin.xseries.XMaterial;
 import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
-import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.ListEditor;
-import de.ancash.minecraft.inventory.editor.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.ListEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
 
 @SuppressWarnings("rawtypes")
 public class ListHandler implements IValueHandler<List> {
@@ -48,6 +48,13 @@ public class ListHandler implements IValueHandler<List> {
 	@Override
 	public List get(ConfigurationSection section, String s) {
 		return section.getList(s);
+	}
+
+	@Override
+	public ItemStack getAddItem() {
+		return null;
+		// return new ItemBuilder(XMaterial.IRON_BARS).setDisplayname("§7Add
+		// List").build();
 	}
 
 	@SuppressWarnings("nls")

@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.handler;
+package de.ancash.minecraft.inventory.editor.yml.handler;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -13,9 +13,10 @@ import com.cryptomorin.xseries.XMaterial;
 
 import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
-import de.ancash.minecraft.inventory.editor.BooleanEditor;
-import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.YamlFileEditor;
+import de.ancash.minecraft.ItemBuilder;
+import de.ancash.minecraft.inventory.editor.yml.BooleanEditor;
+import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
 
 public class BooleanHandler implements IValueHandler<Boolean> {
 
@@ -32,6 +33,12 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 	@Override
 	public Boolean get(ConfigurationSection section, String s) {
 		return section.getBoolean(s);
+	}
+
+	@SuppressWarnings("nls")
+	@Override
+	public ItemStack getAddItem() {
+		return new ItemBuilder(XMaterial.REDSTONE_TORCH).setDisplayname("§7Add Boolean").build();
 	}
 
 	@Override

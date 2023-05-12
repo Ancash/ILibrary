@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.handler;
+package de.ancash.minecraft.inventory.editor.yml.handler;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -12,9 +12,10 @@ import com.cryptomorin.xseries.XMaterial;
 
 import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
-import de.ancash.minecraft.inventory.editor.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.DoubleEditor;
-import de.ancash.minecraft.inventory.editor.YamlFileEditor;
+import de.ancash.minecraft.ItemBuilder;
+import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.DoubleEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
 
 public class DoubleHandler implements IValueHandler<Double> {
 
@@ -36,6 +37,12 @@ public class DoubleHandler implements IValueHandler<Double> {
 	@Override
 	public Class<Double> getClazz() {
 		return Double.class;
+	}
+
+	@SuppressWarnings("nls")
+	@Override
+	public ItemStack getAddItem() {
+		return new ItemBuilder(XMaterial.LADDER).setDisplayname("§7Add Double").build();
 	}
 
 	@Override

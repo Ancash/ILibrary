@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor;
+package de.ancash.minecraft.inventory.editor.yml;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,8 +8,7 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -17,27 +16,27 @@ import org.bukkit.entity.Player;
 
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.libs.org.simpleyaml.configuration.file.YamlFile;
-import de.ancash.minecraft.inventory.editor.handler.BooleanHandler;
-import de.ancash.minecraft.inventory.editor.handler.ConfigurationSectionHandler;
-import de.ancash.minecraft.inventory.editor.handler.DoubleHandler;
-import de.ancash.minecraft.inventory.editor.handler.IValueHandler;
-import de.ancash.minecraft.inventory.editor.handler.ListHandler;
-import de.ancash.minecraft.inventory.editor.handler.LongHandler;
-import de.ancash.minecraft.inventory.editor.handler.MapHandler;
-import de.ancash.minecraft.inventory.editor.handler.StringHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.BooleanHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.ConfigurationSectionHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.DoubleHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.ListHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.LongHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.MapHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.StringHandler;
 
 public class YamlFileEditor {
 
-	public static final Set<IValueHandler<?>> DEFAULT_VALUE_HANDLER = Collections.unmodifiableSet(new HashSet<>(
+	public static final List<IValueHandler<?>> DEFAULT_VALUE_HANDLER = Collections.unmodifiableList(
 			Arrays.asList(ConfigurationSectionHandler.INSTANCE, MapHandler.INSTANCE, BooleanHandler.INSTANCE,
-					LongHandler.INSTANCE, DoubleHandler.INSTANCE, ListHandler.INSTANCE, StringHandler.INSTANCE)));
+					LongHandler.INSTANCE, DoubleHandler.INSTANCE, ListHandler.INSTANCE, StringHandler.INSTANCE));
 
 	protected final File file;
 	protected final Player p;
 	protected final YamlFile yamlFile = new YamlFile();
 	protected final String root;
 	protected final EditorSettings settings;
-	protected final Set<IValueHandler<?>> handler;
+	protected final List<IValueHandler<?>> handler;
 	protected final Consumer<YamlFileEditor> onSave;
 
 	public YamlFileEditor(File file, Player p, Consumer<YamlFileEditor> onSave)
@@ -52,13 +51,13 @@ public class YamlFileEditor {
 		}, file, p, root, onSave);
 	}
 
-	public YamlFileEditor(File file, Player p, Set<IValueHandler<?>> handler, Consumer<YamlFileEditor> onSave)
+	public YamlFileEditor(File file, Player p, List<IValueHandler<?>> handler, Consumer<YamlFileEditor> onSave)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this(new EditorSettings() {
 		}, file, p, handler, onSave);
 	}
 
-	public YamlFileEditor(File file, Player p, Set<IValueHandler<?>> handler, String root,
+	public YamlFileEditor(File file, Player p, List<IValueHandler<?>> handler, String root,
 			Consumer<YamlFileEditor> onSave) throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this(new EditorSettings() {
 		}, file, p, handler, root, onSave);
@@ -75,12 +74,12 @@ public class YamlFileEditor {
 	}
 
 	@SuppressWarnings("nls")
-	public YamlFileEditor(EditorSettings settings, File file, Player p, Set<IValueHandler<?>> handler,
+	public YamlFileEditor(EditorSettings settings, File file, Player p, List<IValueHandler<?>> handler,
 			Consumer<YamlFileEditor> onSave) throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this(settings, file, p, handler, "", onSave);
 	}
 
-	public YamlFileEditor(EditorSettings settings, File file, Player p, Set<IValueHandler<?>> handler, String root,
+	public YamlFileEditor(EditorSettings settings, File file, Player p, List<IValueHandler<?>> handler, String root,
 			Consumer<YamlFileEditor> onSave) throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this.file = file;
 		this.root = root;

@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor;
+package de.ancash.minecraft.inventory.editor.yml;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -35,7 +35,7 @@ public abstract class ValueEditor<T> extends IGUI {
 		open();
 	}
 
-	public ItemStack getEditorItem() {
+	protected ItemStack getEditorItem() {
 		return new ItemBuilder(XMaterial.REDSTONE_TORCH).setDisplayname(String.valueOf(valSup.get())).build();
 	}
 

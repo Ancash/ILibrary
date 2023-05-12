@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor;
+package de.ancash.minecraft.inventory.editor.yml;
 
 import java.util.UUID;
 import java.util.function.Supplier;

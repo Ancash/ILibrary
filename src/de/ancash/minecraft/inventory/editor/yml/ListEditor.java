@@ -1,5 +1,6 @@
-package de.ancash.minecraft.inventory.editor;
+package de.ancash.minecraft.inventory.editor.yml;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -13,8 +14,8 @@ import com.cryptomorin.xseries.XMaterial;
 import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.InventoryItem;
-import de.ancash.minecraft.inventory.editor.handler.IValueHandler;
-import de.ancash.minecraft.inventory.editor.handler.ListHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.ListHandler;
 import net.md_5.bungee.api.ChatColor;
 
 @SuppressWarnings("rawtypes")
@@ -47,6 +48,7 @@ public class ListEditor<T> extends ValueEditor<List> {
 						super.back();
 					})));
 		addMainItem();
+		addInsertItem();
 	}
 
 	@SuppressWarnings({ "unchecked", "nls" })
@@ -62,7 +64,7 @@ public class ListEditor<T> extends ValueEditor<List> {
 	}
 
 	protected void addMainItem() {
-		addInventoryItem(new InventoryItem(this, getEditorItem(), 10, (slot, shift, action, top) -> {
+		addInventoryItem(new InventoryItem(this, getEditorItem(), 11, (slot, shift, action, top) -> {
 			if (!top)
 				return;
 			if (shift) {
@@ -76,6 +78,9 @@ public class ListEditor<T> extends ValueEditor<List> {
 			case PICKUP_ALL:
 				nextElement();
 				return;
+			case PICKUP_HALF:
+				prevElement();
+				return;
 			default:
 				break;
 			}
@@ -87,6 +92,7 @@ public class ListEditor<T> extends ValueEditor<List> {
 		if (pos < 0)
 			pos = getList().size() - 1;
 		addMainItem();
+		addInsertItem();
 	}
 
 	protected void nextElement() {
@@ -94,6 +100,43 @@ public class ListEditor<T> extends ValueEditor<List> {
 		if (pos == getList().size())
 			pos = 0;
 		addMainItem();
+		addInsertItem();
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void addInsertItem() {
+		addInventoryItem(new InventoryItem(this, insertItem(), 15, (slot, shift, action, top) -> {
+			if (!top)
+				return;
+			List list = getList();
+			switch (action) {
+			case PICKUP_HALF:
+				list.add(Math.max(pos, 0), type.defaultValue());
+				break;
+			case PICKUP_ALL:
+				list.add(Math.min(pos + 1, list.size() - 1), type.defaultValue());
+				break;
+			default:
+				break;
+			}
+			addMainItem();
+			addInsertItem();
+		}));
+	}
+
+	@SuppressWarnings("nls")
+	protected ItemStack insertItem() {
+		List<String> lore = new ArrayList<>();
+		List list = getList();
+		lore.add("§eRight click to insert before");
+		lore.add("§eLeft click to insert after");
+		lore.add("§7Index: " + pos);
+		if (pos > 0)
+			lore.add("§fPrevious: '" + list.get(pos - 1) + "'");
+		lore.add("§fCurrent: '" + list.get(Math.min(pos, getList().size() - 1)) + "'");
+		if (pos < list.size() - 1)
+			lore.add("§fNext: '" + list.get(pos + 1) + "'");
+		return new ItemBuilder(XMaterial.ARROW).setLore(lore).build();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -113,19 +156,20 @@ public class ListEditor<T> extends ValueEditor<List> {
 
 	@SuppressWarnings("nls")
 	@Override
-	public ItemStack getEditorItem() {
+	protected ItemStack getEditorItem() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("§eLeft click to go down").append("\n")
+		builder.append("§eLeft click to go down").append("\n").append("§eRight click to go up").append("\n")
 				.append("§eClick mouse wheel to delete the selected element").append("\n")
 				.append("§eShift click to edit the selected element").append("\n")
-				.append("§7Type: " + type.getClazz().getSimpleName()).append("\n");
+				.append("§7Type: " + type.getClazz().getSimpleName()).append("\n").append("§7Syntax: [{index}]={value}")
+				.append("\n");
 		for (int i = pos; i - pos < getList().size(); i++) {
 			builder.append(ChatColor.WHITE.toString());
 			if (i == pos)
 				builder.append(">");
 			builder.append("[").append(i % getList().size()).append("]=");
 			String s = getList().get(i % getList().size()).toString().replace("\n", "\\n");
-			builder.append(s).append('\n');
+			builder.append("'").append(s).append("'").append('\n');
 		}
 		return new ItemBuilder(XMaterial.CHEST).setDisplayname(title).setLore(builder.toString().split("\n")).build();
 	}

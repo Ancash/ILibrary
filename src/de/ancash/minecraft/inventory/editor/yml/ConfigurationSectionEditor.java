@@ -1,10 +1,10 @@
-package de.ancash.minecraft.inventory.editor;
+package de.ancash.minecraft.inventory.editor.yml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,19 +13,13 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.cryptomorin.xseries.XMaterial;
-
 import de.ancash.ILibrary;
 import de.ancash.lambda.Lambda;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
+import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
-import de.ancash.minecraft.inventory.editor.handler.BooleanHandler;
-import de.ancash.minecraft.inventory.editor.handler.ConfigurationSectionHandler;
-import de.ancash.minecraft.inventory.editor.handler.DoubleHandler;
-import de.ancash.minecraft.inventory.editor.handler.IValueHandler;
-import de.ancash.minecraft.inventory.editor.handler.LongHandler;
-import de.ancash.minecraft.inventory.editor.handler.StringHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
 import de.ancash.minecraft.inventory.input.StringInputGUI;
 
 public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection> {
@@ -33,10 +27,11 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	protected final YamlFileEditor editor;
 	protected final ConfigurationSection root;
 	protected ConfigurationSection current;
+	protected int addPos = 0;
 	protected Runnable onSave;
 	protected final List<String> keys = new ArrayList<>();
 	protected int keysPage;
-	protected final Set<IValueHandler<?>> handler;
+	protected final List<IValueHandler<?>> handler;
 	protected final Map<String, IValueHandler<?>> mappedTypes = new HashMap<String, IValueHandler<?>>();
 	protected boolean finishedConstructor = false;
 	protected final Runnable onDelete;
@@ -47,11 +42,11 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	}
 
 	public ConfigurationSectionEditor(YamlFileEditor editor, Player player, ConfigurationSection root,
-			ConfigurationSection current, Set<IValueHandler<?>> handler, Runnable onDelete) {
+			ConfigurationSection current, List<IValueHandler<?>> handler, Runnable onDelete) {
 		super(player.getUniqueId(), YamlFileEditor.createTitle(root, current), 54, editor.settings, null, null);
 		finishedConstructor = true;
 		this.onDelete = onDelete;
-		this.handler = handler;
+		this.handler = Collections.unmodifiableList(handler);
 		this.root = root;
 		this.current = current;
 		this.editor = editor;
@@ -83,21 +78,43 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 		super.open();
 	}
 
+	@SuppressWarnings("nls")
+	protected void addAddItem() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("§eLeft click to go down").append("\n").append("§eRight click to add property").append("\n");
+		for (int i = 0; i < handler.size(); i++) {
+			IValueHandler<?> ivh = handler.get(i);
+			ItemStack add = ivh.getAddItem();
+			if (add == null)
+				continue;
+			if (i == addPos) {
+				builder.append("§a");
+			} else
+				builder.append("§f");
+			builder.append("Add " + ivh.getClazz().getSimpleName());
+			builder.append("\n");
+		}
+
+		addInventoryItem(
+				new InventoryItem(this, ItemStackUtils.setLore(settings.addItem(), builder.toString().split("\n")), 46,
+						(slot, shift, action, top) -> {
+							if (!top)
+								return;
+							switch (action) {
+							case PICKUP_ALL:
+								nextAddOption();
+								addAddItem();
+								break;
+							case PICKUP_HALF:
+								createKey(handler.get(addPos));
+								break;
+							default:
+								break;
+							}
+						}));
+	}
+
 	protected void loadOptions() {
-		addInventoryItem(new InventoryItem(this, settings.addStringItem(), 46,
-				(a, b, c, top) -> Lambda.execIf(top, () -> createKey(StringHandler.INSTANCE,
-						XMaterial.matchXMaterial(settings.addStringItem()).parseItem()))));
-		addInventoryItem(new InventoryItem(this, settings.addLongItem(), 47, (a, b, c, top) -> Lambda.execIf(top,
-				() -> createKey(LongHandler.INSTANCE, XMaterial.matchXMaterial(settings.addLongItem()).parseItem()))));
-		addInventoryItem(new InventoryItem(this, settings.addDoubleItem(), 48,
-				(a, b, c, top) -> Lambda.execIf(top, () -> createKey(DoubleHandler.INSTANCE,
-						XMaterial.matchXMaterial(settings.addDoubleItem()).parseItem()))));
-		addInventoryItem(new InventoryItem(this, settings.addBooleanItem(), 49,
-				(a, b, c, top) -> Lambda.execIf(top, () -> createKey(BooleanHandler.INSTANCE,
-						XMaterial.matchXMaterial(settings.addBooleanItem()).parseItem()))));
-		addInventoryItem(new InventoryItem(this, settings.addConfigurationSectionItem(), 50,
-				(a, b, c, top) -> Lambda.execIf(top, () -> createKey(ConfigurationSectionHandler.INSTANCE,
-						XMaterial.matchXMaterial(settings.addConfigurationSectionItem()).parseItem()))));
 		if (onDelete != null)
 			addInventoryItem(
 					new InventoryItem(this, settings.deleteItem(), 51, (a, b, c, top) -> Lambda.execIf(top, () -> {
@@ -108,13 +125,21 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 			editor.onSave.accept(editor);
 			closeAll();
 		})));
+		addAddItem();
 	}
 
-	protected void createKey(IValueHandler<?> type, ItemStack item) {
+	protected void nextAddOption() {
+		addPos = (addPos + 1) % handler.size();
+		if (handler.get(addPos).getAddItem() == null)
+			nextAddOption();
+	}
+
+	@SuppressWarnings("nls")
+	protected void createKey(IValueHandler<?> type) {
 		closeAll();
 		StringInputGUI sig = new StringInputGUI(ILibrary.getInstance(), Bukkit.getPlayer(getId()));
 		sig.setTitle("Create " + type.getClazz().getSimpleName());
-		sig.setLeft(item);
+		sig.setLeft(type.getAddItem());
 		sig.setText("key");
 		sig.onComplete(key -> {
 			current.set(key, type.defaultValue());
@@ -250,7 +275,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 		return root;
 	}
 
-	public Set<IValueHandler<?>> getValueHandler() {
+	public List<IValueHandler<?>> getValueHandler() {
 		return handler;
 	}
 }

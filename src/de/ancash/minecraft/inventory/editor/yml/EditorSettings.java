@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor;
+package de.ancash.minecraft.inventory.editor.yml;
 
 import org.bukkit.inventory.ItemStack;
 
@@ -6,7 +6,7 @@ import com.cryptomorin.xseries.XMaterial;
 
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemBuilder;
-import de.ancash.minecraft.inventory.editor.handler.IValueHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
 
 public interface EditorSettings {
 
@@ -20,31 +20,6 @@ public interface EditorSettings {
 
 	public default ItemStack getBooleanItem() {
 		return XMaterial.REDSTONE_TORCH.parseItem();
-	}
-
-	@SuppressWarnings("nls")
-	public default ItemStack addStringItem() {
-		return new ItemBuilder(XMaterial.OAK_SIGN).setDisplayname("§7Add String").build();
-	}
-
-	@SuppressWarnings("nls")
-	public default ItemStack addBooleanItem() {
-		return new ItemBuilder(XMaterial.REDSTONE_TORCH).setDisplayname("§7Add Boolean").build();
-	}
-
-	@SuppressWarnings("nls")
-	public default ItemStack addDoubleItem() {
-		return new ItemBuilder(XMaterial.LADDER).setDisplayname("§7Add Double").build();
-	}
-
-	@SuppressWarnings("nls")
-	public default ItemStack addLongItem() {
-		return new ItemBuilder(XMaterial.STICK).setDisplayname("§7Add Long").build();
-	}
-
-	@SuppressWarnings("nls")
-	public default ItemStack addConfigurationSectionItem() {
-		return new ItemBuilder(XMaterial.CHEST).setDisplayname("§7Add ConfigurationSection").build();
 	}
 
 	@SuppressWarnings("nls")
@@ -81,5 +56,10 @@ public interface EditorSettings {
 	@SuppressWarnings("nls")
 	public default ItemStack deleteItem() {
 		return new ItemBuilder(XMaterial.RED_STAINED_GLASS_PANE).setDisplayname("§cDelete").build();
+	}
+
+	@SuppressWarnings("nls")
+	public default ItemStack addItem() {
+		return new ItemBuilder(XMaterial.DROPPER).setDisplayname("§aAdd Property").build();
 	}
 }
