@@ -15,13 +15,14 @@ import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
 import de.ancash.minecraft.inventory.editor.yml.LongEditor;
-import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 
 public class LongHandler implements IValueHandler<Long> {
 
 	public static final LongHandler INSTANCE = new LongHandler();
 
-	LongHandler() {
+	protected LongHandler() {
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public class LongHandler implements IValueHandler<Long> {
 	}
 
 	@Override
-	public Class<Long> getClazz() {
+	public Class<?> getClazz() {
 		return Long.class;
 	}
 
@@ -64,9 +65,9 @@ public class LongHandler implements IValueHandler<Long> {
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
-				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
-						editor.getHandler(key).getClazz(), 32),
+		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
+				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
+						32),
 				() -> editor.getCurrent().getLong(key), l -> editor.getCurrent().set(key, l), editor::open,
 				() -> editor.getCurrent().remove(key));
 	}
@@ -77,9 +78,9 @@ public class LongHandler implements IValueHandler<Long> {
 	}
 
 	@Override
-	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<Long> valSup, Consumer<Long> onEdit, Runnable onBack, Runnable onDelete) {
-		LongEditor le = new LongEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack, onDelete);
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
+			String title, Supplier<Long> valSup, Consumer<Long> onEdit, Runnable onBack, Runnable onDelete) {
+		LongEditor le = new LongEditor(id, title, parent, yfe, key, valSup, onEdit, onBack, onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> le.open(), 1);
 	}
 

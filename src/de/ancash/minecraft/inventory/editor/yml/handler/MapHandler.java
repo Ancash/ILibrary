@@ -12,14 +12,15 @@ import org.bukkit.inventory.ItemStack;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.libs.org.simpleyaml.configuration.MemoryConfiguration;
 import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 
 @SuppressWarnings("rawtypes")
 public class MapHandler implements IValueHandler<Map> {
 
 	public static final MapHandler INSTANCE = new MapHandler();
 
-	MapHandler() {
+	protected MapHandler() {
 	}
 
 	@Override
@@ -64,12 +65,12 @@ public class MapHandler implements IValueHandler<Map> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title, Supplier<Map> valSup,
-			Consumer<Map> onEdit, Runnable onBack, Runnable onDelete) {
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
+			String title, Supplier<Map> valSup, Consumer<Map> onEdit, Runnable onBack, Runnable onDelete) {
 		MemoryConfiguration mc = new MemoryConfiguration();
 		Map<String, Object> m = valSup.get();
 		m.entrySet().forEach(entry -> mc.set(entry.getKey(), entry.getValue()));
-		ConfigurationSectionHandler.INSTANCE.edit(yfe, valHandler, id, title, () -> mc, null, () -> {
+		ConfigurationSectionHandler.INSTANCE.edit(yfe, parent, key, valHandler, id, title, () -> mc, null, () -> {
 			onEdit.accept(mc.getMapValues(true));
 			onBack.run();
 		}, onDelete);

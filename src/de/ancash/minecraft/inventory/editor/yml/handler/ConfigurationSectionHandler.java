@@ -15,13 +15,14 @@ import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.libs.org.simpleyaml.configuration.MemoryConfiguration;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 
 public class ConfigurationSectionHandler implements IValueHandler<ConfigurationSection> {
 
 	public static final ConfigurationSectionHandler INSTANCE = new ConfigurationSectionHandler();
 
-	ConfigurationSectionHandler() {
+	protected ConfigurationSectionHandler() {
 	}
 
 	@Override
@@ -46,7 +47,7 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 	}
 
 	@Override
-	public Class<ConfigurationSection> getClazz() {
+	public Class<?> getClazz() {
 		return ConfigurationSection.class;
 	}
 
@@ -58,8 +59,8 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
-				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent().getConfigurationSection(key), 32),
+		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
+				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent().getConfigurationSection(key), 32),
 				() -> editor.getCurrent().getConfigurationSection(key), k -> {
 					throw new UnsupportedOperationException();
 				}, () -> editor.open(), () -> editor.getCurrent().remove(key));
@@ -71,11 +72,11 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 	}
 
 	@Override
-	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<ConfigurationSection> valSup, Consumer<ConfigurationSection> onEdit, Runnable onBack,
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
+			String title, Supplier<ConfigurationSection> valSup, Consumer<ConfigurationSection> onEdit, Runnable onBack,
 			Runnable onDelete) {
-		ConfigurationSectionEditor e = new ConfigurationSectionEditor(yfe, Bukkit.getPlayer(id), yfe.getRoot(),
-				valSup.get(), onDelete);
+		ConfigurationSectionEditor e = new ConfigurationSectionEditor(yfe, parent, key, Bukkit.getPlayer(id),
+				yfe.getRoot(), valSup.get(), onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> {
 			e.addRootBackItem(onBack);
 			e.open();

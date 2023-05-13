@@ -10,7 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 
-import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 
 public class FEditCommand implements CommandExecutor {
 
@@ -35,7 +35,7 @@ public class FEditCommand implements CommandExecutor {
 			root = String.join(".", Arrays.copyOfRange(args, 1, args.length));
 		}
 		try {
-			YamlFileEditor editor = new YamlFileEditor(file, p, root, yfe -> {
+			YamlEditor editor = new YamlEditor(file, p, root, yfe -> {
 				try {
 					yfe.getYamlFile().save();
 				} catch (IOException e) {

@@ -23,13 +23,14 @@ public class ListEditor extends ValueEditor<List> {
 	protected int pos = 0;
 	protected final List<IValueHandler<?>> handler;
 	protected final Consumer<List> onEdit;
-	protected final YamlFileEditor yfe;
+	protected final YamlEditor yfe;
 	protected int addPos = 0;
 	protected final Runnable onDelete;
 
-	public ListEditor(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
-			EditorSettings settings, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack, Runnable onDelete) {
-		super(id, title, 36, settings, valSup, onBack);
+	public ListEditor(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
+			String title, EditorSettings settings, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack,
+			Runnable onDelete) {
+		super(id, title, 36, parent, yfe, key, valSup, onBack);
 		this.onEdit = onEdit;
 		this.onDelete = onDelete;
 		this.handler = valHandler;
@@ -50,11 +51,12 @@ public class ListEditor extends ValueEditor<List> {
 		if (l.size() <= pos)
 			return;
 		IValueHandler<?> ivh = yfe.getHandler(l.get(pos));
-		ivh.castEdit(yfe, yfe.getValHandler(), getId(),
-				YamlFileEditor.cut(String.join(":", title, String.valueOf(pos)), 32), () -> l.get(pos), e -> {
+		ivh.uncheckedEdit(yfe, this, key, yfe.getValHandler(), getId(),
+				YamlEditor.cut(String.join(":", title, String.valueOf(pos)), 32), () -> l.get(pos), e -> {
 					l.set(pos, e);
 					onEdit.accept(l);
-				}, () -> ListHandler.INSTANCE.castEdit(yfe, handler, id, title, valSup, onEdit, onBack, onDelete),
+				}, () -> ListHandler.INSTANCE.uncheckedEdit(yfe, this, key, handler, id, title, valSup, onEdit, onBack,
+						onDelete),
 				null);
 	}
 

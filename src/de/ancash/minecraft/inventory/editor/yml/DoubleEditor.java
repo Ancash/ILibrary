@@ -1,5 +1,6 @@
 package de.ancash.minecraft.inventory.editor.yml;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -10,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import com.cryptomorin.xseries.XMaterial;
 
 import de.ancash.ILibrary;
+import de.ancash.datastructures.tuples.Tuple;
 import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.IGUIManager;
@@ -21,9 +23,9 @@ public class DoubleEditor extends ValueEditor<Double> {
 	protected final Consumer<Double> onEdit;
 	protected final Runnable onDelete;
 
-	public DoubleEditor(UUID id, String title, EditorSettings settings, Supplier<Double> valSup,
-			Consumer<Double> onEdit, Runnable onBack, Runnable onDelete) {
-		super(id, title, 36, settings, valSup, onBack);
+	public DoubleEditor(UUID id, String title, ValueEditor<?> parent, YamlEditor yeditor, String key,
+			Supplier<Double> valSup, Consumer<Double> onEdit, Runnable onBack, Runnable onDelete) {
+		super(id, title, 36, parent, yeditor, key, valSup, onBack);
 		this.onDelete = onDelete;
 		this.onEdit = onEdit;
 		addInventoryItem(
@@ -44,8 +46,11 @@ public class DoubleEditor extends ValueEditor<Double> {
 		NumberInputGUI<Double> nig = new NumberInputGUI<>(ILibrary.getInstance(), Bukkit.getPlayer(getId()),
 				Double.class, s -> {
 					onEdit.accept(s);
-					Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
-							() -> new DoubleEditor(getId(), title, settings, valSup, onEdit, onBack, onDelete), 1);
+					Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> new DoubleEditor(getId(), title,
+							parent, yeditor, key, valSup, onEdit, onBack, onDelete), 1);
+				}, s -> {
+					Optional<String> o = yeditor.isValid(this, s);
+					return Tuple.of(!o.isPresent(), o.orElse(null));
 				});
 		nig.setLeft(XMaterial.DIRT.parseItem());
 		nig.setTitle(title);

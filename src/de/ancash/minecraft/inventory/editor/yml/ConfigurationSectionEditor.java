@@ -24,7 +24,7 @@ import de.ancash.minecraft.inventory.input.StringInputGUI;
 
 public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection> {
 
-	protected final YamlFileEditor editor;
+	protected final YamlEditor editor;
 	protected final ConfigurationSection root;
 	protected ConfigurationSection current;
 	protected int addPos = 0;
@@ -36,14 +36,15 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	protected boolean finishedConstructor = false;
 	protected final Runnable onDelete;
 
-	public ConfigurationSectionEditor(YamlFileEditor editor, Player player, ConfigurationSection root,
-			ConfigurationSection current, Runnable onDelete) {
-		this(editor, player, root, current, YamlFileEditor.getDefaultHandler(), onDelete);
+	public ConfigurationSectionEditor(YamlEditor editor, ValueEditor<?> parent, String key, Player player,
+			ConfigurationSection root, ConfigurationSection current, Runnable onDelete) {
+		this(editor, parent, key, player, root, current, YamlEditor.getDefaultHandler(), onDelete);
 	}
 
-	public ConfigurationSectionEditor(YamlFileEditor editor, Player player, ConfigurationSection root,
-			ConfigurationSection current, List<IValueHandler<?>> handler, Runnable onDelete) {
-		super(player.getUniqueId(), YamlFileEditor.createTitle(root, current), 54, editor.settings, null, null);
+	public ConfigurationSectionEditor(YamlEditor editor, ValueEditor<?> parent, String key, Player player,
+			ConfigurationSection root, ConfigurationSection current, List<IValueHandler<?>> handler,
+			Runnable onDelete) {
+		super(player.getUniqueId(), YamlEditor.createTitle(root, current), 54, parent, editor, key, null, null);
 		finishedConstructor = true;
 		this.onDelete = onDelete;
 		this.handler = Collections.unmodifiableList(handler);
@@ -57,7 +58,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 		onBack = r;
 	}
 
-	public YamlFileEditor getFile() {
+	public YamlEditor getFile() {
 		return editor;
 	}
 
@@ -152,7 +153,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	}
 
 	public void newInventory() {
-		newInventory(YamlFileEditor.createTitle(root, current), getSize());
+		newInventory(YamlEditor.createTitle(root, current), getSize());
 	}
 
 	@SuppressWarnings("nls")

@@ -16,13 +16,14 @@ import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
 import de.ancash.minecraft.inventory.editor.yml.StringEditor;
-import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 
 public class StringHandler implements IValueHandler<String> {
 
 	public static final StringHandler INSTANCE = new StringHandler();
 
-	StringHandler() {
+	protected StringHandler() {
 	}
 
 	@Override
@@ -36,7 +37,7 @@ public class StringHandler implements IValueHandler<String> {
 	}
 
 	@Override
-	public Class<String> getClazz() {
+	public Class<?> getClazz() {
 		return String.class;
 	}
 
@@ -59,9 +60,9 @@ public class StringHandler implements IValueHandler<String> {
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
-				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
-						editor.getHandler(key).getClazz(), 32),
+		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
+				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
+						32),
 				() -> editor.getCurrent().getString(key), s -> editor.getCurrent().set(key, s), editor::open,
 				() -> editor.getCurrent().remove(key));
 	}
@@ -72,9 +73,9 @@ public class StringHandler implements IValueHandler<String> {
 	}
 
 	@Override
-	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<String> valSup, Consumer<String> onEdit, Runnable onBack, Runnable onDelete) {
-		StringEditor se = new StringEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack, onDelete);
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
+			String title, Supplier<String> valSup, Consumer<String> onEdit, Runnable onBack, Runnable onDelete) {
+		StringEditor se = new StringEditor(id, title, parent, yfe, key, valSup, onEdit, onBack, onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> se.open(), 1);
 	}
 

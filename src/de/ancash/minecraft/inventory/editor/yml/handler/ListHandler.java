@@ -17,14 +17,15 @@ import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
 import de.ancash.minecraft.inventory.editor.yml.ListEditor;
-import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 
 @SuppressWarnings("rawtypes")
 public class ListHandler implements IValueHandler<List> {
 
 	public static final ListHandler INSTANCE = new ListHandler();
 
-	ListHandler() {
+	protected ListHandler() {
 	}
 
 	@Override
@@ -38,7 +39,7 @@ public class ListHandler implements IValueHandler<List> {
 	}
 
 	@Override
-	public Class<List> getClazz() {
+	public Class<?> getClazz() {
 		return List.class;
 	}
 
@@ -80,17 +81,18 @@ public class ListHandler implements IValueHandler<List> {
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
-				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
-						editor.getHandler(key).getClazz(), 32),
+		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
+				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
+						32),
 				() -> editor.getCurrent().getList(key), k -> editor.getCurrent().set(key, k), editor::open,
 				() -> editor.getCurrent().remove(key));
 	}
 
 	@Override
-	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack, Runnable onDelete) {
-		ListEditor le = new ListEditor(yfe, valHandler, id, title, yfe.getSettings(), valSup, onEdit, onBack, onDelete);
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
+			String title, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack, Runnable onDelete) {
+		ListEditor le = new ListEditor(yfe, parent, key, valHandler, id, title, yfe.getSettings(), valSup, onEdit,
+				onBack, onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> le.open(), 1);
 	}
 

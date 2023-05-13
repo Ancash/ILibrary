@@ -11,7 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 
 public interface IValueHandler<T> {
 
@@ -34,15 +35,16 @@ public interface IValueHandler<T> {
 
 	public String valueToString(ConfigurationSection section, String s);
 
-	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title, Supplier<T> valSup,
-			Consumer<T> onEdit, Runnable onBack, Runnable onDelete);
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
+			String title, Supplier<T> valSup, Consumer<T> onEdit, Runnable onBack, Runnable onDelete);
 
 	public T defaultValue();
 
 	@SuppressWarnings("unchecked")
-	public default void castEdit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<?> valSup, Consumer<?> onEdit, Runnable onBack, Runnable onDelete) {
-		edit(yfe, valHandler, id, title, (Supplier<T>) valSup, (Consumer<T>) onEdit, onBack, onDelete);
+	public default void uncheckedEdit(YamlEditor yfe, ValueEditor<?> parent, String key,
+			List<IValueHandler<?>> valHandler, UUID id, String title, Supplier<?> valSup, Consumer<?> onEdit,
+			Runnable onBack, Runnable onDelete) {
+		edit(yfe, parent, key, valHandler, id, title, (Supplier<T>) valSup, (Consumer<T>) onEdit, onBack, onDelete);
 	}
 
 	public ItemStack getAddItem();

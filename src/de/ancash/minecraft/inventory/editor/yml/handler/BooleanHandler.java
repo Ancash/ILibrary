@@ -16,13 +16,14 @@ import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.editor.yml.BooleanEditor;
 import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 
 public class BooleanHandler implements IValueHandler<Boolean> {
 
 	public static final BooleanHandler INSTANCE = new BooleanHandler();
 
-	BooleanHandler() {
+	protected BooleanHandler() {
 	}
 
 	@Override
@@ -47,7 +48,7 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 	}
 
 	@Override
-	public Class<Boolean> getClazz() {
+	public Class<?> getClazz() {
 		return Boolean.class;
 	}
 
@@ -60,9 +61,9 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
-				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
-						editor.getHandler(key).getClazz(), 32),
+		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
+				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
+						32),
 				() -> editor.getCurrent().getBoolean(key), b -> editor.getCurrent().set(key, b), editor::open,
 				() -> editor.getCurrent().remove(key));
 	}
@@ -82,9 +83,9 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 	}
 
 	@Override
-	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<Boolean> valSup, Consumer<Boolean> onEdit, Runnable onBack, Runnable onDelete) {
-		BooleanEditor be = new BooleanEditor(id, title, yfe.getSettings(), () -> onEdit.accept(!valSup.get()), valSup,
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
+			String title, Supplier<Boolean> valSup, Consumer<Boolean> onEdit, Runnable onBack, Runnable onDelete) {
+		BooleanEditor be = new BooleanEditor(id, title, parent, yfe, key, () -> onEdit.accept(!valSup.get()), valSup,
 				onBack, onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> be.open(), 1);
 	}

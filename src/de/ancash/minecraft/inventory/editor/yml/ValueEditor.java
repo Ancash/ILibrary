@@ -21,11 +21,18 @@ public abstract class ValueEditor<T> extends IGUI {
 	protected final EditorSettings settings;
 	protected final Supplier<T> valSup;
 	protected Runnable onBack;
+	protected final ValueEditor<?> parent;
+	protected final YamlEditor yeditor;
+	protected final String key;
 
-	public ValueEditor(UUID id, String title, int size, EditorSettings settings, Supplier<T> valSup, Runnable onBack) {
+	public ValueEditor(UUID id, String title, int size, ValueEditor<?> parent, YamlEditor yeditor, String key,
+			Supplier<T> valSup, Runnable onBack) {
 		super(id, size, title);
-		this.settings = settings;
+		this.settings = yeditor.settings;
+		this.key = key;
+		this.yeditor = yeditor;
 		this.onBack = onBack;
+		this.parent = parent;
 		this.valSup = valSup;
 		for (int i = 0; i < getSize(); i++)
 			setItem(settings.getBackgroundItem(), i);
@@ -33,6 +40,22 @@ public abstract class ValueEditor<T> extends IGUI {
 			addInventoryItem(new InventoryItem(this, settings.getBackItem(), getSize() - 5,
 					(a, b, c, top) -> Lambda.execIf(top, this::back)));
 		open();
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public boolean hasKey() {
+		return key != null;
+	}
+
+	public ValueEditor<?> getParent() {
+		return parent;
+	}
+
+	public boolean hasParent() {
+		return getParent() != null;
 	}
 
 	protected ItemStack getEditorItem() {

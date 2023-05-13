@@ -15,13 +15,14 @@ import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
 import de.ancash.minecraft.inventory.editor.yml.DoubleEditor;
-import de.ancash.minecraft.inventory.editor.yml.YamlFileEditor;
+import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 
 public class DoubleHandler implements IValueHandler<Double> {
 
 	public static final DoubleHandler INSTANCE = new DoubleHandler();
 
-	DoubleHandler() {
+	protected DoubleHandler() {
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public class DoubleHandler implements IValueHandler<Double> {
 	}
 
 	@Override
-	public Class<Double> getClazz() {
+	public Class<?> getClazz() {
 		return Double.class;
 	}
 
@@ -64,9 +65,9 @@ public class DoubleHandler implements IValueHandler<Double> {
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		edit(editor.getFile(), editor.getValueHandler(), editor.getId(),
-				YamlFileEditor.createTitle(editor.getRoot(), editor.getCurrent(), key,
-						editor.getHandler(key).getClazz(), 32),
+		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
+				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
+						32),
 				() -> editor.getCurrent().getDouble(key), d -> editor.getCurrent().set(key, d), editor::open,
 				() -> editor.getCurrent().remove(key));
 	}
@@ -77,9 +78,9 @@ public class DoubleHandler implements IValueHandler<Double> {
 	}
 
 	@Override
-	public void edit(YamlFileEditor yfe, List<IValueHandler<?>> valHandler, UUID id, String title,
-			Supplier<Double> valSup, Consumer<Double> onEdit, Runnable onBack, Runnable onDelete) {
-		DoubleEditor de = new DoubleEditor(id, title, yfe.getSettings(), valSup, onEdit, onBack, onDelete);
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
+			String title, Supplier<Double> valSup, Consumer<Double> onEdit, Runnable onBack, Runnable onDelete) {
+		DoubleEditor de = new DoubleEditor(id, title, parent, yfe, key, valSup, onEdit, onBack, onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> de.open(), 1);
 	}
 
