@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 
+import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.libs.org.simpleyaml.configuration.file.YamlFile;
 import de.ancash.minecraft.inventory.editor.yml.handler.BooleanHandler;
@@ -26,6 +27,8 @@ import de.ancash.minecraft.inventory.editor.yml.handler.ListHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.LongHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.MapHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.StringHandler;
+import de.ancash.minecraft.inventory.editor.yml.listener.IKeyValidator;
+import de.ancash.minecraft.inventory.editor.yml.listener.IListTypeValidator;
 import de.ancash.minecraft.inventory.editor.yml.listener.IValueEditorListener;
 
 public class YamlEditor {
@@ -51,6 +54,8 @@ public class YamlEditor {
 	protected final Consumer<YamlEditor> onSave;
 	protected final Set<IValueEditorListener> listener = new HashSet<>();
 	protected final Set<AbstractInputValidator<?>> validator = new HashSet<>();
+	private IListTypeValidator listTypeValidator;
+	protected IKeyValidator keyValidator;
 
 	public YamlEditor(File file, Player p, Consumer<YamlEditor> onSave)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
@@ -131,7 +136,7 @@ public class YamlEditor {
 
 	public void open() {
 		ConfigurationSectionEditor editor = new ConfigurationSectionEditor(this, null, null, p,
-				yamlFile.getConfigurationSection(root), yamlFile.getConfigurationSection(root), handler, null);
+				yamlFile.getConfigurationSection(root), handler, null);
 		editor.open();
 	}
 
@@ -161,14 +166,30 @@ public class YamlEditor {
 		listener.add(ivel);
 	}
 
+	public void setKeyValidator(IKeyValidator ikv) {
+		this.keyValidator = ikv;
+	}
+
+	public IKeyValidator getKeyValidator() {
+		return keyValidator;
+	}
+
+	public boolean hasKeyValidator() {
+		return keyValidator != null;
+	}
+
 	public Set<IValueEditorListener> getListener() {
 		return listener;
 	}
 
+	@SuppressWarnings("nls")
 	public IValueHandler<?> getHandler(Object o) {
+		if (o == null)
+			throw new IllegalArgumentException("value null");
 		for (IValueHandler<?> ivh : handler)
 			if (ivh.isValid(o))
 				return ivh;
+		ILibrary.getInstance().getLogger().severe("No handler found for " + o.getClass() + ": " + o);
 		return null;
 	}
 
@@ -193,6 +214,14 @@ public class YamlEditor {
 
 	public List<IValueHandler<?>> getValHandler() {
 		return handler;
+	}
+
+	public IListTypeValidator getListTypeValidator() {
+		return listTypeValidator;
+	}
+
+	public void setListTypeValidator(IListTypeValidator listTypeValidator) {
+		this.listTypeValidator = listTypeValidator;
 	}
 
 	public ConfigurationSection getRoot() {

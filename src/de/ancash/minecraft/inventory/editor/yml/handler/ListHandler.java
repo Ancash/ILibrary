@@ -34,11 +34,6 @@ public class ListHandler implements IValueHandler<List> {
 	}
 
 	@Override
-	public void set(ConfigurationSection section, String key, List value) {
-		section.set(key, value);
-	}
-
-	@Override
 	public Class<?> getClazz() {
 		return List.class;
 	}
@@ -84,7 +79,7 @@ public class ListHandler implements IValueHandler<List> {
 		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
 				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
 						32),
-				() -> editor.getCurrent().getList(key), k -> editor.getCurrent().set(key, k), editor::open,
+				() -> editor.getCurrent().getList(key), k -> editor.getCurrent().set(key, k), () -> editor.open(),
 				() -> editor.getCurrent().remove(key));
 	}
 

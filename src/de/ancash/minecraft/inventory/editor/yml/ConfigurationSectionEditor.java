@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,6 +15,8 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 
 import de.ancash.ILibrary;
+import de.ancash.datastructures.tuples.Duplet;
+import de.ancash.datastructures.tuples.Tuple;
 import de.ancash.lambda.Lambda;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
@@ -37,18 +40,18 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	protected final Runnable onDelete;
 
 	public ConfigurationSectionEditor(YamlEditor editor, ValueEditor<?> parent, String key, Player player,
-			ConfigurationSection root, ConfigurationSection current, Runnable onDelete) {
-		this(editor, parent, key, player, root, current, YamlEditor.getDefaultHandler(), onDelete);
+			ConfigurationSection current, Runnable onDelete) {
+		this(editor, parent, key, player, current, YamlEditor.getDefaultHandler(), onDelete);
 	}
 
 	public ConfigurationSectionEditor(YamlEditor editor, ValueEditor<?> parent, String key, Player player,
-			ConfigurationSection root, ConfigurationSection current, List<IValueHandler<?>> handler,
-			Runnable onDelete) {
-		super(player.getUniqueId(), YamlEditor.createTitle(root, current), 54, parent, editor, key, null, null);
+			ConfigurationSection current, List<IValueHandler<?>> handler, Runnable onDelete) {
+		super(player.getUniqueId(), YamlEditor.createTitle(editor.getRoot(), current), 54, parent, editor, key, null,
+				null);
 		finishedConstructor = true;
 		this.onDelete = onDelete;
 		this.handler = Collections.unmodifiableList(handler);
-		this.root = root;
+		this.root = editor.getRoot();
 		this.current = current;
 		this.editor = editor;
 		open();
@@ -82,7 +85,8 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	@SuppressWarnings("nls")
 	protected void addAddItem() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("§eLeft click to select type").append("\n").append("§eRight click to add property").append("\n");
+		builder.append("§eMouse wheel to select type").append("\n").append("§eRight/Left click to add property")
+				.append("\n");
 		for (int i = 0; i < handler.size(); i++) {
 			IValueHandler<?> ivh = handler.get(i);
 			ItemStack add = ivh.getAddItem();
@@ -102,9 +106,12 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 							if (!top)
 								return;
 							switch (action) {
-							case PICKUP_ALL:
+							case CLONE_STACK:
 								nextAddOption();
 								addAddItem();
+								break;
+							case PICKUP_ALL:
+								createKey(handler.get(addPos));
 								break;
 							case PICKUP_HALF:
 								createKey(handler.get(addPos));
@@ -139,13 +146,21 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	protected void createKey(IValueHandler<?> type) {
 		closeAll();
 		StringInputGUI sig = new StringInputGUI(ILibrary.getInstance(), Bukkit.getPlayer(getId()));
+		AtomicReference<String> res = new AtomicReference<>();
 		sig.setTitle("Create " + type.getClazz().getSimpleName());
 		sig.setLeft(type.getAddItem());
 		sig.setText("key");
 		sig.onComplete(key -> {
-			current.set(key, type.defaultValue());
+			type.setDefaultValue(current, res.get());
 			mapHandler();
 			Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> open(), keysPage);
+		});
+		sig.isValid(in -> {
+			if (!yeditor.hasKeyValidator())
+				return Tuple.of(true, null);
+			Duplet<String, String> dup = yeditor.getKeyValidator().validate(this, type, in);
+			res.set(dup.getFirst());
+			return Tuple.of(dup.getFirst() != null, dup.getSecond());
 		});
 		IGUIManager.remove(getId());
 		sig.open();

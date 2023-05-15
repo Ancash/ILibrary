@@ -40,6 +40,17 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 		return section.isConfigurationSection(key);
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public void addDefaultToList(ValueEditor<?> where, List list, int pos) {
+		ConfigurationSectionEditor cse = where.getClosesConfigurationSectionEditor();
+		if (cse != null) {
+			list.add(pos, new CustomMemoryConfiguration(cse.getCurrent()));
+		} else {
+			list.add(pos, defaultValue());
+		}
+	}
+
 	@SuppressWarnings("nls")
 	@Override
 	public ItemStack getAddItem() {
@@ -72,11 +83,16 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 	}
 
 	@Override
+	public void setDefaultValue(ConfigurationSection section, String key) {
+		section.createSection(key);
+	}
+
+	@Override
 	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
 			String title, Supplier<ConfigurationSection> valSup, Consumer<ConfigurationSection> onEdit, Runnable onBack,
 			Runnable onDelete) {
 		ConfigurationSectionEditor e = new ConfigurationSectionEditor(yfe, parent, key, Bukkit.getPlayer(id),
-				yfe.getRoot(), valSup.get(), onDelete);
+				valSup.get(), onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> {
 			e.addRootBackItem(onBack);
 			e.open();

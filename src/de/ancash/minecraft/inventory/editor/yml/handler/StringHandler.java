@@ -32,11 +32,6 @@ public class StringHandler implements IValueHandler<String> {
 	}
 
 	@Override
-	public void set(ConfigurationSection section, String key, String value) {
-		section.set(key, value);
-	}
-
-	@Override
 	public Class<?> getClazz() {
 		return String.class;
 	}

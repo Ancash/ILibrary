@@ -22,7 +22,14 @@ public interface IValueHandler<T> {
 
 	public T get(ConfigurationSection section, String s);
 
-	public void set(ConfigurationSection section, String key, T value);
+	public default void set(ConfigurationSection section, String key, T value) {
+		section.set(key, value);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public default void addDefaultToList(ValueEditor<?> where, List list, int pos) {
+		list.add(pos, defaultValue());
+	}
 
 	public Class<?> getClazz();
 
@@ -39,6 +46,10 @@ public interface IValueHandler<T> {
 			String title, Supplier<T> valSup, Consumer<T> onEdit, Runnable onBack, Runnable onDelete);
 
 	public T defaultValue();
+
+	public default void setDefaultValue(ConfigurationSection section, String key) {
+		section.set(key, defaultValue());
+	}
 
 	@SuppressWarnings("unchecked")
 	public default void uncheckedEdit(YamlEditor yfe, ValueEditor<?> parent, String key,

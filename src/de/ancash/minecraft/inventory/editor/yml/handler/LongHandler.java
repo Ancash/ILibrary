@@ -31,11 +31,6 @@ public class LongHandler implements IValueHandler<Long> {
 	}
 
 	@Override
-	public void set(ConfigurationSection section, String key, Long value) {
-		section.set(key, value);
-	}
-
-	@Override
 	public Class<?> getClazz() {
 		return Long.class;
 	}

@@ -1,6 +1,7 @@
 package de.ancash.minecraft.inventory.editor.yml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -20,21 +21,31 @@ import net.md_5.bungee.api.ChatColor;
 @SuppressWarnings("rawtypes")
 public class ListEditor extends ValueEditor<List> {
 
-	protected int pos = 0;
-	protected final List<IValueHandler<?>> handler;
+	protected int elementPos = 0;
+	protected List<IValueHandler<?>> handler;
 	protected final Consumer<List> onEdit;
 	protected final YamlEditor yfe;
 	protected int addPos = 0;
 	protected final Runnable onDelete;
+	protected boolean finishedConstructor = false;
 
 	public ListEditor(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
 			String title, EditorSettings settings, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack,
 			Runnable onDelete) {
 		super(id, title, 36, parent, yfe, key, valSup, onBack);
+		finishedConstructor = true;
 		this.onEdit = onEdit;
 		this.onDelete = onDelete;
 		this.handler = valHandler;
 		this.yfe = yfe;
+		if (yfe.getListTypeValidator() != null)
+			yfe.getListTypeValidator().onInit(this);
+	}
+
+	@Override
+	public void open() {
+		if (!finishedConstructor)
+			return;
 		if (onDelete != null)
 			addInventoryItem(
 					new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
@@ -43,17 +54,26 @@ public class ListEditor extends ValueEditor<List> {
 					})));
 		addMainItem();
 		addInsertItem();
+		super.open();
+	}
+
+	public void setHandler(List<IValueHandler<?>> handler) {
+		this.handler = Collections.unmodifiableList(new ArrayList<>(handler));
+	}
+
+	public List<IValueHandler<?>> getHandler() {
+		return handler;
 	}
 
 	@SuppressWarnings({ "unchecked", "nls" })
 	protected void editSelected() {
-		List l = getList();
-		if (l.size() <= pos)
+		List l = getList0();
+		if (l.size() <= elementPos)
 			return;
-		IValueHandler<?> ivh = yfe.getHandler(l.get(pos));
+		IValueHandler<?> ivh = yfe.getHandler(l.get(elementPos));
 		ivh.uncheckedEdit(yfe, this, key, yfe.getValHandler(), getId(),
-				YamlEditor.cut(String.join(":", title, String.valueOf(pos)), 32), () -> l.get(pos), e -> {
-					l.set(pos, e);
+				YamlEditor.cut(String.join(":", title, String.valueOf(elementPos)), 32), () -> l.get(elementPos), e -> {
+					l.set(elementPos, e);
 					onEdit.accept(l);
 				}, () -> ListHandler.INSTANCE.uncheckedEdit(yfe, this, key, handler, id, title, valSup, onEdit, onBack,
 						onDelete),
@@ -85,40 +105,43 @@ public class ListEditor extends ValueEditor<List> {
 	}
 
 	protected void prevElement() {
-		if (getList().isEmpty())
+		if (getList0().isEmpty())
 			return;
-		pos--;
-		if (pos < 0)
-			pos = getList().size() - 1;
+		elementPos--;
+		if (elementPos < 0)
+			elementPos = getList0().size() - 1;
 		addMainItem();
 		addInsertItem();
 	}
 
 	protected void nextElement() {
-		if (getList().isEmpty())
+		if (getList0().isEmpty())
 			return;
-		pos++;
-		if (pos == getList().size())
-			pos = 0;
+		elementPos++;
+		if (elementPos == getList0().size())
+			elementPos = 0;
 		addMainItem();
 		addInsertItem();
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void addInsertItem() {
 		addInventoryItem(new InventoryItem(this, insertItem(), 15, (slot, shift, action, top) -> {
 			if (!top)
 				return;
-			List list = getList();
+			List list = getList0();
 			switch (action) {
 			case PICKUP_HALF:
-				list.add(Math.max(pos, 0), handler.get(addPos).defaultValue());
+				handler.get(addPos).addDefaultToList(this, list, Math.max(elementPos, 0));
+				if (yfe.getListTypeValidator() != null)
+					yfe.getListTypeValidator().onInsert(this, handler.get(addPos));
 				break;
 			case PICKUP_ALL:
 				if (list.isEmpty())
-					list.add(0, null);
+					handler.get(addPos).addDefaultToList(this, list, 0);
 				else
-					list.add(Math.min(pos + 1, list.size() - 1), handler.get(addPos).defaultValue());
+					handler.get(addPos).addDefaultToList(this, list, Math.min(elementPos + 1, list.size() - 1));
+				if (yfe.getListTypeValidator() != null)
+					yfe.getListTypeValidator().onInsert(this, handler.get(addPos));
 				break;
 			case CLONE_STACK:
 				nextAddOption();
@@ -126,6 +149,7 @@ public class ListEditor extends ValueEditor<List> {
 			default:
 				break;
 			}
+			addPos = addPos % handler.size();
 			addMainItem();
 			addInsertItem();
 		}));
@@ -134,23 +158,28 @@ public class ListEditor extends ValueEditor<List> {
 	@SuppressWarnings("nls")
 	protected ItemStack insertItem() {
 		List<String> lore = new ArrayList<>();
-		List list = getList();
+		List list = getList0();
 		lore.add("§eRight click to insert before");
 		lore.add("§eLeft click to insert after");
 		lore.add("§eMouse wheel to select type");
 		lore.addAll(getSelecteTypeLore());
-		lore.add("§7Index: " + pos);
+		lore.add("§7Index: " + elementPos);
 		if (!list.isEmpty()) {
-			if (pos > 0)
-				lore.add("§fPrevious: '" + list.get(pos - 1) + "'");
-			lore.add("§fCurrent: '" + list.get(pos) + "'");
-			if (pos < list.size() - 1)
-				lore.add("§fNext: '" + list.get(pos + 1) + "'");
+			if (elementPos > 0)
+				lore.add("§fPrevious: '" + list.get(elementPos - 1) + "'");
+			lore.add("§fCurrent: '" + list.get(elementPos) + "'");
+			if (elementPos < list.size() - 1)
+				lore.add("§fNext: '" + list.get(elementPos + 1) + "'");
 		}
 		return new ItemBuilder(XMaterial.ARROW).setLore(lore).build();
 	}
 
-	protected List getList() {
+	@SuppressWarnings("unchecked")
+	public List getList() {
+		return Collections.unmodifiableList(getList0());
+	}
+
+	protected List getList0() {
 		return valSup.get();
 	}
 
@@ -177,13 +206,13 @@ public class ListEditor extends ValueEditor<List> {
 	}
 
 	protected void deleteSelected() {
-		List l = getList();
-		if (l.size() <= pos)
+		List l = getList0();
+		if (l.size() <= elementPos)
 			return;
-		l.remove(pos);
-		pos = Math.max(0, pos - 1);
+		l.remove(elementPos);
+		elementPos = Math.max(0, elementPos - 1);
 		addMainItem();
-		onEdit.accept(getList());
+		onEdit.accept(getList0());
 	}
 
 	@SuppressWarnings("nls")
@@ -194,14 +223,16 @@ public class ListEditor extends ValueEditor<List> {
 				.append("§eMouse wheel to delete the selected element").append("\n")
 				.append("§eShift click to edit the selected element").append("\n")
 				.append("§7Syntax: [{index}][{type}]={value}").append("\n");
-		for (int i = pos; i - pos < getList().size(); i++) {
+
+		System.out.println("list; " + getList0());
+		for (int i = elementPos; i - elementPos < getList0().size(); i++) {
 			builder.append(ChatColor.WHITE.toString());
-			if (i == pos)
+			if (i == elementPos)
 				builder.append(">");
-			builder.append(i % getList().size()).append("[")
-					.append(yfe.getHandler(getList().get(i % getList().size())).getClazz().getSimpleName())
+			builder.append("[").append(i % getList0().size()).append("][")
+					.append(yfe.getHandler(getList0().get(i % getList0().size())).getClazz().getSimpleName())
 					.append("]=");
-			String s = getList().get(i % getList().size()).toString().replace("\n", "\\n");
+			String s = getList0().get(i % getList0().size()).toString().replace("\n", "\\n");
 			builder.append("'").append(s).append("'").append('\n');
 		}
 		return new ItemBuilder(XMaterial.CHEST).setDisplayname(title).setLore(builder.toString().split("\n")).build();

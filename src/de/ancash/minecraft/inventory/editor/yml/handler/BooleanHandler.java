@@ -43,11 +43,6 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 	}
 
 	@Override
-	public void set(ConfigurationSection section, String key, Boolean value) {
-		section.set(key, value);
-	}
-
-	@Override
 	public Class<?> getClazz() {
 		return Boolean.class;
 	}

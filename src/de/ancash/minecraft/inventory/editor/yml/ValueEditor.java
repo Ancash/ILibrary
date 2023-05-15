@@ -42,6 +42,14 @@ public abstract class ValueEditor<T> extends IGUI {
 		open();
 	}
 
+	public ConfigurationSectionEditor getClosesConfigurationSectionEditor() {
+		if (this instanceof ConfigurationSectionEditor)
+			return (ConfigurationSectionEditor) this;
+		if (!hasParent())
+			return null;
+		return getParent().getClosesConfigurationSectionEditor();
+	}
+
 	public String getKey() {
 		return key;
 	}
@@ -75,9 +83,6 @@ public abstract class ValueEditor<T> extends IGUI {
 	@Override
 	public void onInventoryClose(InventoryCloseEvent event) {
 		IGUIManager.remove(id);
-		if (onBack == null)
-			return;
-		onBack.run();
 	}
 
 	@Override

@@ -31,11 +31,6 @@ public class DoubleHandler implements IValueHandler<Double> {
 	}
 
 	@Override
-	public void set(ConfigurationSection section, String key, Double value) {
-		section.set(key, value);
-	}
-
-	@Override
 	public Class<?> getClazz() {
 		return Double.class;
 	}
