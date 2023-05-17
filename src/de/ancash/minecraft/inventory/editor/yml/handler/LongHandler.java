@@ -59,6 +59,13 @@ public class LongHandler implements IValueHandler<Long> {
 	}
 
 	@Override
+	public void uncheckedEdit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler,
+			UUID id, String title, Supplier<?> valSup, Consumer<?> onEdit, Runnable onBack, Runnable onDelete) {
+		IValueHandler.super.uncheckedEdit(yfe, parent, key, valHandler, id, title,
+				() -> ((Number) valSup.get()).longValue(), onEdit, onBack, onDelete);
+	}
+
+	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
 		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
 				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),

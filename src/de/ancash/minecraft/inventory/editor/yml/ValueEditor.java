@@ -75,6 +75,10 @@ public abstract class ValueEditor<T> extends IGUI {
 		onBack.run();
 	}
 
+	public YamlEditor getYamlEditor() {
+		return yeditor;
+	}
+
 	@Override
 	public void onInventoryClick(InventoryClickEvent event) {
 		event.setCancelled(true);

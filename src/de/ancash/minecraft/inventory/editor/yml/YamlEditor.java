@@ -28,7 +28,7 @@ import de.ancash.minecraft.inventory.editor.yml.handler.LongHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.MapHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.StringHandler;
 import de.ancash.minecraft.inventory.editor.yml.listener.IKeyValidator;
-import de.ancash.minecraft.inventory.editor.yml.listener.IListTypeValidator;
+import de.ancash.minecraft.inventory.editor.yml.listener.IListEditorListener;
 import de.ancash.minecraft.inventory.editor.yml.listener.IValueEditorListener;
 
 public class YamlEditor {
@@ -54,7 +54,7 @@ public class YamlEditor {
 	protected final Consumer<YamlEditor> onSave;
 	protected final Set<IValueEditorListener> listener = new HashSet<>();
 	protected final Set<AbstractInputValidator<?>> validator = new HashSet<>();
-	private IListTypeValidator listTypeValidator;
+	private IListEditorListener listEditorListener;
 	protected IKeyValidator keyValidator;
 
 	public YamlEditor(File file, Player p, Consumer<YamlEditor> onSave)
@@ -216,12 +216,12 @@ public class YamlEditor {
 		return handler;
 	}
 
-	public IListTypeValidator getListTypeValidator() {
-		return listTypeValidator;
+	public IListEditorListener getListTypeValidator() {
+		return listEditorListener;
 	}
 
-	public void setListTypeValidator(IListTypeValidator listTypeValidator) {
-		this.listTypeValidator = listTypeValidator;
+	public void setListTypeValidator(IListEditorListener listEditorListener) {
+		this.listEditorListener = listEditorListener;
 	}
 
 	public ConfigurationSection getRoot() {

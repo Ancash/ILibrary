@@ -209,10 +209,13 @@ public class ListEditor extends ValueEditor<List> {
 		List l = getList0();
 		if (l.size() <= elementPos)
 			return;
-		l.remove(elementPos);
+		Object o = l.remove(elementPos);
 		elementPos = Math.max(0, elementPos - 1);
-		addMainItem();
 		onEdit.accept(getList0());
+		if (yfe.getListTypeValidator() != null)
+			yfe.getListTypeValidator().onDelete(this, yfe.getHandler(o), o);
+		addMainItem();
+		addInsertItem();
 	}
 
 	@SuppressWarnings("nls")
@@ -223,8 +226,6 @@ public class ListEditor extends ValueEditor<List> {
 				.append("§eMouse wheel to delete the selected element").append("\n")
 				.append("§eShift click to edit the selected element").append("\n")
 				.append("§7Syntax: [{index}][{type}]={value}").append("\n");
-
-		System.out.println("list; " + getList0());
 		for (int i = elementPos; i - elementPos < getList0().size(); i++) {
 			builder.append(ChatColor.WHITE.toString());
 			if (i == elementPos)

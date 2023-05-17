@@ -54,7 +54,7 @@ public class LongEditor extends ValueEditor<Long> {
 				});
 		nig.setLeft(XMaterial.DIRT.parseItem());
 		nig.setTitle(title);
-		nig.setText(valSup.get().toString().toString());
+		nig.setText(valSup.get().toString());
 		closeAll();
 		IGUIManager.remove(id);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> nig.start(), 1);
