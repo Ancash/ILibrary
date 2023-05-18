@@ -1,6 +1,6 @@
-package de.ancash.minecraft.inventory.editor.yml.listener;
+package de.ancash.minecraft.inventory.editor.yml;
 
-import de.ancash.minecraft.inventory.editor.yml.ListEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ListEditor;
 import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
 
 public interface IListEditorListener {

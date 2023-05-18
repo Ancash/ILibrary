@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.yml;
+package de.ancash.minecraft.inventory.editor.yml.gui;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -15,6 +15,8 @@ import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.IGUI;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
+import de.ancash.minecraft.inventory.editor.yml.EditorSettings;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 
 public abstract class ValueEditor<T> extends IGUI {
 
@@ -28,7 +30,7 @@ public abstract class ValueEditor<T> extends IGUI {
 	public ValueEditor(UUID id, String title, int size, ValueEditor<?> parent, YamlEditor yeditor, String key,
 			Supplier<T> valSup, Runnable onBack) {
 		super(id, size, title);
-		this.settings = yeditor.settings;
+		this.settings = yeditor.getSettings();
 		this.key = key;
 		this.yeditor = yeditor;
 		this.onBack = onBack;

@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.yml;
+package de.ancash.minecraft.inventory.editor.yml.gui;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +22,8 @@ import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
+import de.ancash.minecraft.inventory.editor.yml.EditorSettings;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
 import de.ancash.minecraft.inventory.input.StringInputGUI;
 
@@ -55,6 +57,11 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 		this.current = current;
 		this.editor = editor;
 		open();
+	}
+
+	@Override
+	public int hashCode() {
+		return current.getCurrentPath().hashCode();
 	}
 
 	public void addRootBackItem(Runnable r) {
@@ -130,7 +137,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 						super.back();
 					})));
 		addInventoryItem(new InventoryItem(this, settings.saveItem(), 52, (a, b, c, top) -> Lambda.execIf(top, () -> {
-			editor.onSave.accept(editor);
+			editor.getOnSave().accept(editor);
 			closeAll();
 		})));
 		addAddItem();
@@ -175,7 +182,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	protected void mapHandler() {
 		mappedHandler.clear();
 		for (String key : getCurrent().getKeys(false)) {
-			IValueHandler<?> ivh = editor.getHandler(getCurrent(), key);
+			IValueHandler<?> ivh = editor.getHandler(this, key);
 			if (ivh != null)
 				mappedHandler.put(key, ivh);
 			else

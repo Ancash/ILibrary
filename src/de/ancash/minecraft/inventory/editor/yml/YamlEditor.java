@@ -19,22 +19,28 @@ import org.bukkit.entity.Player;
 import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.libs.org.simpleyaml.configuration.file.YamlFile;
+import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ValueEditor;
 import de.ancash.minecraft.inventory.editor.yml.handler.BooleanHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.ByteHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.ConfigurationSectionHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.DoubleHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.FloatHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.IntegerHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.ListHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.LongHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.MapHandler;
+import de.ancash.minecraft.inventory.editor.yml.handler.ShortHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.StringHandler;
-import de.ancash.minecraft.inventory.editor.yml.listener.IKeyValidator;
-import de.ancash.minecraft.inventory.editor.yml.listener.IListEditorListener;
-import de.ancash.minecraft.inventory.editor.yml.listener.IValueEditorListener;
 
 public class YamlEditor {
 
+	public static final IHandlerMapper DEFAULT_HANDLER_MAPPER = new IHandlerMapper() {
+	};
 	private static final List<IValueHandler<?>> DEFAULT_VALUE_HANDLER = Arrays.asList(
-			ConfigurationSectionHandler.INSTANCE, MapHandler.INSTANCE, BooleanHandler.INSTANCE, LongHandler.INSTANCE,
+			ConfigurationSectionHandler.INSTANCE, MapHandler.INSTANCE, BooleanHandler.INSTANCE, ByteHandler.INSTANCE,
+			ShortHandler.INSTANCE, IntegerHandler.INSTANCE, LongHandler.INSTANCE, FloatHandler.INSTANCE,
 			DoubleHandler.INSTANCE, ListHandler.INSTANCE, StringHandler.INSTANCE);
 
 	public static List<IValueHandler<?>> getDefaultHandler() {
@@ -54,8 +60,9 @@ public class YamlEditor {
 	protected final Consumer<YamlEditor> onSave;
 	protected final Set<IValueEditorListener> listener = new HashSet<>();
 	protected final Set<AbstractInputValidator<?>> validator = new HashSet<>();
-	private IListEditorListener listEditorListener;
+	protected IListEditorListener listEditorListener;
 	protected IKeyValidator keyValidator;
+	protected IHandlerMapper handlerMapper = DEFAULT_HANDLER_MAPPER;
 
 	public YamlEditor(File file, Player p, Consumer<YamlEditor> onSave)
 			throws FileNotFoundException, IOException, InvalidConfigurationException {
@@ -144,6 +151,10 @@ public class YamlEditor {
 		validator.add(aiv);
 	}
 
+	public void setHandlerMapper(IHandlerMapper ihm) {
+		handlerMapper = ihm;
+	}
+
 	public Optional<String> isValid(ValueEditor<?> ve, Object o) {
 		if (validator.isEmpty()) {
 			getListener().forEach(ivel -> ivel.onValidInput(ve, o));
@@ -183,24 +194,27 @@ public class YamlEditor {
 	}
 
 	@SuppressWarnings("nls")
-	public IValueHandler<?> getHandler(Object o) {
+	public IValueHandler<?> getHandler(ConfigurationSectionEditor where, String key) {
+		IValueHandler<?> ivh = handlerMapper.getHandler(where, key);
+		if (ivh != null)
+			return ivh;
+		ILibrary.getInstance().getLogger().severe(
+				"No handler found for " + where.getCurrent().get(key).getClass() + ": " + where.getCurrent().get(key));
+		return null;
+	}
+
+	@SuppressWarnings("nls")
+	public IValueHandler<?> getHandler(ValueEditor<?> where, Object o) {
 		if (o == null)
 			throw new IllegalArgumentException("value null");
-		for (IValueHandler<?> ivh : handler)
-			if (ivh.isValid(o))
-				return ivh;
+		IValueHandler<?> ivh = handlerMapper.getHandler(where, o);
+		if (ivh != null)
+			return ivh;
 		ILibrary.getInstance().getLogger().severe("No handler found for " + o.getClass() + ": " + o);
 		return null;
 	}
 
-	public IValueHandler<?> getHandler(ConfigurationSection cs, String key) {
-		for (IValueHandler<?> ivh : handler)
-			if (ivh.isValid(cs, key))
-				return ivh;
-		return null;
-	}
-
-	protected Consumer<YamlEditor> getOnSave() {
+	public Consumer<YamlEditor> getOnSave() {
 		return onSave;
 	}
 

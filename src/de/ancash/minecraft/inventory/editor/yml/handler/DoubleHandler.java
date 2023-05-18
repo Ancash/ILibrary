@@ -13,10 +13,10 @@ import com.cryptomorin.xseries.XMaterial;
 import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemBuilder;
-import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.yml.DoubleEditor;
-import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.DoubleEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ValueEditor;
 
 public class DoubleHandler implements IValueHandler<Double> {
 
@@ -69,7 +69,7 @@ public class DoubleHandler implements IValueHandler<Double> {
 
 	@Override
 	public boolean isValid(Object o) {
-		return o instanceof Double || o instanceof Float;
+		return o instanceof Double;
 	}
 
 	@Override

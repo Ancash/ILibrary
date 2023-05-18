@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.yml;
+package de.ancash.minecraft.inventory.editor.yml.gui;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,15 +16,16 @@ import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
-import de.ancash.minecraft.inventory.input.NumberInputGUI;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
+import de.ancash.minecraft.inventory.input.StringInputGUI;
 
-public class LongEditor extends ValueEditor<Long> {
+public class StringEditor extends ValueEditor<String> {
 
-	protected final Consumer<Long> onEdit;
+	protected final Consumer<String> onEdit;
 	protected final Runnable onDelete;
 
-	public LongEditor(UUID id, String title, ValueEditor<?> parent, YamlEditor yeditor, String key,
-			Supplier<Long> valSup, Consumer<Long> onEdit, Runnable onBack, Runnable onDelete) {
+	public StringEditor(UUID id, String title, ValueEditor<?> parent, YamlEditor yeditor, String key,
+			Supplier<String> valSup, Consumer<String> onEdit, Runnable onBack, Runnable onDelete) {
 		super(id, title, 36, parent, yeditor, key, valSup, onBack);
 		this.onEdit = onEdit;
 		this.onDelete = onDelete;
@@ -43,20 +44,19 @@ public class LongEditor extends ValueEditor<Long> {
 	}
 
 	public void acceptInput() {
-		NumberInputGUI<Long> nig = new NumberInputGUI<>(ILibrary.getInstance(), Bukkit.getPlayer(getId()), Long.class,
-				s -> {
-					onEdit.accept(s);
-					Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> new LongEditor(getId(), title,
-							parent, yeditor, key, valSup, onEdit, onBack, onDelete), 1);
-				}, l -> {
-					Optional<String> o = yeditor.isValid(this, l);
-					return Tuple.of(!o.isPresent(), o.orElse(null));
-				});
-		nig.setLeft(XMaterial.DIRT.parseItem());
-		nig.setTitle(title);
-		nig.setText(valSup.get().toString());
+		StringInputGUI sig = new StringInputGUI(ILibrary.getInstance(), Bukkit.getPlayer(getId()), s -> {
+			onEdit.accept(s);
+			Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
+					() -> new StringEditor(getId(), title, parent, yeditor, key, valSup, onEdit, onBack, onDelete), 1);
+		}, in -> {
+			Optional<String> o = yeditor.isValid(this, in);
+			return Tuple.of(!o.isPresent(), o.orElse(null));
+		});
+		sig.setLeft(XMaterial.DIRT.parseItem());
+		sig.setTitle(title);
+		sig.setText(valSup.get().toString());
 		closeAll();
 		IGUIManager.remove(id);
-		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> nig.start(), 1);
+		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> sig.open(), 1);
 	}
 }

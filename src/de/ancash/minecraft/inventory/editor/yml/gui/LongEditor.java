@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.yml;
+package de.ancash.minecraft.inventory.editor.yml.gui;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,18 +16,19 @@ import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 import de.ancash.minecraft.inventory.input.NumberInputGUI;
 
-public class DoubleEditor extends ValueEditor<Double> {
+public class LongEditor extends ValueEditor<Long> {
 
-	protected final Consumer<Double> onEdit;
+	protected final Consumer<Long> onEdit;
 	protected final Runnable onDelete;
 
-	public DoubleEditor(UUID id, String title, ValueEditor<?> parent, YamlEditor yeditor, String key,
-			Supplier<Double> valSup, Consumer<Double> onEdit, Runnable onBack, Runnable onDelete) {
+	public LongEditor(UUID id, String title, ValueEditor<?> parent, YamlEditor yeditor, String key,
+			Supplier<Long> valSup, Consumer<Long> onEdit, Runnable onBack, Runnable onDelete) {
 		super(id, title, 36, parent, yeditor, key, valSup, onBack);
-		this.onDelete = onDelete;
 		this.onEdit = onEdit;
+		this.onDelete = onDelete;
 		addInventoryItem(
 				new InventoryItem(this, getEditorItem(), 13, (a, b, c, top) -> Lambda.execIf(top, this::acceptInput)));
 		if (onDelete != null)
@@ -43,13 +44,13 @@ public class DoubleEditor extends ValueEditor<Double> {
 	}
 
 	public void acceptInput() {
-		NumberInputGUI<Double> nig = new NumberInputGUI<>(ILibrary.getInstance(), Bukkit.getPlayer(getId()),
-				Double.class, s -> {
+		NumberInputGUI<Long> nig = new NumberInputGUI<>(ILibrary.getInstance(), Bukkit.getPlayer(getId()), Long.class,
+				s -> {
 					onEdit.accept(s);
-					Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> new DoubleEditor(getId(), title,
+					Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> new LongEditor(getId(), title,
 							parent, yeditor, key, valSup, onEdit, onBack, onDelete), 1);
-				}, s -> {
-					Optional<String> o = yeditor.isValid(this, s);
+				}, l -> {
+					Optional<String> o = yeditor.isValid(this, l);
 					return Tuple.of(!o.isPresent(), o.orElse(null));
 				});
 		nig.setLeft(XMaterial.DIRT.parseItem());

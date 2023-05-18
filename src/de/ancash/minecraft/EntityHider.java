@@ -1,27 +1,6 @@
 package de.ancash.minecraft;
 
-import static com.comphenix.protocol.PacketType.Play.Server.ANIMATION;
-import static com.comphenix.protocol.PacketType.Play.Server.ATTACH_ENTITY;
-import static com.comphenix.protocol.PacketType.Play.Server.BED;
-import static com.comphenix.protocol.PacketType.Play.Server.BLOCK_BREAK_ANIMATION;
-import static com.comphenix.protocol.PacketType.Play.Server.COLLECT;
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_DESTROY;
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_EFFECT;
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_EQUIPMENT;
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_HEAD_ROTATION;
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_LOOK;
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_METADATA;
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_MOVE_LOOK;
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_STATUS;
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_TELEPORT;
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_VELOCITY;
-import static com.comphenix.protocol.PacketType.Play.Server.NAMED_ENTITY_SPAWN;
-import static com.comphenix.protocol.PacketType.Play.Server.REL_ENTITY_MOVE;
-import static com.comphenix.protocol.PacketType.Play.Server.REMOVE_ENTITY_EFFECT;
-import static com.comphenix.protocol.PacketType.Play.Server.SPAWN_ENTITY;
-import static com.comphenix.protocol.PacketType.Play.Server.SPAWN_ENTITY_EXPERIENCE_ORB;
-import static com.comphenix.protocol.PacketType.Play.Server.SPAWN_ENTITY_LIVING;
-import static com.comphenix.protocol.PacketType.Play.Server.SPAWN_ENTITY_PAINTING;
+import static com.comphenix.protocol.PacketType.Play.Server.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;

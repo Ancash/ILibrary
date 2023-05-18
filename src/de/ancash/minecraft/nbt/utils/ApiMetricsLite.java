@@ -1,6 +1,6 @@
 package de.ancash.minecraft.nbt.utils;
 
-import static de.ancash.minecraft.nbt.utils.MinecraftVersion.getLogger;
+import static de.ancash.minecraft.nbt.utils.MinecraftVersion.*;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

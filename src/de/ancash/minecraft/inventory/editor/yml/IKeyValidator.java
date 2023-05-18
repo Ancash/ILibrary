@@ -1,7 +1,7 @@
-package de.ancash.minecraft.inventory.editor.yml.listener;
+package de.ancash.minecraft.inventory.editor.yml;
 
 import de.ancash.datastructures.tuples.Duplet;
-import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ValueEditor;
 import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
 
 public interface IKeyValidator {

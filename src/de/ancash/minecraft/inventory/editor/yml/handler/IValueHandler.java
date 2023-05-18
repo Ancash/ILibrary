@@ -10,9 +10,9 @@ import org.bukkit.inventory.ItemStack;
 
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
-import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ValueEditor;
 
 public interface IValueHandler<T> {
 
@@ -24,6 +24,11 @@ public interface IValueHandler<T> {
 
 	public default void set(ConfigurationSection section, String key, T value) {
 		section.set(key, value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public default void setUnchecked(ConfigurationSection section, String key, Object value) {
+		set(section, key, (T) value);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

@@ -15,10 +15,10 @@ import com.cryptomorin.xseries.XMaterial;
 import de.ancash.ILibrary;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemBuilder;
-import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.yml.ListEditor;
-import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ListEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ValueEditor;
 
 @SuppressWarnings("rawtypes")
 public class ListHandler implements IValueHandler<List> {

@@ -15,35 +15,35 @@ import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.yml.gui.LongEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.DoubleEditor;
 import de.ancash.minecraft.inventory.editor.yml.gui.ValueEditor;
 
-public class LongHandler implements IValueHandler<Long> {
+public class FloatHandler implements IValueHandler<Float> {
 
-	public static final LongHandler INSTANCE = new LongHandler();
+	public static final FloatHandler INSTANCE = new FloatHandler();
 
-	protected LongHandler() {
+	protected FloatHandler() {
 	}
 
 	@Override
 	public boolean isValid(ConfigurationSection section, String key) {
-		return section.isLong(key) || section.isInt(key);
+		return section.get(key) instanceof Float;
 	}
 
 	@Override
 	public Class<?> getClazz() {
-		return Long.class;
+		return Float.class;
 	}
 
 	@SuppressWarnings("nls")
 	@Override
 	public ItemStack getAddItem() {
-		return new ItemBuilder(XMaterial.STICK).setDisplayname("§7Add Long").build();
+		return new ItemBuilder(XMaterial.LADDER).setDisplayname("§7Add Float").build();
 	}
 
 	@Override
-	public Long get(ConfigurationSection section, String s) {
-		return section.getLong(s);
+	public Float get(ConfigurationSection section, String s) {
+		return ((Number) section.get(s)).floatValue();
 	}
 
 	@Override
@@ -54,15 +54,8 @@ public class LongHandler implements IValueHandler<Long> {
 	@Override
 	public ItemStack getEditItem(ConfigurationSectionEditor editor, String key) {
 		ItemStack item = IValueHandler.super.getEditItem(editor, key);
-		item.setType(XMaterial.STICK.parseMaterial());
+		item.setType(XMaterial.LADDER.parseMaterial());
 		return item;
-	}
-
-	@Override
-	public void uncheckedEdit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler,
-			UUID id, String title, Supplier<?> valSup, Consumer<?> onEdit, Runnable onBack, Runnable onDelete) {
-		IValueHandler.super.uncheckedEdit(yfe, parent, key, valHandler, id, title,
-				() -> ((Number) valSup.get()).longValue(), onEdit, onBack, onDelete);
 	}
 
 	@Override
@@ -70,24 +63,25 @@ public class LongHandler implements IValueHandler<Long> {
 		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
 				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
 						32),
-				() -> editor.getCurrent().getLong(key), l -> editor.getCurrent().set(key, l), editor::open,
+				() -> get(editor.getCurrent(), key), d -> editor.getCurrent().set(key, d), editor::open,
 				() -> editor.getCurrent().remove(key));
 	}
 
 	@Override
 	public boolean isValid(Object o) {
-		return o instanceof Long;
+		return o instanceof Float;
 	}
 
 	@Override
 	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
-			String title, Supplier<Long> valSup, Consumer<Long> onEdit, Runnable onBack, Runnable onDelete) {
-		LongEditor le = new LongEditor(id, title, parent, yfe, key, valSup, onEdit, onBack, onDelete);
-		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> le.open(), 1);
+			String title, Supplier<Float> valSup, Consumer<Float> onEdit, Runnable onBack, Runnable onDelete) {
+		DoubleEditor de = new DoubleEditor(id, title, parent, yfe, key, () -> valSup.get().doubleValue(),
+				d -> onEdit.accept(d.floatValue()), onBack, onDelete);
+		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> de.open(), 1);
 	}
 
 	@Override
-	public Long defaultValue() {
-		return 0l;
+	public Float defaultValue() {
+		return 0f;
 	}
 }

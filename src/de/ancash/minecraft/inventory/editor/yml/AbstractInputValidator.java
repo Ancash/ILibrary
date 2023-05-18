@@ -2,6 +2,8 @@ package de.ancash.minecraft.inventory.editor.yml;
 
 import java.util.Optional;
 
+import de.ancash.minecraft.inventory.editor.yml.gui.ValueEditor;
+
 public abstract class AbstractInputValidator<T> {
 
 	public abstract Optional<String> isValid(ValueEditor<T> editor, T t);

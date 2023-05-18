@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.yml;
+package de.ancash.minecraft.inventory.editor.yml.gui;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.InventoryItem;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 
 public class BooleanEditor extends ValueEditor<Boolean> {
 

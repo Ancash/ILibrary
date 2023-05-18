@@ -11,9 +11,9 @@ import org.bukkit.inventory.ItemStack;
 
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.libs.org.simpleyaml.configuration.MemoryConfiguration;
-import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionEditor;
-import de.ancash.minecraft.inventory.editor.yml.ValueEditor;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ValueEditor;
 
 @SuppressWarnings("rawtypes")
 public class MapHandler implements IValueHandler<Map> {

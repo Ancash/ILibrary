@@ -1,4 +1,4 @@
-package de.ancash.minecraft.inventory.editor.yml;
+package de.ancash.minecraft.inventory.editor.yml.gui;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +14,8 @@ import com.cryptomorin.xseries.XMaterial;
 import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.InventoryItem;
+import de.ancash.minecraft.inventory.editor.yml.EditorSettings;
+import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.ListHandler;
 import net.md_5.bungee.api.ChatColor;
@@ -70,7 +72,7 @@ public class ListEditor extends ValueEditor<List> {
 		List l = getList0();
 		if (l.size() <= elementPos)
 			return;
-		IValueHandler<?> ivh = yfe.getHandler(l.get(elementPos));
+		IValueHandler<?> ivh = yfe.getHandler(this, l.get(elementPos));
 		ivh.uncheckedEdit(yfe, this, key, yfe.getValHandler(), getId(),
 				YamlEditor.cut(String.join(":", title, String.valueOf(elementPos)), 32), () -> l.get(elementPos), e -> {
 					l.set(elementPos, e);
@@ -139,7 +141,7 @@ public class ListEditor extends ValueEditor<List> {
 				if (list.isEmpty())
 					handler.get(addPos).addDefaultToList(this, list, 0);
 				else
-					handler.get(addPos).addDefaultToList(this, list, Math.min(elementPos + 1, list.size() - 1));
+					handler.get(addPos).addDefaultToList(this, list, Math.min(elementPos + 1, list.size()));
 				if (yfe.getListTypeValidator() != null)
 					yfe.getListTypeValidator().onInsert(this, handler.get(addPos));
 				break;
@@ -213,7 +215,7 @@ public class ListEditor extends ValueEditor<List> {
 		elementPos = Math.max(0, elementPos - 1);
 		onEdit.accept(getList0());
 		if (yfe.getListTypeValidator() != null)
-			yfe.getListTypeValidator().onDelete(this, yfe.getHandler(o), o);
+			yfe.getListTypeValidator().onDelete(this, yfe.getHandler(this, o), o);
 		addMainItem();
 		addInsertItem();
 	}
@@ -231,7 +233,7 @@ public class ListEditor extends ValueEditor<List> {
 			if (i == elementPos)
 				builder.append(">");
 			builder.append("[").append(i % getList0().size()).append("][")
-					.append(yfe.getHandler(getList0().get(i % getList0().size())).getClazz().getSimpleName())
+					.append(yfe.getHandler(this, getList0().get(i % getList0().size())).getClazz().getSimpleName())
 					.append("]=");
 			String s = getList0().get(i % getList0().size()).toString().replace("\n", "\\n");
 			builder.append("'").append(s).append("'").append('\n');
