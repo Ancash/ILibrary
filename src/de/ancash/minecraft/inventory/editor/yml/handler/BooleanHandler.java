@@ -56,7 +56,7 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
+		edit(editor.getYamlEditor(), editor, key, editor.getValueHandler(), editor.getId(),
 				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
 						32),
 				() -> editor.getCurrent().getBoolean(key), b -> editor.getCurrent().set(key, b), editor::open,

@@ -55,7 +55,7 @@ public class StringHandler implements IValueHandler<String> {
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
+		edit(editor.getYamlEditor(), editor, key, editor.getValueHandler(), editor.getId(),
 				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
 						32),
 				() -> editor.getCurrent().getString(key), s -> editor.getCurrent().set(key, s), editor::open,

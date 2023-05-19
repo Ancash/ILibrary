@@ -34,7 +34,13 @@ public class ListEditor extends ValueEditor<List> {
 	public ListEditor(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
 			String title, EditorSettings settings, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack,
 			Runnable onDelete) {
-		super(id, title, 36, parent, yfe, key, valSup, onBack);
+		this(yfe, parent, null, key, valHandler, id, title, settings, valSup, onEdit, onBack, onDelete);
+	}
+
+	public ListEditor(YamlEditor yfe, ValueEditor<?> parent, ValueEditor<?> nestedParent, String key,
+			List<IValueHandler<?>> valHandler, UUID id, String title, EditorSettings settings, Supplier<List> valSup,
+			Consumer<List> onEdit, Runnable onBack, Runnable onDelete) {
+		super(id, title, 36, parent, nestedParent, yfe, key, valSup, onBack);
 		finishedConstructor = true;
 		this.onEdit = onEdit;
 		this.onDelete = onDelete;
@@ -72,7 +78,7 @@ public class ListEditor extends ValueEditor<List> {
 		List l = getList0();
 		if (l.size() <= elementPos)
 			return;
-		IValueHandler<?> ivh = yfe.getHandler(this, l.get(elementPos));
+		IValueHandler<?> ivh = yfe.getListHandler(this, l.get(elementPos));
 		ivh.uncheckedEdit(yfe, this, key, yfe.getValHandler(), getId(),
 				YamlEditor.cut(String.join(":", title, String.valueOf(elementPos)), 32), () -> l.get(elementPos), e -> {
 					l.set(elementPos, e);
@@ -215,7 +221,7 @@ public class ListEditor extends ValueEditor<List> {
 		elementPos = Math.max(0, elementPos - 1);
 		onEdit.accept(getList0());
 		if (yfe.getListTypeValidator() != null)
-			yfe.getListTypeValidator().onDelete(this, yfe.getHandler(this, o), o);
+			yfe.getListTypeValidator().onDelete(this, yfe.getListHandler(this, o), o);
 		addMainItem();
 		addInsertItem();
 	}
@@ -233,7 +239,7 @@ public class ListEditor extends ValueEditor<List> {
 			if (i == elementPos)
 				builder.append(">");
 			builder.append("[").append(i % getList0().size()).append("][")
-					.append(yfe.getHandler(this, getList0().get(i % getList0().size())).getClazz().getSimpleName())
+					.append(yfe.getListHandler(this, getList0().get(i % getList0().size())).getClazz().getSimpleName())
 					.append("]=");
 			String s = getList0().get(i % getList0().size()).toString().replace("\n", "\\n");
 			builder.append("'").append(s).append("'").append('\n');

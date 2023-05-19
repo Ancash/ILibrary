@@ -70,7 +70,7 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
+		edit(editor.getYamlEditor(), editor, key, editor.getValueHandler(), editor.getId(),
 				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent().getConfigurationSection(key), 32),
 				() -> editor.getCurrent().getConfigurationSection(key), k -> {
 					throw new UnsupportedOperationException();

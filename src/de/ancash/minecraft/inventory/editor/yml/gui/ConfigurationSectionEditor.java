@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.bukkit.Bukkit;
@@ -22,6 +23,7 @@ import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
+import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionKeyConstructor;
 import de.ancash.minecraft.inventory.editor.yml.EditorSettings;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
@@ -29,7 +31,6 @@ import de.ancash.minecraft.inventory.input.StringInputGUI;
 
 public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection> {
 
-	protected final YamlEditor editor;
 	protected final ConfigurationSection root;
 	protected ConfigurationSection current;
 	protected int addPos = 0;
@@ -38,6 +39,8 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	protected int keysPage;
 	protected final List<IValueHandler<?>> handler;
 	protected final Map<String, IValueHandler<?>> mappedHandler = new HashMap<String, IValueHandler<?>>();
+	protected final List<ConfigurationSectionKeyConstructor> suggestions = new ArrayList<>();
+	protected int sugPos = 0;
 	protected boolean finishedConstructor = false;
 	protected final Runnable onDelete;
 
@@ -55,7 +58,6 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 		this.handler = Collections.unmodifiableList(handler);
 		this.root = editor.getRoot();
 		this.current = current;
-		this.editor = editor;
 		open();
 	}
 
@@ -66,10 +68,6 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 
 	public void addRootBackItem(Runnable r) {
 		onBack = r;
-	}
-
-	public YamlEditor getFile() {
-		return editor;
 	}
 
 	public IValueHandler<?> getHandler(String key) {
@@ -83,10 +81,30 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 		if (!root.getCurrentPath().isEmpty() && !current.getCurrentPath().startsWith(root.getCurrentPath())) {
 			return;
 		}
-		loadConfiguration();
+		newInventory(getTitle(), getSize());
+		keysPage = 0;
+		keys.clear();
+		keys.addAll(getCurrent().getKeys(false));
 		mapHandler();
 		loadPage();
+		loadOptions();
 		super.open();
+	}
+
+	protected void loadOptions() {
+		if (onDelete != null)
+			addInventoryItem(
+					new InventoryItem(this, settings.deleteItem(), 51, (a, b, c, top) -> Lambda.execIf(top, () -> {
+						onDelete.run();
+						super.back();
+					})));
+		addInventoryItem(new InventoryItem(this, settings.saveItem(), 52, (a, b, c, top) -> Lambda.execIf(top, () -> {
+			yeditor.getOnSave().accept(yeditor);
+			closeAll();
+		})));
+		addAddItem();
+		loadSuggestions();
+		addSuggestionsItem();
 	}
 
 	@SuppressWarnings("nls")
@@ -129,24 +147,82 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 						}));
 	}
 
-	protected void loadOptions() {
-		if (onDelete != null)
-			addInventoryItem(
-					new InventoryItem(this, settings.deleteItem(), 51, (a, b, c, top) -> Lambda.execIf(top, () -> {
-						onDelete.run();
-						super.back();
-					})));
-		addInventoryItem(new InventoryItem(this, settings.saveItem(), 52, (a, b, c, top) -> Lambda.execIf(top, () -> {
-			editor.getOnSave().accept(editor);
-			closeAll();
-		})));
-		addAddItem();
-	}
-
 	protected void nextAddOption() {
 		addPos = (addPos + 1) % handler.size();
 		if (handler.get(addPos).getAddItem() == null)
 			nextAddOption();
+	}
+
+	protected void loadSuggestions() {
+		suggestions.clear();
+		yeditor.getCSKeyConstructorProvider().stream().map(k -> k.getKeyConstructor(this))
+				.filter(s -> s != null && !s.isEmpty()).flatMap(Set::stream)
+				.sorted((a, b) -> a.getKey().compareTo(b.getKey())).forEach(suggestions::add);
+		for (int i = 0; i < suggestions.size() - 1; i++)
+			if (suggestions.get(i).getKey().equals(suggestions.get(i + 1).getKey()))
+				throw new IllegalStateException("duplicate key suggestion: " + suggestions.get(i).getKey());
+	}
+
+	@SuppressWarnings("nls")
+	protected void addSuggestionsItem() {
+		StringBuilder lore = new StringBuilder();
+		lore.append("§eMouse wheel to select type").append("\n").append("§eRight/Left click to add property")
+				.append("\n").append("§7Suggestions:");
+
+		for (int i = 0; i < suggestions.size(); i++) {
+			ConfigurationSectionKeyConstructor cskc = suggestions.get(i);
+			lore.append("\n");
+
+			if (i == sugPos)
+				lore.append("§a");
+			else
+				lore.append("§f");
+			if (current.contains(cskc.getKey()))
+				lore.append("§c");
+			lore.append(String.format("%s (%s)", cskc.getKey(), cskc.getName()));
+		}
+		addInventoryItem(
+				new InventoryItem(this, ItemStackUtils.setLore(settings.suggestionsItem(), lore.toString().split("\n")),
+						47, (slot, shift, action, top) -> {
+							if (!top)
+								return;
+							if (suggestions.isEmpty())
+								return;
+							switch (action) {
+							case CLONE_STACK:
+								nextSuggestionsOption();
+								addSuggestionsItem();
+								break;
+							case PICKUP_ALL:
+								createSuggestion(suggestions.get(sugPos));
+								open();
+								break;
+							case PICKUP_HALF:
+								createSuggestion(suggestions.get(sugPos));
+								open();
+								break;
+							default:
+								break;
+							}
+						}));
+	}
+
+	protected void nextSuggestionsOption() {
+		nextSuggestionsOption(0);
+	}
+
+	protected void nextSuggestionsOption(int cnt) {
+		if (suggestions.isEmpty() || cnt > suggestions.size())
+			return;
+		sugPos = (sugPos + 1) % suggestions.size();
+		if (current.contains(suggestions.get(sugPos).getKey()))
+			nextSuggestionsOption(cnt + 1);
+	}
+
+	protected void createSuggestion(ConfigurationSectionKeyConstructor cskc) {
+		if (current.contains(cskc.getKey()))
+			return;
+		cskc.createKey(this);
 	}
 
 	@SuppressWarnings("nls")
@@ -171,7 +247,6 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 		});
 		IGUIManager.remove(getId());
 		sig.open();
-
 	}
 
 	public void newInventory() {
@@ -182,20 +257,13 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	protected void mapHandler() {
 		mappedHandler.clear();
 		for (String key : getCurrent().getKeys(false)) {
-			IValueHandler<?> ivh = editor.getHandler(this, key);
+			IValueHandler<?> ivh = yeditor.getHandler(this, key);
 			if (ivh != null)
 				mappedHandler.put(key, ivh);
 			else
 				throw new IllegalStateException("unknown type at "
 						+ String.join(".", getCurrent().getCurrentPath(), key) + ": " + getCurrent().get(key));
 		}
-	}
-
-	protected void loadConfiguration() {
-		newInventory(getTitle(), getSize());
-		keysPage = 0;
-		keys.clear();
-		keys.addAll(getCurrent().getKeys(false));
 	}
 
 	protected void loadPage() {
@@ -225,7 +293,6 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 		if (hasNextPage())
 			addInventoryItem(new InventoryItem(this, settings.getNextItem(), getSize() - 1,
 					(a, b, c, top) -> Lambda.execIf(top, this::nextPage)));
-		loadOptions();
 	}
 
 	public void prevPage() {

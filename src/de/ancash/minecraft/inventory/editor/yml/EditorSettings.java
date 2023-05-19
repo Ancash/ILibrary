@@ -62,4 +62,8 @@ public interface EditorSettings {
 	public default ItemStack addItem() {
 		return new ItemBuilder(XMaterial.DROPPER).setDisplayname("§aAdd Property").build();
 	}
+
+	public default ItemStack suggestionsItem() {
+		return new ItemBuilder(XMaterial.CHEST).setDisplayname("§aSuggestions").build();
+	}
 }

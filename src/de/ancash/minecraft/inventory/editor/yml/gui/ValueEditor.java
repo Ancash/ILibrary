@@ -29,6 +29,11 @@ public abstract class ValueEditor<T> extends IGUI {
 
 	public ValueEditor(UUID id, String title, int size, ValueEditor<?> parent, YamlEditor yeditor, String key,
 			Supplier<T> valSup, Runnable onBack) {
+		this(id, title, size, parent, null, yeditor, key, valSup, onBack);
+	}
+
+	public ValueEditor(UUID id, String title, int size, ValueEditor<?> parent, ValueEditor<?> nestedParent,
+			YamlEditor yeditor, String key, Supplier<T> valSup, Runnable onBack) {
 		super(id, size, title);
 		this.settings = yeditor.getSettings();
 		this.key = key;

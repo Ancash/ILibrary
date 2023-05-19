@@ -38,7 +38,7 @@ public class IntegerHandler implements IValueHandler<Integer> {
 	@SuppressWarnings("nls")
 	@Override
 	public ItemStack getAddItem() {
-		return new ItemBuilder(XMaterial.STICK).setDisplayname("§7Add Integer").build();
+		return new ItemBuilder(XMaterial.GOLD_INGOT).setDisplayname("§7Add Integer").build();
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class IntegerHandler implements IValueHandler<Integer> {
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
+		edit(editor.getYamlEditor(), editor, key, editor.getValueHandler(), editor.getId(),
 				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
 						32),
 				() -> get(editor.getCurrent(), key), l -> editor.getCurrent().set(key, l), editor::open,

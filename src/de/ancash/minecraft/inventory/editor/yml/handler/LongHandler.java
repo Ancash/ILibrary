@@ -38,7 +38,7 @@ public class LongHandler implements IValueHandler<Long> {
 	@SuppressWarnings("nls")
 	@Override
 	public ItemStack getAddItem() {
-		return new ItemBuilder(XMaterial.STICK).setDisplayname("§7Add Long").build();
+		return new ItemBuilder(XMaterial.DIAMOND).setDisplayname("§7Add Long").build();
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class LongHandler implements IValueHandler<Long> {
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
-		edit(editor.getFile(), editor, key, editor.getValueHandler(), editor.getId(),
+		edit(editor.getYamlEditor(), editor, key, editor.getValueHandler(), editor.getId(),
 				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
 						32),
 				() -> editor.getCurrent().getLong(key), l -> editor.getCurrent().set(key, l), editor::open,

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -17,9 +18,11 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 
 import de.ancash.ILibrary;
+import de.ancash.libs.org.apache.commons.lang3.Validate;
 import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.libs.org.simpleyaml.configuration.file.YamlFile;
 import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;
+import de.ancash.minecraft.inventory.editor.yml.gui.ListEditor;
 import de.ancash.minecraft.inventory.editor.yml.gui.ValueEditor;
 import de.ancash.minecraft.inventory.editor.yml.handler.BooleanHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.ByteHandler;
@@ -56,10 +59,11 @@ public class YamlEditor {
 	protected final YamlFile yamlFile = new YamlFile();
 	protected final String root;
 	protected final EditorSettings settings;
-	protected final List<IValueHandler<?>> handler;
+	protected final ArrayList<IValueHandler<?>> handler;
 	protected final Consumer<YamlEditor> onSave;
-	protected final Set<IValueEditorListener> listener = new HashSet<>();
-	protected final Set<AbstractInputValidator<?>> validator = new HashSet<>();
+	protected final HashSet<IValueEditorListener> listener = new HashSet<>();
+	protected final HashSet<AbstractInputValidator<?>> validator = new HashSet<>();
+	protected final ArrayList<IConfigurationSectionKeyConstructorProvider> csKeyProvider = new ArrayList<>();
 	protected IListEditorListener listEditorListener;
 	protected IKeyValidator keyValidator;
 	protected IHandlerMapper handlerMapper = DEFAULT_HANDLER_MAPPER;
@@ -117,7 +121,7 @@ public class YamlEditor {
 		this.root = root;
 		this.p = p;
 		this.settings = settings;
-		this.handler = handler;
+		this.handler = new ArrayList<>(handler);
 		this.onSave = onSave;
 		StringBuilder builder = new StringBuilder();
 		Files.lines(file.toPath(), StandardCharsets.UTF_8).forEach(s -> builder.append(s).append('\n'));
@@ -133,7 +137,7 @@ public class YamlEditor {
 		this.root = root;
 		this.p = p;
 		this.settings = settings;
-		this.handler = handler;
+		this.handler = new ArrayList<>(handler);
 		this.onSave = onSave;
 		this.file = null;
 		yamlFile.loadFromString(yaml.replace("==: ", "clazz: "));
@@ -153,6 +157,16 @@ public class YamlEditor {
 
 	public void setHandlerMapper(IHandlerMapper ihm) {
 		handlerMapper = ihm;
+	}
+
+	public void addCSKeyConstructorProvider(IConfigurationSectionKeyConstructorProvider provider) {
+		Validate.notNull(provider);
+		csKeyProvider.add(provider);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<IConfigurationSectionKeyConstructorProvider> getCSKeyConstructorProvider() {
+		return (List<IConfigurationSectionKeyConstructorProvider>) csKeyProvider.clone();
 	}
 
 	public Optional<String> isValid(ValueEditor<?> ve, Object o) {
@@ -189,8 +203,9 @@ public class YamlEditor {
 		return keyValidator != null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Set<IValueEditorListener> getListener() {
-		return listener;
+		return (Set<IValueEditorListener>) listener.clone();
 	}
 
 	@SuppressWarnings("nls")
@@ -204,10 +219,10 @@ public class YamlEditor {
 	}
 
 	@SuppressWarnings("nls")
-	public IValueHandler<?> getHandler(ValueEditor<?> where, Object o) {
+	public IValueHandler<?> getListHandler(ListEditor where, Object o) {
 		if (o == null)
 			throw new IllegalArgumentException("value null");
-		IValueHandler<?> ivh = handlerMapper.getHandler(where, o);
+		IValueHandler<?> ivh = handlerMapper.getListHandler(where, o);
 		if (ivh != null)
 			return ivh;
 		ILibrary.getInstance().getLogger().severe("No handler found for " + o.getClass() + ": " + o);
@@ -226,8 +241,9 @@ public class YamlEditor {
 		return settings;
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<IValueHandler<?>> getValHandler() {
-		return handler;
+		return (List<IValueHandler<?>>) handler.clone();
 	}
 
 	public IListEditorListener getListTypeValidator() {
