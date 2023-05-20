@@ -17,6 +17,7 @@ import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
+import de.ancash.minecraft.inventory.editor.yml.suggestion.ValueSuggestion;
 import de.ancash.minecraft.inventory.input.NumberInputGUI;
 
 public class DoubleEditor extends ValueEditor<Double> {
@@ -30,7 +31,8 @@ public class DoubleEditor extends ValueEditor<Double> {
 		this.onDelete = onDelete;
 		this.onEdit = onEdit;
 		addInventoryItem(
-				new InventoryItem(this, getEditorItem(), 13, (a, b, c, top) -> Lambda.execIf(top, this::acceptInput)));
+				new InventoryItem(this, getEditorItem(), 12, (a, b, c, top) -> Lambda.execIf(top, this::acceptInput)));
+		addEditorItemWithSuggestions(14, XMaterial.CHEST);
 		if (onDelete != null)
 			addInventoryItem(
 					new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
@@ -41,6 +43,13 @@ public class DoubleEditor extends ValueEditor<Double> {
 
 	public ItemStack getEditorItem() {
 		return new ItemBuilder(XMaterial.OAK_SIGN).setDisplayname(String.valueOf(valSup.get())).build();
+	}
+
+	@Override
+	protected void useSuggestion(ValueSuggestion<Double> sugg) {
+		onEdit.accept(sugg.getSuggestion());
+		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
+				() -> new DoubleEditor(getId(), title, parent, yeditor, key, valSup, onEdit, onBack, onDelete), 1);
 	}
 
 	public void acceptInput() {

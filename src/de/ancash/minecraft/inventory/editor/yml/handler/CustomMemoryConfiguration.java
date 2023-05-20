@@ -1,7 +1,7 @@
 package de.ancash.minecraft.inventory.editor.yml.handler;
 
-import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
-import de.ancash.libs.org.simpleyaml.configuration.MemoryConfiguration;
+import org.simpleyaml.configuration.ConfigurationSection;
+import org.simpleyaml.configuration.MemoryConfiguration;
 
 public class CustomMemoryConfiguration extends MemoryConfiguration {
 

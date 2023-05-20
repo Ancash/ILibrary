@@ -14,19 +14,20 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
+import org.simpleyaml.configuration.ConfigurationSection;
 
 import de.ancash.ILibrary;
 import de.ancash.datastructures.tuples.Duplet;
 import de.ancash.datastructures.tuples.Tuple;
 import de.ancash.lambda.Lambda;
-import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
-import de.ancash.minecraft.inventory.editor.yml.ConfigurationSectionKeyConstructor;
 import de.ancash.minecraft.inventory.editor.yml.EditorSettings;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
+import de.ancash.minecraft.inventory.editor.yml.suggestion.KeySuggestion;
+import de.ancash.minecraft.inventory.editor.yml.suggestion.ValueSuggestion;
 import de.ancash.minecraft.inventory.input.StringInputGUI;
 
 public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection> {
@@ -39,7 +40,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	protected int keysPage;
 	protected final List<IValueHandler<?>> handler;
 	protected final Map<String, IValueHandler<?>> mappedHandler = new HashMap<String, IValueHandler<?>>();
-	protected final List<ConfigurationSectionKeyConstructor> suggestions = new ArrayList<>();
+	protected final List<KeySuggestion> suggestions = new ArrayList<>();
 	protected int sugPos = 0;
 	protected boolean finishedConstructor = false;
 	protected final Runnable onDelete;
@@ -82,10 +83,6 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 			return;
 		}
 		newInventory(getTitle(), getSize());
-		keysPage = 0;
-		keys.clear();
-		keys.addAll(getCurrent().getKeys(false));
-		mapHandler();
 		loadPage();
 		loadOptions();
 		super.open();
@@ -147,6 +144,11 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 						}));
 	}
 
+	@Override
+	protected void useSuggestion(ValueSuggestion<ConfigurationSection> sugg) {
+		throw new UnsupportedOperationException();
+	}
+
 	protected void nextAddOption() {
 		addPos = (addPos + 1) % handler.size();
 		if (handler.get(addPos).getAddItem() == null)
@@ -155,9 +157,8 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 
 	protected void loadSuggestions() {
 		suggestions.clear();
-		yeditor.getCSKeyConstructorProvider().stream().map(k -> k.getKeyConstructor(this))
-				.filter(s -> s != null && !s.isEmpty()).flatMap(Set::stream)
-				.sorted((a, b) -> a.getKey().compareTo(b.getKey())).forEach(suggestions::add);
+		yeditor.getKeySuggester().stream().map(k -> k.getKeySuggestions(this)).filter(s -> s != null && !s.isEmpty())
+				.flatMap(Set::stream).sorted((a, b) -> a.getKey().compareTo(b.getKey())).forEach(suggestions::add);
 		for (int i = 0; i < suggestions.size() - 1; i++)
 			if (suggestions.get(i).getKey().equals(suggestions.get(i + 1).getKey()))
 				throw new IllegalStateException("duplicate key suggestion: " + suggestions.get(i).getKey());
@@ -170,7 +171,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 				.append("\n").append("§7Suggestions:");
 
 		for (int i = 0; i < suggestions.size(); i++) {
-			ConfigurationSectionKeyConstructor cskc = suggestions.get(i);
+			KeySuggestion cskc = suggestions.get(i);
 			lore.append("\n");
 
 			if (i == sugPos)
@@ -219,7 +220,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 			nextSuggestionsOption(cnt + 1);
 	}
 
-	protected void createSuggestion(ConfigurationSectionKeyConstructor cskc) {
+	protected void createSuggestion(KeySuggestion cskc) {
 		if (current.contains(cskc.getKey()))
 			return;
 		cskc.createKey(this);
@@ -267,6 +268,11 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	}
 
 	protected void loadPage() {
+		keysPage = 0;
+		keys.clear();
+		keys.addAll(getCurrent().getKeys(false));
+		mapHandler();
+
 		for (int i = 0; i < getSize() - 9; i++) {
 			setItem(null, i);
 			removeInventoryItem(i);

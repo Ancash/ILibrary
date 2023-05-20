@@ -1,7 +1,11 @@
 package de.ancash.minecraft.inventory.editor.yml.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -17,6 +21,7 @@ import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.InventoryItem;
 import de.ancash.minecraft.inventory.editor.yml.EditorSettings;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
+import de.ancash.minecraft.inventory.editor.yml.suggestion.ValueSuggestion;
 
 public abstract class ValueEditor<T> extends IGUI {
 
@@ -26,14 +31,11 @@ public abstract class ValueEditor<T> extends IGUI {
 	protected final ValueEditor<?> parent;
 	protected final YamlEditor yeditor;
 	protected final String key;
+	protected int suggestionsPos = 0;
+	protected final List<ValueSuggestion<T>> suggestions;
 
 	public ValueEditor(UUID id, String title, int size, ValueEditor<?> parent, YamlEditor yeditor, String key,
 			Supplier<T> valSup, Runnable onBack) {
-		this(id, title, size, parent, null, yeditor, key, valSup, onBack);
-	}
-
-	public ValueEditor(UUID id, String title, int size, ValueEditor<?> parent, ValueEditor<?> nestedParent,
-			YamlEditor yeditor, String key, Supplier<T> valSup, Runnable onBack) {
 		super(id, size, title);
 		this.settings = yeditor.getSettings();
 		this.key = key;
@@ -46,6 +48,12 @@ public abstract class ValueEditor<T> extends IGUI {
 		if (onBack != null)
 			addInventoryItem(new InventoryItem(this, settings.getBackItem(), getSize() - 5,
 					(a, b, c, top) -> Lambda.execIf(top, this::back)));
+		if (!(this instanceof ConfigurationSectionEditor))
+			suggestions = yeditor.getValueSuggester().stream().map(ivs -> ivs.getValueSuggestions(this))
+					.filter(s -> s != null && !s.isEmpty()).flatMap(Set::stream)
+					.sorted((a, b) -> a.getAbbreviation().compareTo(b.getAbbreviation())).collect(Collectors.toList());
+		else
+			suggestions = new ArrayList<>();
 		open();
 	}
 
@@ -55,6 +63,10 @@ public abstract class ValueEditor<T> extends IGUI {
 		if (!hasParent())
 			return null;
 		return getParent().getClosesConfigurationSectionEditor();
+	}
+
+	public List<ValueSuggestion<T>> getValueSuggestions() {
+		return suggestions;
 	}
 
 	public String getKey() {
@@ -71,6 +83,60 @@ public abstract class ValueEditor<T> extends IGUI {
 
 	public boolean hasParent() {
 		return getParent() != null;
+	}
+
+	protected void addEditorItemWithSuggestions(int slot, XMaterial mat) {
+		if (suggestions.isEmpty())
+			return;
+		StringBuilder lore = new StringBuilder();
+		lore.append("§7Value: ").append(valSup.get().toString()).append("\n").append("§eMouse wheel to select type")
+				.append("\n").append("§eShift click to skip 10").append("\n")
+				.append("§eRight/Left click to add property").append("\n").append("§eSuggestions:").append("\n");
+		StringBuilder sugs = new StringBuilder();
+		for (int i = suggestionsPos + suggestions.size() - 1; i >= suggestionsPos; i--) {
+			if (i == suggestionsPos) {
+				sugs.append("§a, ").append("§a");
+			} else {
+				sugs.append("§f, ").append("§f");
+			}
+			sugs.append(suggestions.get(i % suggestions.size()).getAbbreviation());
+		}
+		lore.append(sugs.toString().replaceFirst(", ", "").replaceAll("(.{1,140})\\s+", "$1\n"));
+		addInventoryItem(new InventoryItem(this,
+				new ItemBuilder(mat).setDisplayname("").setLore(lore.toString().split("\n")).build(), slot,
+				(sl, shift, action, top) -> {
+					if (!top)
+						return;
+					if (shift) {
+						if (!suggestions.isEmpty()) {
+							suggestionsPos = (suggestionsPos + 10) % suggestions.size();
+							addEditorItemWithSuggestions(slot, mat);
+						}
+						return;
+					}
+					switch (action) {
+					case CLONE_STACK:
+						nextSuggestion();
+						addEditorItemWithSuggestions(slot, mat);
+						break;
+					case PICKUP_ALL:
+						useSuggestion(suggestions.get(suggestionsPos));
+						break;
+					case PICKUP_HALF:
+						useSuggestion(suggestions.get(suggestionsPos));
+						break;
+					default:
+						break;
+					}
+				}));
+	}
+
+	protected abstract void useSuggestion(ValueSuggestion<T> sugg);
+
+	protected void nextSuggestion() {
+		if (suggestions.isEmpty())
+			return;
+		suggestionsPos = (suggestionsPos + 1) % suggestions.size();
 	}
 
 	protected ItemStack getEditorItem() {

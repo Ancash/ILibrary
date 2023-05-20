@@ -1,10 +1,10 @@
 package de.ancash.minecraft.inventory.editor.yml;
 
 import org.bukkit.inventory.ItemStack;
+import org.simpleyaml.configuration.ConfigurationSection;
 
 import com.cryptomorin.xseries.XMaterial;
 
-import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
 

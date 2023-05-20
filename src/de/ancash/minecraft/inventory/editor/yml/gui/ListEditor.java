@@ -18,6 +18,7 @@ import de.ancash.minecraft.inventory.editor.yml.EditorSettings;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.ListHandler;
+import de.ancash.minecraft.inventory.editor.yml.suggestion.ValueSuggestion;
 import net.md_5.bungee.api.ChatColor;
 
 @SuppressWarnings("rawtypes")
@@ -34,13 +35,7 @@ public class ListEditor extends ValueEditor<List> {
 	public ListEditor(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
 			String title, EditorSettings settings, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack,
 			Runnable onDelete) {
-		this(yfe, parent, null, key, valHandler, id, title, settings, valSup, onEdit, onBack, onDelete);
-	}
-
-	public ListEditor(YamlEditor yfe, ValueEditor<?> parent, ValueEditor<?> nestedParent, String key,
-			List<IValueHandler<?>> valHandler, UUID id, String title, EditorSettings settings, Supplier<List> valSup,
-			Consumer<List> onEdit, Runnable onBack, Runnable onDelete) {
-		super(id, title, 36, parent, nestedParent, yfe, key, valSup, onBack);
+		super(id, title, 36, parent, yfe, key, valSup, onBack);
 		finishedConstructor = true;
 		this.onEdit = onEdit;
 		this.onDelete = onDelete;
@@ -71,6 +66,11 @@ public class ListEditor extends ValueEditor<List> {
 
 	public List<IValueHandler<?>> getHandler() {
 		return handler;
+	}
+
+	@Override
+	protected void useSuggestion(ValueSuggestion<List> sugg) {
+		throw new UnsupportedOperationException();
 	}
 
 	@SuppressWarnings({ "unchecked", "nls" })

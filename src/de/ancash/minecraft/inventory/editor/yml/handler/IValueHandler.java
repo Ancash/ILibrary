@@ -7,8 +7,8 @@ import java.util.function.Supplier;
 
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
+import org.simpleyaml.configuration.ConfigurationSection;
 
-import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;

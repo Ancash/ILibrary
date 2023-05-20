@@ -16,11 +16,10 @@ import java.util.function.Consumer;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
+import org.simpleyaml.configuration.ConfigurationSection;
+import org.simpleyaml.configuration.file.YamlFile;
 
 import de.ancash.ILibrary;
-import de.ancash.libs.org.apache.commons.lang3.Validate;
-import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
-import de.ancash.libs.org.simpleyaml.configuration.file.YamlFile;
 import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;
 import de.ancash.minecraft.inventory.editor.yml.gui.ListEditor;
 import de.ancash.minecraft.inventory.editor.yml.gui.ValueEditor;
@@ -36,6 +35,8 @@ import de.ancash.minecraft.inventory.editor.yml.handler.LongHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.MapHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.ShortHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.StringHandler;
+import de.ancash.minecraft.inventory.editor.yml.suggestion.IKeySuggester;
+import de.ancash.minecraft.inventory.editor.yml.suggestion.IValueSuggester;
 
 public class YamlEditor {
 
@@ -63,7 +64,8 @@ public class YamlEditor {
 	protected final Consumer<YamlEditor> onSave;
 	protected final HashSet<IValueEditorListener> listener = new HashSet<>();
 	protected final HashSet<AbstractInputValidator<?>> validator = new HashSet<>();
-	protected final ArrayList<IConfigurationSectionKeyConstructorProvider> csKeyProvider = new ArrayList<>();
+	protected final ArrayList<IKeySuggester> keySuggester = new ArrayList<>();
+	protected final ArrayList<IValueSuggester> valueSuggester = new ArrayList<>();
 	protected IListEditorListener listEditorListener;
 	protected IKeyValidator keyValidator;
 	protected IHandlerMapper handlerMapper = DEFAULT_HANDLER_MAPPER;
@@ -159,14 +161,22 @@ public class YamlEditor {
 		handlerMapper = ihm;
 	}
 
-	public void addCSKeyConstructorProvider(IConfigurationSectionKeyConstructorProvider provider) {
-		Validate.notNull(provider);
-		csKeyProvider.add(provider);
+	public void addKeySuggester(IKeySuggester provider) {
+		keySuggester.add(provider);
+	}
+
+	public void addValueSuggester(IValueSuggester provider) {
+		valueSuggester.add(provider);
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<IConfigurationSectionKeyConstructorProvider> getCSKeyConstructorProvider() {
-		return (List<IConfigurationSectionKeyConstructorProvider>) csKeyProvider.clone();
+	public List<IKeySuggester> getKeySuggester() {
+		return (List<IKeySuggester>) keySuggester.clone();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<IValueSuggester> getValueSuggester() {
+		return (List<IValueSuggester>) valueSuggester.clone();
 	}
 
 	public Optional<String> isValid(ValueEditor<?> ve, Object o) {

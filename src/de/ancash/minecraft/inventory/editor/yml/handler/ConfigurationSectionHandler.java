@@ -7,12 +7,12 @@ import java.util.function.Supplier;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
+import org.simpleyaml.configuration.ConfigurationSection;
+import org.simpleyaml.configuration.MemoryConfiguration;
 
 import com.cryptomorin.xseries.XMaterial;
 
 import de.ancash.ILibrary;
-import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
-import de.ancash.libs.org.simpleyaml.configuration.MemoryConfiguration;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;
@@ -27,6 +27,9 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 
 	@Override
 	public ConfigurationSection get(ConfigurationSection section, String s) {
+		if (!isValid(section, s))
+			throw new IllegalStateException(
+					String.join(".", section.getCurrentPath(), s) + " is not cs but: " + section.get(s).getClass());
 		return section.getConfigurationSection(s);
 	}
 

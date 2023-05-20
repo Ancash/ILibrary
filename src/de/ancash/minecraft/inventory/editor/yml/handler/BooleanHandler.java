@@ -8,11 +8,11 @@ import java.util.stream.IntStream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
+import org.simpleyaml.configuration.ConfigurationSection;
 
 import com.cryptomorin.xseries.XMaterial;
 
 import de.ancash.ILibrary;
-import de.ancash.libs.org.simpleyaml.configuration.ConfigurationSection;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 import de.ancash.minecraft.inventory.editor.yml.gui.BooleanEditor;

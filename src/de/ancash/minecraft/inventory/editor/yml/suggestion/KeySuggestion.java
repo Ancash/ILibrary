@@ -1,30 +1,30 @@
-package de.ancash.minecraft.inventory.editor.yml;
+package de.ancash.minecraft.inventory.editor.yml.suggestion;
 
 import de.ancash.libs.org.apache.commons.lang3.Validate;
 import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;
 import de.ancash.minecraft.inventory.editor.yml.handler.IValueHandler;
 
-public class ConfigurationSectionKeyConstructor {
+public class KeySuggestion {
 
 	protected final String key;
 	protected final IValueHandler<?> handler;
 	protected final Object def;
 	protected final String name;
 
-	public ConfigurationSectionKeyConstructor(String key, IValueHandler<?> handler) {
+	public KeySuggestion(String key, IValueHandler<?> handler) {
 		this(key, handler, null);
 	}
 
-	public ConfigurationSectionKeyConstructor(String key, IValueHandler<?> handler, String name) {
+	public KeySuggestion(String key, IValueHandler<?> handler, String name) {
 		this(key, handler, null, name);
 	}
 
-	public ConfigurationSectionKeyConstructor(String key, IValueHandler<?> handler, Object def) {
+	public KeySuggestion(String key, IValueHandler<?> handler, Object def) {
 		this(key, handler, def, null);
 	}
 
 	@SuppressWarnings("nls")
-	public ConfigurationSectionKeyConstructor(String key, IValueHandler<?> handler, Object def, String name) {
+	public KeySuggestion(String key, IValueHandler<?> handler, Object def, String name) {
 		Validate.isTrue(key != null && !key.isEmpty(), "invalid key: " + key);
 		Validate.notNull(handler, "no handler");
 		if (def != null)
@@ -54,7 +54,7 @@ public class ConfigurationSectionKeyConstructor {
 		return def;
 	}
 
-	public IValueHandler<?> getHandler() {
+	public IValueHandler<?> getType() {
 		return handler;
 	}
 
