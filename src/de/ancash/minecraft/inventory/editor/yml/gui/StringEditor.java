@@ -68,4 +68,9 @@ public class StringEditor extends ValueEditor<String> {
 		IGUIManager.remove(id);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> sig.open(), 1);
 	}
+
+	@Override
+	protected void saveListElement(Object val) {
+		throw new UnsupportedOperationException();
+	}
 }

@@ -96,12 +96,19 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 						super.back();
 					})));
 		addInventoryItem(new InventoryItem(this, settings.saveItem(), 52, (a, b, c, top) -> Lambda.execIf(top, () -> {
+			saveListElement(current);
 			yeditor.getOnSave().accept(yeditor);
 			closeAll();
 		})));
 		addAddItem();
 		loadSuggestions();
 		addSuggestionsItem();
+	}
+
+	@Override
+	protected void saveListElement(Object val) {
+		if (parent != null && (parent instanceof ListEditor || parent instanceof ConfigurationSectionEditor))
+			parent.saveListElement(current);
 	}
 
 	@SuppressWarnings("nls")

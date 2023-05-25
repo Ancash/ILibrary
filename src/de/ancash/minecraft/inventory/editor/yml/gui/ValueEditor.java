@@ -131,6 +131,8 @@ public abstract class ValueEditor<T> extends IGUI {
 				}));
 	}
 
+	protected abstract void saveListElement(Object val);
+
 	protected abstract void useSuggestion(ValueSuggestion<T> sugg);
 
 	protected void nextSuggestion() {

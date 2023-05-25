@@ -45,22 +45,18 @@ public class ItemStackFileUtil {
 	public static ItemStack getItemStack(FileConfiguration fc, String path) {
 		Optional<XMaterial> type = XMaterial.matchXMaterial(fc.getString(path + ".type"));
 		if (!type.isPresent()) {
-			System.err.println("Invalid item type at " + path + ": " + fc.getString(path + ".type"));
+//			System.err.println("Invalid item type at " + path + ": " + fc.getString(path + ".type"));
 			return XMaterial.AIR.parseItem();
 		}
 		ItemStack item = type.get().parseItem();
 		if (type.get().equals(XMaterial.AIR))
 			return item;
 		ConfigurationSection cs = fc.getConfigurationSection(path);
-		if (cs.contains("custom-model-data"))
-			try {
-				ItemMeta m = item.getItemMeta();
-				m.setCustomModelData(cs.getInt("custom-model-data"));
-				item.setItemMeta(m);
-			} catch (Throwable th) {
-				System.err
-						.println("Could not set custom model data " + cs.getInt("custom-model-data") + " for " + path);
-			}
+		if (cs.contains("custom-model-data")) {
+			ItemMeta m = item.getItemMeta();
+			m.setCustomModelData(cs.getInt("custom-model-data"));
+			item.setItemMeta(m);
+		}
 
 		for (String prop : cs.getKeys(true)) {
 			if (cs.isConfigurationSection(prop))
@@ -74,18 +70,14 @@ public class ItemStackFileUtil {
 			if (!GET_CONSUMERS.containsKey(prop)) {
 				continue;
 			}
-			try {
-				if (cs.isString(prop))
-					GET_CONSUMERS.get(prop).accept(item, cs.getString(prop));
-				else if (cs.isBoolean(prop))
-					GET_CONSUMERS.get(prop).accept(item, cs.getBoolean(prop));
-				else if (cs.isInt(prop))
-					GET_CONSUMERS.get(prop).accept(item, cs.getInt(prop));
-				else if (cs.isList(prop))
-					GET_CONSUMERS.get(prop).accept(item, cs.getList(prop));
-			} catch (Exception ex) {
-				System.err.println("Could not handle item property " + prop + " w/ value: " + cs.get(prop));
-			}
+			if (cs.isString(prop))
+				GET_CONSUMERS.get(prop).accept(item, cs.getString(prop));
+			else if (cs.isBoolean(prop))
+				GET_CONSUMERS.get(prop).accept(item, cs.getBoolean(prop));
+			else if (cs.isInt(prop))
+				GET_CONSUMERS.get(prop).accept(item, cs.getInt(prop));
+			else if (cs.isList(prop))
+				GET_CONSUMERS.get(prop).accept(item, cs.getList(prop));
 		}
 		if (cs.isConfigurationSection("meta.nbt")) {
 			NBTItem nbt = new NBTItem(item);

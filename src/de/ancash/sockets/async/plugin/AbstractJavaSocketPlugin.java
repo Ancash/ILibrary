@@ -34,8 +34,7 @@ public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Lis
 			chatClient = null;
 		}
 		try {
-			chatClient = ILibrary.ASYNC_CHAT_CLIENT_FACTORY.newInstance(address, port, 10_000, 256 * 1024, 256 * 1024,
-					2);
+			chatClient = ILibrary.ASYNC_CHAT_CLIENT_FACTORY.newInstance(address, port, 10_000, 1 * 1024, 1 * 1024, 2);
 		} catch (IOException e) {
 			getLogger().severe("Could not connect to " + address + ":" + port + ": " + e);
 		}

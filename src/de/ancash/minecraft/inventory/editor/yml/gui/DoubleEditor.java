@@ -69,4 +69,9 @@ public class DoubleEditor extends ValueEditor<Double> {
 		IGUIManager.remove(id);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> nig.start(), 1);
 	}
+
+	@Override
+	protected void saveListElement(Object val) {
+		throw new UnsupportedOperationException();
+	}
 }

@@ -88,6 +88,16 @@ public class ListEditor extends ValueEditor<List> {
 				null);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void saveListElement(Object val) {
+		List l = getList0();
+		l.set(elementPos, val);
+		onEdit.accept(l);
+		if (parent != null && (parent instanceof ListEditor || parent instanceof ConfigurationSectionEditor))
+			parent.saveListElement(val);
+	}
+
 	protected void addMainItem() {
 		addInventoryItem(new InventoryItem(this, getEditorItem(), 11, (slot, shift, action, top) -> {
 			if (!top)

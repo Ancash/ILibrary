@@ -42,4 +42,9 @@ public class BooleanEditor extends ValueEditor<Boolean> {
 				ItemStackUtils.setDisplayname(settings.getBooleanItem(), String.valueOf(valSup.get())), 12,
 				(a, b, c, top) -> Lambda.execIf(top, this::toggle)));
 	}
+
+	@Override
+	protected void saveListElement(Object val) {
+		throw new UnsupportedOperationException();
+	}
 }
