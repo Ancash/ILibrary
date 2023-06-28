@@ -36,7 +36,7 @@ public abstract class AbstractSocketPlugin implements Listener {
 			chatClient = null;
 		}
 		try {
-			chatClient = ILibrary.ASYNC_CHAT_CLIENT_FACTORY.newInstance(address, port, 10_000, 4 * 1024, 4 * 1024, 2);
+			chatClient = ILibrary.ASYNC_CHAT_CLIENT_FACTORY.newInstance(address, port, 4 * 1024, 4 * 1024, 2);
 		} catch (IOException e) {
 			logger.severe("Could not connect to " + address + ":" + port + ": " + e);
 			;

@@ -60,8 +60,7 @@ public class ILibrary extends JavaPlugin {
 				@Override
 				public void run() {
 					try {
-						asyncClient = ASYNC_CHAT_CLIENT_FACTORY.newInstance(getAddress(), port, 10_000, 128 * 1024,
-								128 * 1024, 2);
+						asyncClient = ASYNC_CHAT_CLIENT_FACTORY.newInstance(getAddress(), port, 4 * 1024, 4 * 1024, 2);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

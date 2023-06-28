@@ -1,6 +1,7 @@
 package de.ancash.minecraft.inventory.input;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -13,6 +14,7 @@ import de.ancash.datastructures.tuples.Tuple;
 import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.input.IStringInput;
 import net.wesjd.anvilgui.AnvilGUI;
+import net.wesjd.anvilgui.AnvilGUI.Slot;
 
 public class StringInputGUI implements IStringInput {
 
@@ -79,11 +81,13 @@ public class StringInputGUI implements IStringInput {
 
 	public void open() {
 		new AnvilGUI.Builder().itemLeft(left).itemRight(right).title(title).text(text).plugin(plugin).preventClose()
-				.onComplete(complete -> {
-					Duplet<Boolean, String> valid = isValid.apply(complete.getText());
+				.onClick((slot, state) -> {
+					if (slot != Slot.OUTPUT)
+						return Collections.emptyList();
+					Duplet<Boolean, String> valid = isValid.apply(state.getText());
 					if (!valid.getFirst())
 						return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText(valid.getSecond()));
-					Lambda.of(onComplete).execIf(Lambda.notNull(), c -> c.accept(complete.getText()));
+					Lambda.of(onComplete).execIf(Lambda.notNull(), c -> c.accept(state.getText()));
 					return Arrays.asList(AnvilGUI.ResponseAction.close());
 				}).open(player);
 	}
