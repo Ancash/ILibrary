@@ -18,6 +18,7 @@ public class InventoryUtils {
 
 	public static int countItemStack(Player player, ItemStack is) {
 		IItemStack iis = new IItemStack(is);
+
 		int cnt = 0;
 		for (int s = 0; s < 36; s++) {
 			ItemStack a = player.getInventory().getItem(s);

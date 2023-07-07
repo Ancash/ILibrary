@@ -26,7 +26,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import de.ancash.minecraft.nbt.utils.MinecraftVersion;
+import de.tr7zw.nbtapi.utils.MinecraftVersion;
 import net.md_5.bungee.api.ChatColor;
 
 @SuppressWarnings("nls")

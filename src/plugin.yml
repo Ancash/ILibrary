@@ -4,6 +4,6 @@ main: de.ancash.ILibrary
 api-version: 1.13
 author: Ancash
 
-commands:
-   fedit:
-      usage: "§7/fedit <file>"
+#commands:
+#   fedit:
+#      usage: "§7/fedit <file>"

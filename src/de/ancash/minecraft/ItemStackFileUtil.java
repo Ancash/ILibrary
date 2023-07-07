@@ -16,7 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.cryptomorin.xseries.XMaterial;
 
-import de.ancash.minecraft.nbt.NBTItem;
+import de.tr7zw.nbtapi.NBTItem;
 import net.md_5.bungee.api.ChatColor;
 
 @SuppressWarnings({ "unchecked", "deprecation" })

@@ -13,9 +13,11 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import de.ancash.datastructures.tuples.Duplet;
 import de.ancash.datastructures.tuples.Tuple;
-import de.ancash.minecraft.nbt.NBT;
-import de.ancash.minecraft.nbt.NBTContainer;
-import de.ancash.minecraft.nbt.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.NBTContainer;
+import de.tr7zw.nbtapi.NBTReflectionUtil;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.utils.nmsmappings.ReflectionMethod;
 
 @SuppressWarnings("nls")
 public class IItemStack {
@@ -114,7 +116,7 @@ public class IItemStack {
 
 		NBTContainer nbt = (NBTContainer) NBT.itemStackToNBT(item);
 		Set<String> keys = nbt.getKeys().stream().collect(Collectors.toSet());
-		keys.forEach(key -> nbtValues.put(key, nbt.getObject(key)));
+		keys.forEach(key -> nbtValues.put(key, NBTReflectionUtil.getData(nbt, ReflectionMethod.COMPOUND_GET, key)));
 		if (keys.contains("SkullOwner") || keys.contains("skull-owner")) {
 			try {
 				String txt = ItemStackUtils.getTexure(item);

@@ -38,6 +38,14 @@
 									<pattern>com.cryptomorin.xseries</pattern>
 									<shadedPattern>de.ancash.minecraft.cryptomorin.xseries</shadedPattern>
 								</relocation>
+								<relocation>
+									<pattern>de.tr7zw.nbtapi</pattern>
+									<shadedPattern>de.ancash.minecraft.nbt</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>de.tr7zw.nbtinjector</pattern>
+									<shadedPattern>de.ancash.minecraft.nbt.injector</shadedPattern>
+								</relocation>
 							</relocations>
 							<filters>
 								<filter>
@@ -86,8 +94,18 @@
 			<id>codemc-snapshots</id>
 			<url>https://repo.codemc.io/repository/maven-snapshots/</url>
 		</repository>
+		<repository>
+			<id>codemc-repo</id>
+			<url>https://repo.codemc.io/repository/maven-public/</url>
+			<layout>default</layout>
+		</repository>
 	</repositories>
 	<dependencies>
+		<dependency>
+			<groupId>de.tr7zw</groupId>
+			<artifactId>item-nbt-api-plugin</artifactId>
+			<version>2.11.3</version>
+		</dependency>
 		<dependency>
 			<groupId>com.comphenix.protocol</groupId>
 			<artifactId>ProtocolLib</artifactId>

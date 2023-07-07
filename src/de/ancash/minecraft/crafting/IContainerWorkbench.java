@@ -25,7 +25,7 @@ import de.ancash.datastructures.tuples.Tuple;
 import de.ancash.minecraft.IItemStack;
 import de.ancash.minecraft.crafting.recipe.ComplexRecipeWrapper;
 import de.ancash.minecraft.crafting.recipe.ComplexRecipeWrapper.ComplexRecipeType;
-import de.ancash.minecraft.nbt.utils.MinecraftVersion;
+import de.tr7zw.nbtapi.utils.MinecraftVersion;
 
 @SuppressWarnings({ "deprecation", "nls" })
 public abstract class IContainerWorkbench {
