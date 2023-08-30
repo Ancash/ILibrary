@@ -42,10 +42,10 @@ public class YamlEditor {
 
 	public static final IHandlerMapper DEFAULT_HANDLER_MAPPER = new IHandlerMapper() {
 	};
-	private static final List<IValueHandler<?>> DEFAULT_VALUE_HANDLER = Arrays.asList(
-			ConfigurationSectionHandler.INSTANCE, MapHandler.INSTANCE, BooleanHandler.INSTANCE, ByteHandler.INSTANCE,
-			ShortHandler.INSTANCE, IntegerHandler.INSTANCE, LongHandler.INSTANCE, FloatHandler.INSTANCE,
-			DoubleHandler.INSTANCE, ListHandler.INSTANCE, StringHandler.INSTANCE);
+	private static final List<IValueHandler<?>> DEFAULT_VALUE_HANDLER = Collections.unmodifiableList(
+			Arrays.asList(ConfigurationSectionHandler.INSTANCE, MapHandler.INSTANCE, BooleanHandler.INSTANCE,
+					ByteHandler.INSTANCE, ShortHandler.INSTANCE, IntegerHandler.INSTANCE, LongHandler.INSTANCE,
+					FloatHandler.INSTANCE, DoubleHandler.INSTANCE, ListHandler.INSTANCE, StringHandler.INSTANCE));
 
 	public static List<IValueHandler<?>> getDefaultHandler() {
 		return Collections.unmodifiableList(DEFAULT_VALUE_HANDLER);

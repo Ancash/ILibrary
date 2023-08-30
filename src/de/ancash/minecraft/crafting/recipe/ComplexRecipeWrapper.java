@@ -58,7 +58,7 @@ public class ComplexRecipeWrapper extends ShapedRecipe implements WrappedRecipe 
 	}
 
 	public enum ComplexRecipeType {
-		BANNER_DUPLICATE, ARMOR_DYE, SHULKER_DYE, FIREWORK, BOOK_DUPLICATE(XMaterial.WRITTEN_BOOK);
+		BANNER_DUPLICATE, ARMOR_DYE, SHULKER_DYE, FIREWORK, BOOK_DUPLICATE(XMaterial.WRITTEN_BOOK), REPAIR;
 
 		private final Set<XMaterial> ignoreOnCraft;
 
@@ -71,7 +71,7 @@ public class ComplexRecipeWrapper extends ShapedRecipe implements WrappedRecipe 
 		}
 
 		@SuppressWarnings("nls")
-		public static ComplexRecipeType matchType(ItemStack result) {
+		public static ComplexRecipeType matchType(Object irecipe, ItemStack result) {
 			String name = XMaterial.matchXMaterial(result).toString().toLowerCase(Locale.ENGLISH);
 			if (name.contains("banner"))
 				return BANNER_DUPLICATE;
@@ -83,7 +83,11 @@ public class ComplexRecipeWrapper extends ShapedRecipe implements WrappedRecipe 
 				return BOOK_DUPLICATE;
 			else if (name.contains("shulker"))
 				return SHULKER_DYE;
-			throw new IllegalArgumentException("Could not match complex recipe: " + name);
+			
+			if(irecipe.getClass().getCanonicalName().contains("Repair"))
+				return REPAIR;
+			
+			throw new IllegalArgumentException("Could not match complex recipe: \nresult name=" + name + "\nclass=" + irecipe.getClass() + "\nsuper class=" + irecipe.getClass().getSuperclass());
 		}
 	}
 }

@@ -3,7 +3,9 @@ package de.ancash.minecraft;
 import static com.comphenix.protocol.PacketType.Play.Server.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.entity.Entity;
@@ -29,11 +31,10 @@ import com.google.common.collect.Table;
 public class EntityHider implements Listener {
 	protected Table<Integer, Integer, Boolean> observerEntityMap = HashBasedTable.create();
 
-	// Packets that update remote player entities
-	@SuppressWarnings({ "deprecation" })
+	@SuppressWarnings("deprecation")
 	private static final PacketType[] ENTITY_PACKETS = { ENTITY_EQUIPMENT, BED, ANIMATION, NAMED_ENTITY_SPAWN, COLLECT,
 			SPAWN_ENTITY, SPAWN_ENTITY_LIVING, SPAWN_ENTITY_PAINTING, SPAWN_ENTITY_EXPERIENCE_ORB, ENTITY_VELOCITY,
-			REL_ENTITY_MOVE, ENTITY_LOOK, ENTITY_MOVE_LOOK, ENTITY_MOVE_LOOK, ENTITY_TELEPORT, ENTITY_HEAD_ROTATION,
+			REL_ENTITY_MOVE, ENTITY_LOOK, ENTITY_MOVE_LOOK, ENTITY_TELEPORT, ENTITY_TELEPORT, ENTITY_HEAD_ROTATION,
 			ENTITY_STATUS, ATTACH_ENTITY, ENTITY_METADATA, ENTITY_EFFECT, REMOVE_ENTITY_EFFECT, BLOCK_BREAK_ANIMATION
 
 			// We don't handle DESTROY_ENTITY though
@@ -208,7 +209,11 @@ public class EntityHider implements Listener {
 	 * @return The packet listener.
 	 */
 	private PacketAdapter constructProtocol(Plugin plugin) {
-		return new PacketAdapter(plugin, ENTITY_PACKETS) {
+		List<PacketType> supported = new ArrayList<>();
+		for (PacketType pt : ENTITY_PACKETS)
+			if (pt.isSupported())
+				supported.add(pt);
+		return new PacketAdapter(plugin, supported.toArray(new PacketType[supported.size()])) {
 			@Override
 			public void onPacketSending(PacketEvent event) {
 				int entityID = event.getPacket().getIntegers().read(0);

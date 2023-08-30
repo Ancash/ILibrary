@@ -54,19 +54,19 @@ public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Lis
 
 	@EventHandler
 	public void onPacket(ClientPacketReceiveEvent event) {
-		if (event.getReceiver() == null || chatClient == null || event.getReceiver().equals(chatClient))
+		if (event.getReceiver().equals(chatClient))
 			this.onPacketReceive(event.getPacket());
 	}
 
 	@EventHandler
 	public void onClientDisconnect(ClientDisconnectEvent event) {
-		if (event.getClient() == null || chatClient == null || event.getClient().equals(chatClient))
+		if (event.getClient().equals(chatClient))
 			this.onClientDisconnect(event.getClient());
 	}
 
 	@EventHandler
 	public void onClientConnect(ClientConnectEvent event) {
-		if (event.getClient() == null || chatClient == null || event.getClient().equals(chatClient))
+		if (event.getClient().equals(chatClient))
 			this.onClientConnect(event.getClient());
 	}
 

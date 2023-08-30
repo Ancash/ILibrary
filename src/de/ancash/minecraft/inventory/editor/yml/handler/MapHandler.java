@@ -25,7 +25,7 @@ public class MapHandler implements IValueHandler<Map> {
 
 	@Override
 	public boolean isValid(ConfigurationSection section, String key) {
-		return false;
+		return isValid(section.get(key));
 	}
 
 	@Override
@@ -69,11 +69,22 @@ public class MapHandler implements IValueHandler<Map> {
 			String title, Supplier<Map> valSup, Consumer<Map> onEdit, Runnable onBack, Runnable onDelete) {
 		MemoryConfiguration mc = new MemoryConfiguration();
 		Map<String, Object> m = valSup.get();
-		m.entrySet().forEach(entry -> mc.set(entry.getKey(), entry.getValue()));
+		putMap(mc, m);
 		ConfigurationSectionHandler.INSTANCE.edit(yfe, parent, key, valHandler, id, title, () -> mc, null, () -> {
-			onEdit.accept(mc.getMapValues(true));
+			onEdit.accept(mc.getMapValues(false));
 			onBack.run();
 		}, onDelete);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void putMap(ConfigurationSection mc, Map<String, Object> map) {
+		for (String key : map.keySet()) {
+			Object o = map.get(key);
+			if (o instanceof Map)
+				putMap(mc.createSection(key), (Map<String, Object>) o);
+			else
+				mc.set(key, o);
+		}
 	}
 
 	@Override

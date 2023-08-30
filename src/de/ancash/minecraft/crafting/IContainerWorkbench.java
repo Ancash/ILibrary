@@ -93,13 +93,16 @@ public abstract class IContainerWorkbench {
 		if (!cache.containsKey(key)) {
 			for (int i = 0; i < 9; i++)
 				setItem(i, ings[i]);
+			
 			Recipe r = getCurrentRecipe();
 			if (r != null && isComplexRecipe())
 				r = getComplexRecipe(r, ings);
+			
 			for (int i = 0; i < 9; i++)
 				setItem(i, null);
 			cache.put(key, Optional.ofNullable(r));
 		}
+		
 		return cache.get(key).orElse(null);
 	}
 
@@ -107,7 +110,7 @@ public abstract class IContainerWorkbench {
 		ItemStack result = craftRecipe0(getCurrentIRecipe());
 		if (result == null || result.getType() == Material.AIR)
 			return null;
-		ComplexRecipeWrapper complex = ComplexRecipeWrapper.newInstance(result, ComplexRecipeType.matchType(result));
+		ComplexRecipeWrapper complex = ComplexRecipeWrapper.newInstance(result, ComplexRecipeType.matchType(getCurrentIRecipe(), result));
 		Duplet<String[], Map<Character, MaterialData>> duplet = mapIngredients(ingredients);
 		complex.shape(duplet.getFirst());
 		for (Entry<Character, MaterialData> entry : duplet.getSecond().entrySet())
