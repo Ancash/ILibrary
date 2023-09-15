@@ -3,7 +3,6 @@ package de.ancash.minecraft.inventory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -140,19 +139,25 @@ public abstract class IGUI {
 		if (isInventoryItem(event.getSlot()))
 			getInventoryItem(event.getSlot()).onClick(event.getSlot(), event.isShiftClick(), event.getAction(),
 					event.getInventory().equals(event.getClickedInventory()));
-		checkModuleItems(event);
+		if (checkModuleItems(event)) {
+			event.setCancelled(true);
+			return;
+		}
 		onInventoryClick(event);
 	}
 
-	protected void checkModuleItems(InventoryClickEvent event) {
+	protected boolean checkModuleItems(InventoryClickEvent event) {
 		if (!event.getInventory().equals(event.getClickedInventory()))
-			return;
-		Optional.ofNullable(modules.get(event.getSlot())).ifPresent(mod -> {
-			if (mod.isEnabled()) {
-				mod.preOnClick(event.getSlot(), event.isShiftClick(), event.getAction());
-			} else
-				mod.onDisabledClick();
-		});
+			return false;
+		IGUIModule m = modules.get(event.getSlot());
+		if (m == null)
+			return false;
+		if (!m.isEnabled()) {
+			m.onDisabledClick();
+			return false;
+		}
+		m.preOnClick(event.getSlot(), event.isShiftClick(), event.getAction());
+		return true;
 	}
 
 	final void preOnInventoryClose(InventoryCloseEvent event) {
@@ -186,6 +191,18 @@ public abstract class IGUI {
 
 	public Map<Integer, IGUIModule> getModules() {
 		return Collections.unmodifiableMap(modules);
+	}
+
+	public void removeModule(int s) {
+		IGUIModule m = modules.remove(s);
+		if (m == null)
+			return;
+		m.disable();
+		for (int i : m.slots) {
+			modules.remove(i);
+			inventoryItems[i] = null;
+			setItem(null, i);
+		}
 	}
 
 	public void disableAllModules() {

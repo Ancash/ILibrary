@@ -83,11 +83,12 @@ public class ComplexRecipeWrapper extends ShapedRecipe implements WrappedRecipe 
 				return BOOK_DUPLICATE;
 			else if (name.contains("shulker"))
 				return SHULKER_DYE;
-			
-			if(irecipe.getClass().getCanonicalName().contains("Repair"))
+
+			if (irecipe.getClass().getCanonicalName().contains("Repair"))
 				return REPAIR;
-			
-			throw new IllegalArgumentException("Could not match complex recipe: \nresult name=" + name + "\nclass=" + irecipe.getClass() + "\nsuper class=" + irecipe.getClass().getSuperclass());
+
+			throw new IllegalArgumentException("Could not match complex recipe: \nresult name=" + name + "\nclass="
+					+ irecipe.getClass() + "\nsuper class=" + irecipe.getClass().getSuperclass());
 		}
 	}
 }
