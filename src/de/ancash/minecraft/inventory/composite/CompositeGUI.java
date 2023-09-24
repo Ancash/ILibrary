@@ -39,11 +39,12 @@ public class CompositeGUI {
 		return gui.getTitle();
 	}
 
+	@SuppressWarnings("nls")
 	public synchronized void enable() {
 		if (enabled)
 			throw new IllegalStateException("already enabled");
 		enabled = true;
-		modules.values().forEach(cm -> cm.module.enable());
+		modules.values().forEach(cm -> cm.modules.forEach(CompositeIGUIModuleWrapper::enable));
 	}
 
 	public boolean isEnabled() {
@@ -62,13 +63,16 @@ public class CompositeGUI {
 
 	@SuppressWarnings("nls")
 	public void addModule(CompositeModule m) {
-		if (modules.containsKey(m.getSlot()))
-			throw new IllegalStateException(m.getSlot() + " already occupied");
-		if (m.getSlot() < 0 || m.getSlot() >= getSize())
-			throw new IllegalArgumentException("out of index: " + m.getSlot());
-		modules.put(m.getSlot(), m);
+		for (int s : m.getSlots()) {
+			if (modules.containsKey(s))
+				throw new IllegalStateException(s + " already occupied");
+			if (s < 0 || s >= getSize())
+				throw new IllegalArgumentException("out of index: " + s);
+		}
+		for (int s : m.getSlots())
+			modules.put(s, m);
 		if (enabled)
-			gui.addModule(m.module).enable();
+			m.modules.forEach(c -> gui.addModule(c).enable());
 	}
 
 	class CompositeIGUI extends IGUI {
