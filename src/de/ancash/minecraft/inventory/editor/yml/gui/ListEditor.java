@@ -102,23 +102,19 @@ public class ListEditor extends ValueEditor<List> {
 		addInventoryItem(new InventoryItem(this, getEditorItem(), 11, (slot, shift, action, top) -> {
 			if (!top)
 				return;
-			if (shift) {
-				editSelected();
-				return;
-			}
-			switch (action) {
-			case CLONE_STACK:
+			if (shift)
 				deleteSelected();
-				return;
-			case PICKUP_ALL:
-				nextElement();
-				return;
-			case PICKUP_HALF:
-				prevElement();
-				return;
-			default:
-				break;
-			}
+			else
+				switch (action) {
+				case PICKUP_ALL:
+					editSelected();
+					return;
+				case PICKUP_HALF:
+					nextElement();
+					return;
+				default:
+					break;
+				}
 		}));
 	}
 
@@ -147,26 +143,26 @@ public class ListEditor extends ValueEditor<List> {
 			if (!top)
 				return;
 			List list = getList0();
-			switch (action) {
-			case PICKUP_HALF:
-				handler.get(addPos).addDefaultToList(this, list, Math.max(elementPos, 0));
-				if (yfe.getListTypeValidator() != null)
-					yfe.getListTypeValidator().onInsert(this, handler.get(addPos));
-				break;
-			case PICKUP_ALL:
-				if (list.isEmpty())
-					handler.get(addPos).addDefaultToList(this, list, 0);
-				else
-					handler.get(addPos).addDefaultToList(this, list, Math.min(elementPos + 1, list.size()));
-				if (yfe.getListTypeValidator() != null)
-					yfe.getListTypeValidator().onInsert(this, handler.get(addPos));
-				break;
-			case CLONE_STACK:
+			if (shift)
 				nextAddOption();
-				break;
-			default:
-				break;
-			}
+			else
+				switch (action) {
+				case PICKUP_HALF:
+					handler.get(addPos).addDefaultToList(this, list, Math.max(elementPos, 0));
+					if (yfe.getListTypeValidator() != null)
+						yfe.getListTypeValidator().onInsert(this, handler.get(addPos));
+					break;
+				case PICKUP_ALL:
+					if (list.isEmpty())
+						handler.get(addPos).addDefaultToList(this, list, 0);
+					else
+						handler.get(addPos).addDefaultToList(this, list, Math.min(elementPos + 1, list.size()));
+					if (yfe.getListTypeValidator() != null)
+						yfe.getListTypeValidator().onInsert(this, handler.get(addPos));
+					break;
+				default:
+					break;
+				}
 			addPos = addPos % handler.size();
 			addMainItem();
 			addInsertItem();
@@ -179,7 +175,7 @@ public class ListEditor extends ValueEditor<List> {
 		List list = getList0();
 		lore.add("§eRight click to insert before");
 		lore.add("§eLeft click to insert after");
-		lore.add("§eMouse wheel to select type");
+		lore.add("§eShift click to select type");
 		lore.addAll(getSelecteTypeLore());
 		lore.add("§7Index: " + elementPos);
 		if (!list.isEmpty()) {
@@ -240,9 +236,8 @@ public class ListEditor extends ValueEditor<List> {
 	@Override
 	protected ItemStack getEditorItem() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("§eLeft click to go down").append("\n").append("§eRight click to go up").append("\n")
-				.append("§eMouse wheel to delete the selected element").append("\n")
-				.append("§eShift click to edit the selected element").append("\n")
+		builder.append("§eRight click to select element").append("\n").append("§eLeft click to edited selected element")
+				.append("\n").append("§eShift click to delete the selected element").append("\n").append("\n")
 				.append("§7Syntax: [{index}][{type}]={value}").append("\n");
 		for (int i = elementPos; i - elementPos < getList0().size(); i++) {
 			builder.append(ChatColor.WHITE.toString());

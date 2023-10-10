@@ -107,6 +107,7 @@ public class Metrics {
 	 *                 <a href="https://bstats.org/what-is-my-plugin-id">What is my
 	 *                 plugin id?</a>
 	 */
+	@SuppressWarnings("deprecation")
 	public Metrics(Plugin plugin, int pluginId, boolean forced) {
 		if (plugin == null) {
 			throw new IllegalArgumentException("Plugin cannot be null!");

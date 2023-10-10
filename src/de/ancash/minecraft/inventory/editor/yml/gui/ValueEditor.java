@@ -115,15 +115,12 @@ public abstract class ValueEditor<T> extends IGUI {
 						return;
 					}
 					switch (action) {
-					case CLONE_STACK:
-						nextSuggestion();
-						addEditorItemWithSuggestions(slot, mat);
-						break;
 					case PICKUP_ALL:
 						useSuggestion(suggestions.get(suggestionsPos));
 						break;
 					case PICKUP_HALF:
-						useSuggestion(suggestions.get(suggestionsPos));
+						nextSuggestion();
+						addEditorItemWithSuggestions(slot, mat);
 						break;
 					default:
 						break;

@@ -114,8 +114,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	@SuppressWarnings("nls")
 	protected void addAddItem() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("§eMouse wheel to select type").append("\n").append("§eRight/Left click to add property")
-				.append("\n");
+		builder.append("§eRight click to select type").append("\n").append("§eLeft click to add property").append("\n");
 		for (int i = 0; i < handler.size(); i++) {
 			IValueHandler<?> ivh = handler.get(i);
 			ItemStack add = ivh.getAddItem();
@@ -135,15 +134,12 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 							if (!top)
 								return;
 							switch (action) {
-							case CLONE_STACK:
-								nextAddOption();
-								addAddItem();
-								break;
 							case PICKUP_ALL:
 								createKey(handler.get(addPos));
 								break;
 							case PICKUP_HALF:
-								createKey(handler.get(addPos));
+								nextAddOption();
+								addAddItem();
 								break;
 							default:
 								break;
@@ -174,7 +170,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	@SuppressWarnings("nls")
 	protected void addSuggestionsItem() {
 		StringBuilder lore = new StringBuilder();
-		lore.append("§eMouse wheel to select type").append("\n").append("§eRight/Left click to add property")
+		lore.append("§eRight click to select suggestion").append("\n").append("§eLeft click to add suggestion")
 				.append("\n").append("§7Suggestions:");
 
 		for (int i = 0; i < suggestions.size(); i++) {
@@ -197,17 +193,13 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 							if (suggestions.isEmpty())
 								return;
 							switch (action) {
-							case CLONE_STACK:
-								nextSuggestionsOption();
-								addSuggestionsItem();
-								break;
 							case PICKUP_ALL:
 								createSuggestion(suggestions.get(sugPos));
 								open();
 								break;
 							case PICKUP_HALF:
-								createSuggestion(suggestions.get(sugPos));
-								open();
+								nextSuggestionsOption();
+								addSuggestionsItem();
 								break;
 							default:
 								break;
