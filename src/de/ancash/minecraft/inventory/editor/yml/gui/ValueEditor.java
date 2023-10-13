@@ -2,8 +2,10 @@ package de.ancash.minecraft.inventory.editor.yml.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -14,6 +16,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.cryptomorin.xseries.XMaterial;
 
+import de.ancash.datastructures.tuples.Duplet;
+import de.ancash.datastructures.tuples.Tuple;
 import de.ancash.lambda.Lambda;
 import de.ancash.minecraft.ItemBuilder;
 import de.ancash.minecraft.inventory.IGUI;
@@ -24,6 +28,13 @@ import de.ancash.minecraft.inventory.editor.yml.YamlEditor;
 import de.ancash.minecraft.inventory.editor.yml.suggestion.ValueSuggestion;
 
 public abstract class ValueEditor<T> extends IGUI {
+
+	public static <T> Function<T, Duplet<Boolean, String>> isValid(YamlEditor yeditor, ValueEditor<T> ve) {
+		return in -> {
+			Optional<String> o = yeditor.isValid(ve, in);
+			return Tuple.of(!o.isPresent(), o.orElse(null));
+		};
+	}
 
 	protected final EditorSettings settings;
 	protected final Supplier<T> valSup;

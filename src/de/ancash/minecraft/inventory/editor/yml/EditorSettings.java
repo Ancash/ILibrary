@@ -63,7 +63,17 @@ public interface EditorSettings {
 		return new ItemBuilder(XMaterial.DROPPER).setDisplayname("§aAdd Property").build();
 	}
 
+	@SuppressWarnings("nls")
 	public default ItemStack suggestionsItem() {
 		return new ItemBuilder(XMaterial.CHEST).setDisplayname("§aSuggestions").build();
+	}
+
+	@SuppressWarnings("nls")
+	public default ItemStack stringEditorSupplierItem() {
+		return new ItemBuilder(XMaterial.CHEST).setDisplayname("Add sections")
+				.setLore("§eRight click to insert section (up to 50 chars) before",
+						"§eLeft click to insert section (up to 50 chars) after",
+						"§eShift click to insert up to 256 chars after", "§eQ to insert up to 256 chars before")
+				.build();
 	}
 }
