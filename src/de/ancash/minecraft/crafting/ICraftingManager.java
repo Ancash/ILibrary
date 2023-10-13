@@ -50,12 +50,12 @@ public class ICraftingManager {
 			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_19_R3)) {
 				ContainerWorkbench_1_19_R3.initReflection();
 				clazz = ContainerWorkbench_1_19_R3.class;
-			} else if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_20_R1)) {
+			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_20_R1)) {
 				ContainerWorkbench_1_20_R1.initReflection();
 				clazz = ContainerWorkbench_1_20_R1.class;
 			} else {
-				il.getLogger().severe("No compatible " + IContainerWorkbench.class.getSimpleName() + " impl for "
-						+ MinecraftVersion.getVersion() + " found!");
+				ContainerWorkbench_1_20_R2.initReflection();
+				clazz = ContainerWorkbench_1_20_R2.class;
 			}
 		} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
 				| IllegalArgumentException | IllegalAccessException e) {

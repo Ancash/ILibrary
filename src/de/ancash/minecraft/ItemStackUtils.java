@@ -238,7 +238,7 @@ public class ItemStackUtils {
 		GameProfile profile = getGameProfile(is);
 		Collection<Property> textures = profile.getProperties().get("textures");
 		for (Property p : textures)
-			texture = p.getValue();
+			texture = ReflectionUtil.getPropertyValue(p);
 		return texture;
 	}
 

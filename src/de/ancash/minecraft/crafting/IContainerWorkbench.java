@@ -49,11 +49,14 @@ public abstract class IContainerWorkbench {
 				nmsItemStackAsBukkitCopy = getCraftBukkitClass("inventory.CraftItemStack")
 						.getDeclaredMethod("asBukkitCopy", getNMSClass("ItemStack"));
 
-			} else {
+			} else if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_20_R2)) {
 				nmsItemStackAsBukkitCopy = getCraftBukkitClass("inventory.CraftItemStack")
 						.getDeclaredMethod("asBukkitCopy", Class.forName("net.minecraft.world.item.ItemStack"));
 				iRecipeToBukkitRecipeMethod = Class.forName("net.minecraft.world.item.crafting.IRecipe")
 						.getDeclaredMethod("toBukkitRecipe");
+			} else {
+				nmsItemStackAsBukkitCopy = getCraftBukkitClass("inventory.CraftItemStack")
+						.getDeclaredMethod("asBukkitCopy", Class.forName("net.minecraft.world.item.ItemStack"));
 			}
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
