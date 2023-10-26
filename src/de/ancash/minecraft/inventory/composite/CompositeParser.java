@@ -25,7 +25,7 @@ public class CompositeParser {
 		List<Map<String, Object>> mods = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			Map<String, Object> m = new HashMap<>();
-			m.put(ID, "bazaar_" + i);
+			m.put(ID, "bazaar:" + i);
 			m.put(SLOTS, IntStream.range(0, i).boxed().collect(Collectors.toList()));
 			Map<String, Object> props = new HashMap<>();
 			props.put("iter", i);
@@ -50,7 +50,7 @@ public class CompositeParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static CompositeModule parseModule(Map<String, Object> map) {
+	public static CompositeModuleSupplier parseModule(Map<String, Object> map) {
 		return CompositeModuleRegistry.parse(getString(map, ID), getSlots(map),
 				(Map<String, Object>) map.getOrDefault(PROPERTIES, Collections.emptyMap()));
 	}
@@ -59,7 +59,7 @@ public class CompositeParser {
 	public static CompositeGUISupplier parseGUI(YamlFile file, String path) {
 		String title;
 		int size;
-		List<CompositeModule> modules = new ArrayList<>();
+		List<CompositeModuleSupplier> modules = new ArrayList<>();
 		if (path.isEmpty() || path.equals(".")) {
 			title = file.getString(INV_TITLE);
 			size = file.getInt(INV_SIZE);

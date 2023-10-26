@@ -16,8 +16,10 @@ import de.ancash.libs.org.bukkit.event.EventManager;
 import de.ancash.libs.org.bukkit.event.HandlerList;
 import de.ancash.libs.org.bukkit.event.Listener;
 import de.ancash.libs.org.bukkit.event.Order;
+import de.ancash.minecraft.DefaultCompositeModuleParser;
 import de.ancash.minecraft.crafting.ICraftingManager;
 import de.ancash.minecraft.inventory.IGUIManager;
+import de.ancash.minecraft.inventory.composite.CompositeModuleRegistry;
 import de.ancash.minecraft.updatechecker.UpdateCheckSource;
 import de.ancash.minecraft.updatechecker.UpdateChecker;
 import de.ancash.sockets.async.impl.packet.client.AsyncPacketClient;
@@ -68,6 +70,7 @@ public class ILibrary extends JavaPlugin {
 		}
 		checkForUpdates();
 		Bukkit.getPluginManager().registerEvents(new IGUIManager(this), this);
+		CompositeModuleRegistry.register(this, new DefaultCompositeModuleParser());
 	}
 
 	private final int SPIGOT_RESOURCE_ID = 89796;

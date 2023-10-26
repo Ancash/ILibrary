@@ -3,6 +3,7 @@ package de.ancash.minecraft.crafting;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,21 +46,39 @@ public abstract class IContainerWorkbench {
 					ItemStack.class);
 			playerToEntityHumanMethod = getCraftBukkitClass("entity.CraftPlayer").getDeclaredMethod("getHandle");
 			if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_17_R1)) {
-				iRecipeToBukkitRecipeMethod = getNMSClass("IRecipe").getDeclaredMethod("toBukkitRecipe");
-				nmsItemStackAsBukkitCopy = getCraftBukkitClass("inventory.CraftItemStack")
-						.getDeclaredMethod("asBukkitCopy", getNMSClass("ItemStack"));
-
+				iRecipeToBukkitRecipeMethod = get(getNMSClass("IRecipe"), "toBukkitRecipe");
+				nmsItemStackAsBukkitCopy = get(getCraftBukkitClass("inventory.CraftItemStack"), "asBukkitCopy",
+						getNMSClass("ItemStack"));
 			} else if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_20_R2)) {
-				nmsItemStackAsBukkitCopy = getCraftBukkitClass("inventory.CraftItemStack")
-						.getDeclaredMethod("asBukkitCopy", Class.forName("net.minecraft.world.item.ItemStack"));
-				iRecipeToBukkitRecipeMethod = Class.forName("net.minecraft.world.item.crafting.IRecipe")
-						.getDeclaredMethod("toBukkitRecipe");
+				nmsItemStackAsBukkitCopy = get(getCraftBukkitClass("inventory.CraftItemStack"), "asBukkitCopy",
+						Class.forName("net.minecraft.world.item.ItemStack"));
+				iRecipeToBukkitRecipeMethod = get(Class.forName("net.minecraft.world.item.crafting.IRecipe"),
+						"toBukkitRecipe");
 			} else {
-				nmsItemStackAsBukkitCopy = getCraftBukkitClass("inventory.CraftItemStack")
-						.getDeclaredMethod("asBukkitCopy", Class.forName("net.minecraft.world.item.ItemStack"));
+				nmsItemStackAsBukkitCopy = get(getCraftBukkitClass("inventory.CraftItemStack"), "asBukkitCopy",
+						Class.forName("net.minecraft.world.item.ItemStack"));
 			}
-		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
+		}
+	}
+
+	static Method get(Class<?> clazz, String method, Class<?>... params) {
+		try {
+			Method m = params == null ? clazz.getDeclaredMethod(method) : clazz.getDeclaredMethod(method, params);
+			if (m == null)
+				throw new IllegalStateException("method null");
+			return m;
+		} catch (Throwable th) {
+			th.printStackTrace();
+			if (params == null)
+				params = new Class[0];
+			System.err.println(
+					"could not find method " + method + " in " + clazz + " with params " + Arrays.asList(params));
+			Arrays.asList(clazz.getDeclaredMethods()).stream().map(m -> m.getName() + "("
+					+ Arrays.asList(m.getParameters()).stream().map(p -> p.getType()).collect(Collectors.toList())
+					+ ")\n").collect(Collectors.toList());
+			return null;
 		}
 	}
 
