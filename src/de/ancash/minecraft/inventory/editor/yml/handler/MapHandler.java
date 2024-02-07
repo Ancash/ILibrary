@@ -65,8 +65,8 @@ public class MapHandler implements IValueHandler<Map> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
-			String title, Supplier<Map> valSup, Consumer<Map> onEdit, Runnable onBack, Runnable onDelete) {
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title,
+			Supplier<Map> valSup, Consumer<Map> onEdit, Runnable onBack, Runnable onDelete) {
 		MemoryConfiguration mc = new MemoryConfiguration();
 		Map<String, Object> m = valSup.get();
 		putMap(mc, m);

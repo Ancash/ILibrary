@@ -14,10 +14,8 @@ public class CompositeModule {
 
 	protected final List<CompositeIGUIModuleWrapper> modules;
 
-	CompositeModule(CompositeGUI gui, ItemStack item, List<Integer> slots,
-			Consumer<Triplet<Integer, Boolean, InventoryAction>> onClick) {
-		this.modules = slots.stream().map(s -> new CompositeIGUIModuleWrapper(gui, item, s, onClick))
-				.collect(Collectors.toList());
+	CompositeModule(CompositeGUI gui, ItemStack item, List<Integer> slots, Consumer<Triplet<Integer, Boolean, InventoryAction>> onClick) {
+		this.modules = slots.stream().map(s -> new CompositeIGUIModuleWrapper(gui, item, s, onClick)).collect(Collectors.toList());
 	}
 
 	public void setCanBeEnabled(Supplier<Boolean> enable) {

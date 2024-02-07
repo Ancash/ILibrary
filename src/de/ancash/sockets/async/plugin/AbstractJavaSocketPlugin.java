@@ -34,7 +34,7 @@ public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Lis
 			chatClient = null;
 		}
 		try {
-			chatClient = ILibrary.ASYNC_CHAT_CLIENT_FACTORY.newInstance(address, port, 4 * 1024, 4 * 1024, 2);
+			chatClient = ILibrary.ASYNC_CHAT_CLIENT_FACTORY.newInstance(address, port, 16 * 1024, 16 * 1024);
 		} catch (IOException e) {
 			getLogger().severe("Could not connect to " + address + ":" + port + ": " + e);
 		}
@@ -45,10 +45,11 @@ public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Lis
 	}
 
 	public PacketFuture sendPacket(Packet packet, UUID uuid) {
-		if (chatClient != null)
+		try {
 			chatClient.write(packet);
-		else
-			ILibrary.getInstance().send(packet);
+		} catch (InterruptedException e) {
+			return null;
+		}
 		return new PacketFuture(packet, uuid);
 	}
 

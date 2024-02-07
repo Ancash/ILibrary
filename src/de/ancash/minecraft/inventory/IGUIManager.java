@@ -34,20 +34,20 @@ public class IGUIManager implements Listener {
 
 	@EventHandler
 	public void inventoryClickEvent(InventoryClickEvent event) {
-		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getWhoClicked().getUniqueId()))
-				.collect(Collectors.toSet()).forEach(igui -> igui.getValue().preOnInventoryClick(event));
+		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getWhoClicked().getUniqueId())).collect(Collectors.toSet())
+				.forEach(igui -> igui.getValue().preOnInventoryClick(event));
 	}
 
 	@EventHandler
 	public void inventoryDragEvent(InventoryDragEvent event) {
-		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getWhoClicked().getUniqueId()))
-				.collect(Collectors.toSet()).forEach(igui -> igui.getValue().preOnInventoryDrag(event));
+		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getWhoClicked().getUniqueId())).collect(Collectors.toSet())
+				.forEach(igui -> igui.getValue().preOnInventoryDrag(event));
 	}
 
 	@EventHandler
 	public void inventoryCloseEvent(InventoryCloseEvent event) {
-		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getPlayer().getUniqueId()))
-				.collect(Collectors.toSet()).forEach(igui -> igui.getValue().preOnInventoryClose(event));
+		registeredIGUIs.entrySet().stream().filter(entry -> entry.getKey().equals(event.getPlayer().getUniqueId())).collect(Collectors.toSet())
+				.forEach(igui -> igui.getValue().preOnInventoryClose(event));
 	}
 
 	/**

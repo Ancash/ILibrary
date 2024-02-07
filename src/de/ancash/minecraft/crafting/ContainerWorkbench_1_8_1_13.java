@@ -23,19 +23,15 @@ public class ContainerWorkbench_1_8_1_13 extends IContainerWorkbench {
 	private static Method getItemMethod;
 	private static Random r;
 
-	static void initReflection()
-			throws ClassNotFoundException, NoSuchFieldException, SecurityException, NoSuchMethodException {
+	static void initReflection() throws ClassNotFoundException, NoSuchFieldException, SecurityException, NoSuchMethodException {
 		r = new Random();
 		Class<?> craftPlayer = getCraftBukkitClass("entity.CraftPlayer");
 		playerToEntityHumanMethod = craftPlayer.getMethod("getHandle");
 
 		iRecipeToBukkitRecipeMethod = getNMSClass("IRecipe").getDeclaredMethod("toBukkitRecipe");
-		itemStackAsNMSCopyMethod = getCraftBukkitClass("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy",
-				ItemStack.class);
-		nmsItemStackAsBukkitCopy = getCraftBukkitClass("inventory.CraftItemStack").getDeclaredMethod("asBukkitCopy",
-				getNMSClass("ItemStack"));
-		setItemMethod = getNMSClass("InventoryCrafting").getDeclaredMethod("setItem", int.class,
-				getNMSClass("ItemStack"));
+		itemStackAsNMSCopyMethod = getCraftBukkitClass("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
+		nmsItemStackAsBukkitCopy = getCraftBukkitClass("inventory.CraftItemStack").getDeclaredMethod("asBukkitCopy", getNMSClass("ItemStack"));
+		setItemMethod = getNMSClass("InventoryCrafting").getDeclaredMethod("setItem", int.class, getNMSClass("ItemStack"));
 		getItemMethod = getNMSClass("InventoryCrafting").getDeclaredMethod("getItem", int.class);
 
 		Class<?> entityHuman = getNMSClass("EntityHuman");
@@ -46,8 +42,8 @@ public class ContainerWorkbench_1_8_1_13 extends IContainerWorkbench {
 		worldField.setAccessible(true);
 
 		Class<?> containerWorkbench = getNMSClass("ContainerWorkbench");
-		containerWorkbenchConstructor = containerWorkbench.getConstructor(getNMSClass("PlayerInventory"),
-				getNMSClass("World"), getNMSClass("BlockPosition"));
+		containerWorkbenchConstructor = containerWorkbench.getConstructor(getNMSClass("PlayerInventory"), getNMSClass("World"),
+				getNMSClass("BlockPosition"));
 		inventoryCraftingField = containerWorkbench.getDeclaredField("craftInventory");
 		inventoryCraftingField.setAccessible(true);
 		blockPositionConstructor = getNMSClass("BlockPosition").getDeclaredConstructor(int.class, int.class, int.class);
@@ -71,8 +67,8 @@ public class ContainerWorkbench_1_8_1_13 extends IContainerWorkbench {
 
 			this.player = player;
 			Object entityHuman = playerToEntityHuman(player);
-			this.containerWorkbench = containerWorkbenchConstructor.newInstance(getPlayerInventory(entityHuman),
-					getWorld(entityHuman), newBlockPosition());
+			this.containerWorkbench = containerWorkbenchConstructor.newInstance(getPlayerInventory(entityHuman), getWorld(entityHuman),
+					newBlockPosition());
 			this.inventoryCrafting = getInventoryCrafting(containerWorkbench);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -132,8 +128,7 @@ public class ContainerWorkbench_1_8_1_13 extends IContainerWorkbench {
 		}
 	}
 
-	private static Object getInventoryCrafting(Object containerWorkbench)
-			throws IllegalArgumentException, IllegalAccessException {
+	private static Object getInventoryCrafting(Object containerWorkbench) throws IllegalArgumentException, IllegalAccessException {
 		return inventoryCraftingField.get(containerWorkbench);
 	}
 

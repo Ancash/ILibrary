@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.YamlFile;
+import org.simpleyaml.configuration.implementation.snakeyaml.SnakeYamlImplementation;
 
 import de.ancash.misc.ReflectionUtils;
 
@@ -18,7 +19,7 @@ import de.ancash.misc.ReflectionUtils;
 public class CompositeParser {
 
 	public static void main(String[] args) throws IOException {
-		YamlFile file = new YamlFile();
+		YamlFile file = new YamlFile(new SnakeYamlImplementation());
 		ConfigurationSection cs = file.createSection("test");
 		cs.set(INV_SIZE, 54);
 		cs.set(INV_TITLE, "title");
@@ -64,14 +65,14 @@ public class CompositeParser {
 			title = file.getString(INV_TITLE);
 			size = file.getInt(INV_SIZE);
 			if (file.contains(MODULES))
-				modules = ((List<Map<String, Object>>) file.getList(MODULES)).stream().map(CompositeParser::parseModule)
-						.filter(m -> m != null).collect(Collectors.toList());
+				modules = ((List<Map<String, Object>>) file.getList(MODULES)).stream().map(CompositeParser::parseModule).filter(m -> m != null)
+						.collect(Collectors.toList());
 		} else {
 			title = file.getString(String.join(".", path, INV_TITLE));
 			size = file.getInt(String.join(".", path, INV_SIZE));
 			if (file.contains(String.join(".", path, MODULES)))
-				modules = ((List<Map<String, Object>>) file.getList(String.join(".", path, MODULES))).stream()
-						.map(CompositeParser::parseModule).filter(m -> m != null).collect(Collectors.toList());
+				modules = ((List<Map<String, Object>>) file.getList(String.join(".", path, MODULES))).stream().map(CompositeParser::parseModule)
+						.filter(m -> m != null).collect(Collectors.toList());
 		}
 
 		if (size % 9 != 0 || size < 0 || size > 9 * 6)

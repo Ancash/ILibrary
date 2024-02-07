@@ -22,8 +22,7 @@ class CompositeIGUIModuleWrapper extends IGUIModule {
 	private final ItemStack item;
 	private final int slot;
 
-	public CompositeIGUIModuleWrapper(CompositeGUI igui, ItemStack item, int slot,
-			Consumer<Triplet<Integer, Boolean, InventoryAction>> onClick) {
+	public CompositeIGUIModuleWrapper(CompositeGUI igui, ItemStack item, int slot, Consumer<Triplet<Integer, Boolean, InventoryAction>> onClick) {
 		super(igui.gui);
 		this.gui = igui;
 		this.onClick = onClick;

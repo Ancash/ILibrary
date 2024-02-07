@@ -34,8 +34,7 @@ public class StringInputGUI implements IStringInput {
 		this(plugin, player, onComplete, (chars) -> Tuple.of(true, null));
 	}
 
-	public StringInputGUI(JavaPlugin plugin, Player player, Consumer<String> onComplete,
-			Function<String, Duplet<Boolean, String>> isValid) {
+	public StringInputGUI(JavaPlugin plugin, Player player, Consumer<String> onComplete, Function<String, Duplet<Boolean, String>> isValid) {
 		this.player = player;
 		this.plugin = plugin;
 		this.onComplete = onComplete;
@@ -80,16 +79,15 @@ public class StringInputGUI implements IStringInput {
 	}
 
 	public void open() {
-		new AnvilGUI.Builder().itemLeft(left).itemRight(right).title(title).text(text).plugin(plugin).preventClose()
-				.onClick((slot, state) -> {
-					if (slot != Slot.OUTPUT)
-						return Collections.emptyList();
-					Duplet<Boolean, String> valid = isValid.apply(state.getText());
-					if (!valid.getFirst())
-						return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText(valid.getSecond()));
-					Lambda.of(onComplete).execIf(Lambda.notNull(), c -> c.accept(state.getText()));
-					return Arrays.asList(AnvilGUI.ResponseAction.close());
-				}).open(player);
+		new AnvilGUI.Builder().itemLeft(left).itemRight(right).title(title).text(text).plugin(plugin).preventClose().onClick((slot, state) -> {
+			if (slot != Slot.OUTPUT)
+				return Collections.emptyList();
+			Duplet<Boolean, String> valid = isValid.apply(state.getText());
+			if (!valid.getFirst())
+				return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText(valid.getSecond()));
+			Lambda.of(onComplete).execIf(Lambda.notNull(), c -> c.accept(state.getText()));
+			return Arrays.asList(AnvilGUI.ResponseAction.close());
+		}).open(player);
 	}
 
 	public String getText() {

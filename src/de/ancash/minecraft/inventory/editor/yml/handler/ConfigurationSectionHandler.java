@@ -28,8 +28,7 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 	@Override
 	public ConfigurationSection get(ConfigurationSection section, String s) {
 		if (!isValid(section, s))
-			throw new IllegalStateException(
-					String.join(".", section.getCurrentPath(), s) + " is not cs but: " + section.get(s).getClass());
+			throw new IllegalStateException(String.join(".", section.getCurrentPath(), s) + " is not cs but: " + section.get(s).getClass());
 		return section.getConfigurationSection(s);
 	}
 
@@ -91,11 +90,9 @@ public class ConfigurationSectionHandler implements IValueHandler<ConfigurationS
 	}
 
 	@Override
-	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
-			String title, Supplier<ConfigurationSection> valSup, Consumer<ConfigurationSection> onEdit, Runnable onBack,
-			Runnable onDelete) {
-		ConfigurationSectionEditor e = new ConfigurationSectionEditor(yfe, parent, key, Bukkit.getPlayer(id),
-				valSup.get(), onDelete);
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title,
+			Supplier<ConfigurationSection> valSup, Consumer<ConfigurationSection> onEdit, Runnable onBack, Runnable onDelete) {
+		ConfigurationSectionEditor e = new ConfigurationSectionEditor(yfe, parent, key, Bukkit.getPlayer(id), valSup.get(), onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> {
 			e.addRootBackItem(onBack);
 			e.open();

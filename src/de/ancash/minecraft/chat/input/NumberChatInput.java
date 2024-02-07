@@ -46,8 +46,7 @@ public class NumberChatInput<T extends Number> implements INumberInput<T> {
 		this(pl, player, clazz, onComplete, (c) -> Tuple.of(true, null));
 	}
 
-	public NumberChatInput(JavaPlugin pl, Player player, Class<T> clazz, Consumer<T> onComplete,
-			Function<T, Duplet<Boolean, String>> isValid) {
+	public NumberChatInput(JavaPlugin pl, Player player, Class<T> clazz, Consumer<T> onComplete, Function<T, Duplet<Boolean, String>> isValid) {
 		this.sci = new StringChatInput(pl, player);
 		this.isNumValid = isValid;
 		sci.isValid(this::onInput);

@@ -1,15 +1,10 @@
 package de.ancash;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.simpleyaml.configuration.file.YamlFile;
 
-import de.ancash.libs.org.apache.commons.io.FileUtils;
 import de.ancash.libs.org.bukkit.event.Event;
 import de.ancash.libs.org.bukkit.event.EventExecutor;
 import de.ancash.libs.org.bukkit.event.EventManager;
@@ -22,52 +17,25 @@ import de.ancash.minecraft.inventory.IGUIManager;
 import de.ancash.minecraft.inventory.composite.CompositeModuleRegistry;
 import de.ancash.minecraft.updatechecker.UpdateCheckSource;
 import de.ancash.minecraft.updatechecker.UpdateChecker;
-import de.ancash.sockets.async.impl.packet.client.AsyncPacketClient;
 import de.ancash.sockets.async.impl.packet.client.AsyncPacketClientFactory;
-import de.ancash.sockets.packet.Packet;
 
 public class ILibrary extends JavaPlugin {
 
 	public static final AsyncPacketClientFactory ASYNC_CHAT_CLIENT_FACTORY = new AsyncPacketClientFactory();
 
-	private AsyncPacketClient asyncClient;
-	private int port;
 	private static ILibrary plugin;
-	private YamlFile f;
 	private static final AtomicInteger TICK = new AtomicInteger(0);
 
 	public ILibrary() {
 		plugin = this;
-		f = new YamlFile(new File("plugins/ILibrary/config.yml"));
-		try {
-			if (!f.exists())
-				FileUtils.copyInputStreamToFile(getResource("config.yml"), new File(f.getFilePath()));
-
-			f.load();
-			port = f.getInt("port");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
 	public void onEnable() {
 		Bukkit.getScheduler().runTaskTimer(plugin, () -> TICK.incrementAndGet(), 0, 1);
 //		getCommand("fedit").setExecutor(new FEditCommand());
+//		getCommand("ms").setExecutor(new MaterialSearchCommand());
 		ICraftingManager.getSingleton().init(this);
-		if (f.getBoolean("chat-client")) {
-			new BukkitRunnable() {
-
-				@Override
-				public void run() {
-					try {
-						asyncClient = ASYNC_CHAT_CLIENT_FACTORY.newInstance(getAddress(), port, 4 * 1024, 4 * 1024, 2);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}.runTaskAsynchronously(plugin);
-		}
 		checkForUpdates();
 		Bukkit.getPluginManager().registerEvents(new IGUIManager(this), this);
 		CompositeModuleRegistry.register(this, new DefaultCompositeModuleParser());
@@ -76,14 +44,8 @@ public class ILibrary extends JavaPlugin {
 	private final int SPIGOT_RESOURCE_ID = 89796;
 
 	private void checkForUpdates() {
-		new UpdateChecker(this, UpdateCheckSource.SPIGOT, SPIGOT_RESOURCE_ID + "")
-				.setUsedVersion("v" + getDescription().getVersion()).setDownloadLink(SPIGOT_RESOURCE_ID)
-				.setChangelogLink(SPIGOT_RESOURCE_ID).setNotifyOpsOnJoin(true).checkEveryXHours(6).checkNow();
-	}
-
-	public void send(Packet packet) {
-		if (asyncClient != null)
-			asyncClient.write(packet);
+		new UpdateChecker(this, UpdateCheckSource.SPIGOT, SPIGOT_RESOURCE_ID + "").setUsedVersion("v" + getDescription().getVersion())
+				.setDownloadLink(SPIGOT_RESOURCE_ID).setChangelogLink(SPIGOT_RESOURCE_ID).setNotifyOpsOnJoin(true).checkEveryXHours(6).checkNow();
 	}
 
 	public static int getTick() {
@@ -92,28 +54,6 @@ public class ILibrary extends JavaPlugin {
 
 	public static ILibrary getInstance() {
 		return plugin;
-	}
-
-	public boolean canSendPacket() {
-		return asyncClient != null && asyncClient.isConnected();
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public String getAddress() {
-		return f.getString("address");
-	}
-
-	@Override
-	public synchronized void onDisable() {
-		try {
-			asyncClient.setConnected(false);
-			asyncClient.onDisconnect(null);
-		} catch (Throwable e) {
-		}
-
 	}
 
 	public void registerEvents(Listener iListener, Object owner) {

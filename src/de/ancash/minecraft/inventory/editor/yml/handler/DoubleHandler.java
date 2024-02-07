@@ -61,10 +61,8 @@ public class DoubleHandler implements IValueHandler<Double> {
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
 		edit(editor.getYamlEditor(), editor, key, editor.getValueHandler(), editor.getId(),
-				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
-						32),
-				() -> editor.getCurrent().getDouble(key), d -> editor.getCurrent().set(key, d), editor::open,
-				() -> editor.getCurrent().remove(key));
+				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(), 32),
+				() -> editor.getCurrent().getDouble(key), d -> editor.getCurrent().set(key, d), editor::open, () -> editor.getCurrent().remove(key));
 	}
 
 	@Override
@@ -73,8 +71,8 @@ public class DoubleHandler implements IValueHandler<Double> {
 	}
 
 	@Override
-	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
-			String title, Supplier<Double> valSup, Consumer<Double> onEdit, Runnable onBack, Runnable onDelete) {
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title,
+			Supplier<Double> valSup, Consumer<Double> onEdit, Runnable onBack, Runnable onDelete) {
 		DoubleEditor de = new DoubleEditor(id, title, parent, yfe, key, valSup, onEdit, onBack, onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> de.open(), 1);
 	}

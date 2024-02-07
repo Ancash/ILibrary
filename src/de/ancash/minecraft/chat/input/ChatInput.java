@@ -25,20 +25,18 @@ public class ChatInput implements IInput {
 	}
 
 	@Override
-	public IStringInput newStringInput(JavaPlugin pl, Player player, Consumer<String> onComplete,
-			Function<String, Duplet<Boolean, String>> isValid) {
+	public IStringInput newStringInput(JavaPlugin pl, Player player, Consumer<String> onComplete, Function<String, Duplet<Boolean, String>> isValid) {
 		return new StringChatInput(pl, player, onComplete, isValid);
 	}
 
 	@Override
-	public <T extends Number> INumberInput<T> newNumberInput(JavaPlugin pl, Player player, Class<T> clazz,
-			Consumer<T> onComplete) {
+	public <T extends Number> INumberInput<T> newNumberInput(JavaPlugin pl, Player player, Class<T> clazz, Consumer<T> onComplete) {
 		return newNumberInput(pl, player, clazz, onComplete, (t) -> Tuple.of(t != null, "Invalid number: " + t)); //$NON-NLS-1$
 	}
 
 	@Override
-	public <T extends Number> INumberInput<T> newNumberInput(JavaPlugin plugin, Player player, Class<T> clazz,
-			Consumer<T> onComplete, Function<T, Duplet<Boolean, String>> isValid) {
+	public <T extends Number> INumberInput<T> newNumberInput(JavaPlugin plugin, Player player, Class<T> clazz, Consumer<T> onComplete,
+			Function<T, Duplet<Boolean, String>> isValid) {
 		return new NumberChatInput<>(plugin, player, clazz, onComplete, isValid);
 	}
 }

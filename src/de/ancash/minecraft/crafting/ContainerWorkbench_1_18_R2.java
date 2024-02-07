@@ -24,16 +24,16 @@ public class ContainerWorkbench_1_18_R2 extends IContainerWorkbench {
 	private static Method getItemMethod;
 	private static Random r;
 
-	static void initReflection() throws ClassNotFoundException, NoSuchFieldException, SecurityException,
-			NoSuchMethodException, IllegalArgumentException, IllegalAccessException {
+	static void initReflection() throws ClassNotFoundException, NoSuchFieldException, SecurityException, NoSuchMethodException,
+			IllegalArgumentException, IllegalAccessException {
 		r = new Random();
 		Class<?> bpc = Class.forName("net.minecraft.core.BlockPosition");
 		Class<?> cac = Class.forName("net.minecraft.world.inventory.ContainerAccess");
 		Class<?> cwc = Class.forName("net.minecraft.world.inventory.ContainerWorkbench");
 		Class<?> icc = Class.forName("net.minecraft.world.inventory.InventoryCrafting");
 		blockPositionConstructor = bpc.getDeclaredConstructor(int.class, int.class, int.class);
-		containerWorkbenchConstructor = cwc.getDeclaredConstructor(int.class,
-				Class.forName("net.minecraft.world.entity.player.PlayerInventory"), cac);
+		containerWorkbenchConstructor = cwc.getDeclaredConstructor(int.class, Class.forName("net.minecraft.world.entity.player.PlayerInventory"),
+				cac);
 		containerAccessMethod = cac.getDeclaredMethod("a", Class.forName("net.minecraft.world.level.World"), bpc);
 		Class<?> entityHuman = Class.forName("net.minecraft.world.entity.player.EntityHuman");
 		playerInventoryField = entityHuman.getDeclaredField("co");
@@ -64,13 +64,11 @@ public class ContainerWorkbench_1_18_R2 extends IContainerWorkbench {
 		try {
 			this.player = player;
 			Object nmsPlayer = playerToEntityHuman(player);
-			Object containerAccess = containerAccessMethod.invoke(player, worldField.get(nmsPlayer),
-					newBlockPosition());
-			Object containerWorkbench = containerWorkbenchConstructor.newInstance(0,
-					playerInventoryField.get(playerToEntityHuman(player)), containerAccess);
+			Object containerAccess = containerAccessMethod.invoke(player, worldField.get(nmsPlayer), newBlockPosition());
+			Object containerWorkbench = containerWorkbenchConstructor.newInstance(0, playerInventoryField.get(playerToEntityHuman(player)),
+					containerAccess);
 			inventoryCrafting = inventoryCraftingField.get(containerWorkbench);
-		} catch (IllegalArgumentException | InstantiationException | IllegalAccessException
-				| InvocationTargetException e) {
+		} catch (IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 			throw new IllegalArgumentException(e);
 		}
 	}

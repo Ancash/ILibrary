@@ -39,8 +39,7 @@ public class ItemStackUtils {
 		try {
 			gameProfileIdField = GameProfile.class.getDeclaredField("id");
 			gameProfileIdField.setAccessible(true);
-			profileField = ((SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta()).getClass()
-					.getDeclaredField("profile");
+			profileField = ((SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta()).getClass().getDeclaredField("profile");
 			profileField.setAccessible(true);
 		} catch (NoSuchFieldException | SecurityException e) {
 			e.printStackTrace();
@@ -128,8 +127,7 @@ public class ItemStackUtils {
 	}
 
 	public static String getDisplayName(ItemStack item) {
-		return !item.getItemMeta().hasDisplayName() ? XMaterial.matchXMaterial(item).toString()
-				: item.getItemMeta().getDisplayName();
+		return !item.getItemMeta().hasDisplayName() ? XMaterial.matchXMaterial(item).toString() : item.getItemMeta().getDisplayName();
 	}
 
 	public static ItemStack setDisplayname(ItemStack is, String str) {
@@ -145,7 +143,11 @@ public class ItemStackUtils {
 
 	public static ItemStack setLore(List<String> lore, ItemStack is) {
 		ItemMeta im = is.getItemMeta();
-		im.setLore(lore);
+		List<String> a = new ArrayList<String>();
+		for (String s : lore)
+			for (String b : s.split("\n"))
+				a.add(b);
+		im.setLore(a);
 		is.setItemMeta(im);
 		return is;
 	}
@@ -179,8 +181,7 @@ public class ItemStackUtils {
 				String txt = null;
 				try {
 					txt = ItemStackUtils.getTexure(item);
-				} catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-						| IllegalAccessException e) {
+				} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
 
 				}
 				SkullMeta sm = (SkullMeta) item.getItemMeta();
@@ -232,13 +233,12 @@ public class ItemStackUtils {
 		return is;
 	}
 
-	public static String getTexure(ItemStack is)
-			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public static String getTexure(ItemStack is) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		String texture = null;
 		GameProfile profile = getGameProfile(is);
 		Collection<Property> textures = profile.getProperties().get("textures");
 		for (Property p : textures)
-			texture = ReflectionUtil.getPropertyValue(p);
+			texture = AuthLibUtil.getPropertyValue(p);
 		return texture;
 	}
 
@@ -268,8 +268,8 @@ public class ItemStackUtils {
 
 	public static ItemStack setTexture(ItemStack is, String texture) {
 		SkullMeta hm = (SkullMeta) is.getItemMeta();
-		GameProfile profile = new GameProfile(
-				texture != null ? new UUID(texture.hashCode(), texture.hashCode()) : UUID.randomUUID(), null);
+		GameProfile profile = AuthLibUtil.createGameProfile(texture != null ? new UUID(texture.hashCode(), texture.hashCode()) : UUID.randomUUID(),
+				null);
 		profile.getProperties().put("textures", new Property("textures", texture));
 		try {
 			Field field = hm.getClass().getDeclaredField("profile");

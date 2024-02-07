@@ -28,8 +28,7 @@ public class KeySuggestion {
 		Validate.isTrue(key != null && !key.isEmpty(), "invalid key: " + key);
 		Validate.notNull(handler, "no handler");
 		if (def != null)
-			Validate.isTrue(handler.isValid(def),
-					"default value not valid (" + handler.getClass().getSimpleName() + "): " + def);
+			Validate.isTrue(handler.isValid(def), "default value not valid (" + handler.getClass().getSimpleName() + "): " + def);
 		this.key = key;
 		if (name == null || name.isEmpty())
 			name = handler.getClazz().getSimpleName();

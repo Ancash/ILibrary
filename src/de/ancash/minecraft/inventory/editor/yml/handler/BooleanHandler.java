@@ -57,10 +57,8 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
 		edit(editor.getYamlEditor(), editor, key, editor.getValueHandler(), editor.getId(),
-				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
-						32),
-				() -> editor.getCurrent().getBoolean(key), b -> editor.getCurrent().set(key, b), editor::open,
-				() -> editor.getCurrent().remove(key));
+				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(), 32),
+				() -> editor.getCurrent().getBoolean(key), b -> editor.getCurrent().set(key, b), editor::open, () -> editor.getCurrent().remove(key));
 	}
 
 	public void replaceValue(int[] arr, int find, int replace) {
@@ -78,10 +76,9 @@ public class BooleanHandler implements IValueHandler<Boolean> {
 	}
 
 	@Override
-	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
-			String title, Supplier<Boolean> valSup, Consumer<Boolean> onEdit, Runnable onBack, Runnable onDelete) {
-		BooleanEditor be = new BooleanEditor(id, title, parent, yfe, key, () -> onEdit.accept(!valSup.get()), valSup,
-				onBack, onDelete);
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title,
+			Supplier<Boolean> valSup, Consumer<Boolean> onEdit, Runnable onBack, Runnable onDelete) {
+		BooleanEditor be = new BooleanEditor(id, title, parent, yfe, key, () -> onEdit.accept(!valSup.get()), valSup, onBack, onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> be.open(), 1);
 	}
 

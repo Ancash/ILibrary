@@ -36,8 +36,7 @@ public class StringEditor extends ValueEditor<String> {
 				sb.append("\n");
 			sb.append(c);
 		}
-		return Arrays.asList(sb.toString().split("\n")).stream().map(s -> ItemStackUtils.translateChatColor(s, '&'))
-				.collect(Collectors.toList());
+		return Arrays.asList(sb.toString().split("\n")).stream().map(s -> ItemStackUtils.translateChatColor(s, '&')).collect(Collectors.toList());
 	}
 
 	protected final Consumer<String> onEdit;
@@ -45,8 +44,8 @@ public class StringEditor extends ValueEditor<String> {
 	protected final List<String> value = new ArrayList<>();
 	protected int pos = 0;
 
-	public StringEditor(UUID id, String title, ValueEditor<?> parent, YamlEditor yeditor, String key,
-			Supplier<String> valSup, Consumer<String> onEdit, Runnable onBack, Runnable onDelete) {
+	public StringEditor(UUID id, String title, ValueEditor<?> parent, YamlEditor yeditor, String key, Supplier<String> valSup,
+			Consumer<String> onEdit, Runnable onBack, Runnable onDelete) {
 		super(id, title, 36, parent, yeditor, key, valSup, onBack);
 		this.onEdit = onEdit;
 		this.onDelete = onDelete;
@@ -55,38 +54,36 @@ public class StringEditor extends ValueEditor<String> {
 		addEditorItemWithSuggestions(13, XMaterial.CHEST);
 		addAddItem(15);
 		if (onDelete != null)
-			addInventoryItem(
-					new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
-						onDelete.run();
-						super.back();
-					})));
+			addInventoryItem(new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
+				onDelete.run();
+				super.back();
+			})));
 	}
 
 	@SuppressWarnings("nls")
 	public void addAddItem(int slot) {
-		addInventoryItem(new InventoryItem(this, yeditor.getSettings().stringEditorSupplierItem(), slot,
-				(a, shift, action, top) -> {
-					if (!top)
-						return;
-					if (shift) {
-						acceptChatInput(s -> value.addAll(pos + 1, split(s)));
-						return;
-					}
-					switch (action) {
-					case DROP_ONE_SLOT:
-						acceptChatInput(s -> value.addAll(pos, split(s)));
-						break;
-					case PICKUP_ALL:
-						value.add(Math.min(value.size(), pos + 1), "");
-						break;
-					case PICKUP_HALF:
-						value.add(Math.max(0, pos), "");
-						break;
-					default:
-						break;
-					}
-					addEditorItem(11);
-				}));
+		addInventoryItem(new InventoryItem(this, yeditor.getSettings().stringEditorSupplierItem(), slot, (a, shift, action, top) -> {
+			if (!top)
+				return;
+			if (shift) {
+				acceptChatInput(s -> value.addAll(pos + 1, split(s)));
+				return;
+			}
+			switch (action) {
+			case DROP_ONE_SLOT:
+				acceptChatInput(s -> value.addAll(pos, split(s)));
+				break;
+			case PICKUP_ALL:
+				value.add(Math.min(value.size(), pos + 1), "");
+				break;
+			case PICKUP_HALF:
+				value.add(Math.max(0, pos), "");
+				break;
+			default:
+				break;
+			}
+			addEditorItem(11);
+		}));
 	}
 
 	public void addEditorItem(int slot) {

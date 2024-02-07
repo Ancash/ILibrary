@@ -59,17 +59,16 @@ public class ByteHandler implements IValueHandler<Byte> {
 	}
 
 	@Override
-	public void uncheckedEdit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler,
-			UUID id, String title, Supplier<?> valSup, Consumer<?> onEdit, Runnable onBack, Runnable onDelete) {
-		IValueHandler.super.uncheckedEdit(yfe, parent, key, valHandler, id, title,
-				() -> ((Number) valSup.get()).byteValue(), onEdit, onBack, onDelete);
+	public void uncheckedEdit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title,
+			Supplier<?> valSup, Consumer<?> onEdit, Runnable onBack, Runnable onDelete) {
+		IValueHandler.super.uncheckedEdit(yfe, parent, key, valHandler, id, title, () -> ((Number) valSup.get()).byteValue(), onEdit, onBack,
+				onDelete);
 	}
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
 		edit(editor.getYamlEditor(), editor, key, editor.getValueHandler(), editor.getId(),
-				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
-						32),
+				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(), 32),
 				() -> (byte) editor.getCurrent().getLong(key), l -> editor.getCurrent().set(key, l), editor::open,
 				() -> editor.getCurrent().remove(key));
 	}
@@ -80,10 +79,10 @@ public class ByteHandler implements IValueHandler<Byte> {
 	}
 
 	@Override
-	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
-			String title, Supplier<Byte> valSup, Consumer<Byte> onEdit, Runnable onBack, Runnable onDelete) {
-		LongEditor le = new LongEditor(id, title, parent, yfe, key, () -> valSup.get().longValue(),
-				l -> onEdit.accept(l.byteValue()), onBack, onDelete);
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title,
+			Supplier<Byte> valSup, Consumer<Byte> onEdit, Runnable onBack, Runnable onDelete) {
+		LongEditor le = new LongEditor(id, title, parent, yfe, key, () -> valSup.get().longValue(), l -> onEdit.accept(l.byteValue()), onBack,
+				onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> le.open(), 1);
 	}
 

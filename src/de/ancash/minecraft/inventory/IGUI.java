@@ -73,8 +73,7 @@ public abstract class IGUI {
 	}
 
 	public void close(UUID id) {
-		inv.getViewers().stream().filter(viewer -> viewer.getUniqueId().equals(id)).findFirst()
-				.ifPresent(HumanEntity::closeInventory);
+		inv.getViewers().stream().filter(viewer -> viewer.getUniqueId().equals(id)).findFirst().ifPresent(HumanEntity::closeInventory);
 	}
 
 	public void closeAll() {

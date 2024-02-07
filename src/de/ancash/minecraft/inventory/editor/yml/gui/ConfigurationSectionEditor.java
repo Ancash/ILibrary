@@ -45,15 +45,14 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	protected boolean finishedConstructor = false;
 	protected final Runnable onDelete;
 
-	public ConfigurationSectionEditor(YamlEditor editor, ValueEditor<?> parent, String key, Player player,
-			ConfigurationSection current, Runnable onDelete) {
+	public ConfigurationSectionEditor(YamlEditor editor, ValueEditor<?> parent, String key, Player player, ConfigurationSection current,
+			Runnable onDelete) {
 		this(editor, parent, key, player, current, YamlEditor.getDefaultHandler(), onDelete);
 	}
 
-	public ConfigurationSectionEditor(YamlEditor editor, ValueEditor<?> parent, String key, Player player,
-			ConfigurationSection current, List<IValueHandler<?>> handler, Runnable onDelete) {
-		super(player.getUniqueId(), YamlEditor.createTitle(editor.getRoot(), current), 54, parent, editor, key, null,
-				null);
+	public ConfigurationSectionEditor(YamlEditor editor, ValueEditor<?> parent, String key, Player player, ConfigurationSection current,
+			List<IValueHandler<?>> handler, Runnable onDelete) {
+		super(player.getUniqueId(), YamlEditor.createTitle(editor.getRoot(), current), 54, parent, editor, key, null, null);
 		finishedConstructor = true;
 		this.onDelete = onDelete;
 		this.handler = Collections.unmodifiableList(handler);
@@ -90,11 +89,10 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 
 	protected void loadOptions() {
 		if (onDelete != null)
-			addInventoryItem(
-					new InventoryItem(this, settings.deleteItem(), 51, (a, b, c, top) -> Lambda.execIf(top, () -> {
-						onDelete.run();
-						super.back();
-					})));
+			addInventoryItem(new InventoryItem(this, settings.deleteItem(), 51, (a, b, c, top) -> Lambda.execIf(top, () -> {
+				onDelete.run();
+				super.back();
+			})));
 		addInventoryItem(new InventoryItem(this, settings.saveItem(), 52, (a, b, c, top) -> Lambda.execIf(top, () -> {
 			saveListElement(current);
 			yeditor.getOnSave().accept(yeditor);
@@ -128,23 +126,22 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 			builder.append("\n");
 		}
 
-		addInventoryItem(
-				new InventoryItem(this, ItemStackUtils.setLore(settings.addItem(), builder.toString().split("\n")), 46,
-						(slot, shift, action, top) -> {
-							if (!top)
-								return;
-							switch (action) {
-							case PICKUP_ALL:
-								createKey(handler.get(addPos));
-								break;
-							case PICKUP_HALF:
-								nextAddOption();
-								addAddItem();
-								break;
-							default:
-								break;
-							}
-						}));
+		addInventoryItem(new InventoryItem(this, ItemStackUtils.setLore(settings.addItem(), builder.toString().split("\n")), 46,
+				(slot, shift, action, top) -> {
+					if (!top)
+						return;
+					switch (action) {
+					case PICKUP_ALL:
+						createKey(handler.get(addPos));
+						break;
+					case PICKUP_HALF:
+						nextAddOption();
+						addAddItem();
+						break;
+					default:
+						break;
+					}
+				}));
 	}
 
 	@Override
@@ -160,8 +157,8 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 
 	protected void loadSuggestions() {
 		suggestions.clear();
-		yeditor.getKeySuggester().stream().map(k -> k.getKeySuggestions(this)).filter(s -> s != null && !s.isEmpty())
-				.flatMap(Set::stream).sorted((a, b) -> a.getKey().compareTo(b.getKey())).forEach(suggestions::add);
+		yeditor.getKeySuggester().stream().map(k -> k.getKeySuggestions(this)).filter(s -> s != null && !s.isEmpty()).flatMap(Set::stream)
+				.sorted((a, b) -> a.getKey().compareTo(b.getKey())).forEach(suggestions::add);
 		for (int i = 0; i < suggestions.size() - 1; i++)
 			if (suggestions.get(i).getKey().equals(suggestions.get(i + 1).getKey()))
 				throw new IllegalStateException("duplicate key suggestion: " + suggestions.get(i).getKey());
@@ -170,8 +167,7 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 	@SuppressWarnings("nls")
 	protected void addSuggestionsItem() {
 		StringBuilder lore = new StringBuilder();
-		lore.append("§eRight click to select suggestion").append("\n").append("§eLeft click to add suggestion")
-				.append("\n").append("§7Suggestions:");
+		lore.append("§eRight click to select suggestion").append("\n").append("§eLeft click to add suggestion").append("\n").append("§7Suggestions:");
 
 		for (int i = 0; i < suggestions.size(); i++) {
 			KeySuggestion cskc = suggestions.get(i);
@@ -185,26 +181,25 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 				lore.append("§c");
 			lore.append(String.format("%s (%s)", cskc.getKey(), cskc.getName()));
 		}
-		addInventoryItem(
-				new InventoryItem(this, ItemStackUtils.setLore(settings.suggestionsItem(), lore.toString().split("\n")),
-						47, (slot, shift, action, top) -> {
-							if (!top)
-								return;
-							if (suggestions.isEmpty())
-								return;
-							switch (action) {
-							case PICKUP_ALL:
-								createSuggestion(suggestions.get(sugPos));
-								open();
-								break;
-							case PICKUP_HALF:
-								nextSuggestionsOption();
-								addSuggestionsItem();
-								break;
-							default:
-								break;
-							}
-						}));
+		addInventoryItem(new InventoryItem(this, ItemStackUtils.setLore(settings.suggestionsItem(), lore.toString().split("\n")), 47,
+				(slot, shift, action, top) -> {
+					if (!top)
+						return;
+					if (suggestions.isEmpty())
+						return;
+					switch (action) {
+					case PICKUP_ALL:
+						createSuggestion(suggestions.get(sugPos));
+						open();
+						break;
+					case PICKUP_HALF:
+						nextSuggestionsOption();
+						addSuggestionsItem();
+						break;
+					default:
+						break;
+					}
+				}));
 	}
 
 	protected void nextSuggestionsOption() {
@@ -261,8 +256,8 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 			if (ivh != null)
 				mappedHandler.put(key, ivh);
 			else
-				throw new IllegalStateException("unknown type at "
-						+ String.join(".", getCurrent().getCurrentPath(), key) + ": " + getCurrent().get(key));
+				throw new IllegalStateException(
+						"unknown type at " + String.join(".", getCurrent().getCurrentPath(), key) + ": " + getCurrent().get(key));
 		}
 	}
 
@@ -286,18 +281,14 @@ public class ConfigurationSectionEditor extends ValueEditor<ConfigurationSection
 			String key = keys.get(k);
 			IValueHandler<?> handler = mappedHandler.get(key);
 			ItemStack item = handler.getEditItem(this, key);
-			addInventoryItem(new InventoryItem(this, item, pos++,
-					(a, b, c, top) -> Lambda.execIf(top, () -> handler.edit(this, key))));
+			addInventoryItem(new InventoryItem(this, item, pos++, (a, b, c, top) -> Lambda.execIf(top, () -> handler.edit(this, key))));
 		}
 		if (onBack != null)
-			addInventoryItem(new InventoryItem(this, settings.getBackItem(), getSize() - 9,
-					(a, b, c, top) -> Lambda.execIf(top, onBack)));
+			addInventoryItem(new InventoryItem(this, settings.getBackItem(), getSize() - 9, (a, b, c, top) -> Lambda.execIf(top, onBack)));
 		if (hasPrevPage())
-			addInventoryItem(new InventoryItem(this, settings.getPrevItem(), getSize() - 2,
-					(a, b, c, top) -> Lambda.execIf(top, this::prevPage)));
+			addInventoryItem(new InventoryItem(this, settings.getPrevItem(), getSize() - 2, (a, b, c, top) -> Lambda.execIf(top, this::prevPage)));
 		if (hasNextPage())
-			addInventoryItem(new InventoryItem(this, settings.getNextItem(), getSize() - 1,
-					(a, b, c, top) -> Lambda.execIf(top, this::nextPage)));
+			addInventoryItem(new InventoryItem(this, settings.getNextItem(), getSize() - 1, (a, b, c, top) -> Lambda.execIf(top, this::nextPage)));
 	}
 
 	public void prevPage() {

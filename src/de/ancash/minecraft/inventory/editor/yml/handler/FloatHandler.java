@@ -61,10 +61,8 @@ public class FloatHandler implements IValueHandler<Float> {
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
 		edit(editor.getYamlEditor(), editor, key, editor.getValueHandler(), editor.getId(),
-				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
-						32),
-				() -> get(editor.getCurrent(), key), d -> editor.getCurrent().set(key, d), editor::open,
-				() -> editor.getCurrent().remove(key));
+				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(), 32),
+				() -> get(editor.getCurrent(), key), d -> editor.getCurrent().set(key, d), editor::open, () -> editor.getCurrent().remove(key));
 	}
 
 	@Override
@@ -73,10 +71,10 @@ public class FloatHandler implements IValueHandler<Float> {
 	}
 
 	@Override
-	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
-			String title, Supplier<Float> valSup, Consumer<Float> onEdit, Runnable onBack, Runnable onDelete) {
-		DoubleEditor de = new DoubleEditor(id, title, parent, yfe, key, () -> valSup.get().doubleValue(),
-				d -> onEdit.accept(d.floatValue()), onBack, onDelete);
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title,
+			Supplier<Float> valSup, Consumer<Float> onEdit, Runnable onBack, Runnable onDelete) {
+		DoubleEditor de = new DoubleEditor(id, title, parent, yfe, key, () -> valSup.get().doubleValue(), d -> onEdit.accept(d.floatValue()), onBack,
+				onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> de.open(), 1);
 	}
 

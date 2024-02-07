@@ -40,8 +40,7 @@ public class ItemInputIGUI extends IGUI {
 
 	@Override
 	public void onInventoryDrag(InventoryDragEvent event) {
-		event.getRawSlots().stream()
-				.filter(raw -> raw < event.getInventory().getSize() && !slots.getInputSlots().contains(raw)).findAny()
+		event.getRawSlots().stream().filter(raw -> raw < event.getInventory().getSize() && !slots.getInputSlots().contains(raw)).findAny()
 				.ifPresent(raw -> event.setCancelled(true));
 	}
 

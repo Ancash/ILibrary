@@ -46,8 +46,7 @@ public class NumberInputGUI<T extends Number> implements INumberInput<T> {
 		this(plugin, player, clazz, onComplete, (t) -> Tuple.of(true, null));
 	}
 
-	public NumberInputGUI(JavaPlugin plugin, Player player, Class<T> clazz, Consumer<T> onComplete,
-			Function<T, Duplet<Boolean, String>> isValid) {
+	public NumberInputGUI(JavaPlugin plugin, Player player, Class<T> clazz, Consumer<T> onComplete, Function<T, Duplet<Boolean, String>> isValid) {
 		this.clazz = clazz;
 		this.isValid = isValid;
 		sig = new StringInputGUI(plugin, player);

@@ -45,8 +45,7 @@ public abstract class ValueEditor<T> extends IGUI {
 	protected int suggestionsPos = 0;
 	protected final List<ValueSuggestion<T>> suggestions;
 
-	public ValueEditor(UUID id, String title, int size, ValueEditor<?> parent, YamlEditor yeditor, String key,
-			Supplier<T> valSup, Runnable onBack) {
+	public ValueEditor(UUID id, String title, int size, ValueEditor<?> parent, YamlEditor yeditor, String key, Supplier<T> valSup, Runnable onBack) {
 		super(id, size, title);
 		this.settings = yeditor.getSettings();
 		this.key = key;
@@ -57,12 +56,10 @@ public abstract class ValueEditor<T> extends IGUI {
 		for (int i = 0; i < getSize(); i++)
 			setItem(settings.getBackgroundItem(), i);
 		if (onBack != null)
-			addInventoryItem(new InventoryItem(this, settings.getBackItem(), getSize() - 5,
-					(a, b, c, top) -> Lambda.execIf(top, this::back)));
+			addInventoryItem(new InventoryItem(this, settings.getBackItem(), getSize() - 5, (a, b, c, top) -> Lambda.execIf(top, this::back)));
 		if (!(this instanceof ConfigurationSectionEditor))
-			suggestions = yeditor.getValueSuggester().stream().map(ivs -> ivs.getValueSuggestions(this))
-					.filter(s -> s != null && !s.isEmpty()).flatMap(Set::stream)
-					.sorted((a, b) -> a.getAbbreviation().compareTo(b.getAbbreviation())).collect(Collectors.toList());
+			suggestions = yeditor.getValueSuggester().stream().map(ivs -> ivs.getValueSuggestions(this)).filter(s -> s != null && !s.isEmpty())
+					.flatMap(Set::stream).sorted((a, b) -> a.getAbbreviation().compareTo(b.getAbbreviation())).collect(Collectors.toList());
 		else
 			suggestions = new ArrayList<>();
 		open();
@@ -100,9 +97,9 @@ public abstract class ValueEditor<T> extends IGUI {
 		if (suggestions.isEmpty())
 			return;
 		StringBuilder lore = new StringBuilder();
-		lore.append("§7Value: ").append(valSup.get().toString()).append("\n").append("§eMouse wheel to select type")
-				.append("\n").append("§eShift click to skip 10").append("\n")
-				.append("§eRight/Left click to add property").append("\n").append("§eSuggestions:").append("\n");
+		lore.append("§7Value: ").append(valSup.get().toString()).append("\n").append("§eMouse wheel to select type").append("\n")
+				.append("§eShift click to skip 10").append("\n").append("§eRight/Left click to add property").append("\n").append("§eSuggestions:")
+				.append("\n");
 		StringBuilder sugs = new StringBuilder();
 		for (int i = suggestionsPos + suggestions.size() - 1; i >= suggestionsPos; i--) {
 			if (i == suggestionsPos) {
@@ -113,8 +110,7 @@ public abstract class ValueEditor<T> extends IGUI {
 			sugs.append(suggestions.get(i % suggestions.size()).getAbbreviation());
 		}
 		lore.append(sugs.toString().replaceFirst(", ", "").replaceAll("(.{1,140})\\s+", "$1\n"));
-		addInventoryItem(new InventoryItem(this,
-				new ItemBuilder(mat).setDisplayname("").setLore(lore.toString().split("\n")).build(), slot,
+		addInventoryItem(new InventoryItem(this, new ItemBuilder(mat).setDisplayname("").setLore(lore.toString().split("\n")).build(), slot,
 				(sl, shift, action, top) -> {
 					if (!top)
 						return;

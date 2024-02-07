@@ -32,9 +32,8 @@ public class ListEditor extends ValueEditor<List> {
 	protected final Runnable onDelete;
 	protected boolean finishedConstructor = false;
 
-	public ListEditor(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
-			String title, EditorSettings settings, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack,
-			Runnable onDelete) {
+	public ListEditor(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title,
+			EditorSettings settings, Supplier<List> valSup, Consumer<List> onEdit, Runnable onBack, Runnable onDelete) {
 		super(id, title, 36, parent, yfe, key, valSup, onBack);
 		finishedConstructor = true;
 		this.onEdit = onEdit;
@@ -50,11 +49,10 @@ public class ListEditor extends ValueEditor<List> {
 		if (!finishedConstructor)
 			return;
 		if (onDelete != null)
-			addInventoryItem(
-					new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
-						onDelete.run();
-						super.back();
-					})));
+			addInventoryItem(new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
+				onDelete.run();
+				super.back();
+			})));
 		addMainItem();
 		addInsertItem();
 		super.open();
@@ -79,13 +77,11 @@ public class ListEditor extends ValueEditor<List> {
 		if (l.size() <= elementPos)
 			return;
 		IValueHandler<?> ivh = yfe.getListHandler(this, l.get(elementPos));
-		ivh.uncheckedEdit(yfe, this, key, yfe.getValHandler(), getId(),
-				YamlEditor.cut(String.join(":", title, String.valueOf(elementPos)), 32), () -> l.get(elementPos), e -> {
+		ivh.uncheckedEdit(yfe, this, key, yfe.getValHandler(), getId(), YamlEditor.cut(String.join(":", title, String.valueOf(elementPos)), 32),
+				() -> l.get(elementPos), e -> {
 					l.set(elementPos, e);
 					onEdit.accept(l);
-				}, () -> ListHandler.INSTANCE.uncheckedEdit(yfe, this, key, handler, id, title, valSup, onEdit, onBack,
-						onDelete),
-				null);
+				}, () -> ListHandler.INSTANCE.uncheckedEdit(yfe, this, key, handler, id, title, valSup, onEdit, onBack, onDelete), null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -236,16 +232,15 @@ public class ListEditor extends ValueEditor<List> {
 	@Override
 	protected ItemStack getEditorItem() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("§eRight click to select element").append("\n").append("§eLeft click to edited selected element")
-				.append("\n").append("§eShift click to delete the selected element").append("\n").append("\n")
-				.append("§7Syntax: [{index}][{type}]={value}").append("\n");
+		builder.append("§eRight click to select element").append("\n").append("§eLeft click to edited selected element").append("\n")
+				.append("§eShift click to delete the selected element").append("\n").append("\n").append("§7Syntax: [{index}][{type}]={value}")
+				.append("\n");
 		for (int i = elementPos; i - elementPos < getList0().size(); i++) {
 			builder.append(ChatColor.WHITE.toString());
 			if (i == elementPos)
 				builder.append(">");
 			builder.append("[").append(i % getList0().size()).append("][")
-					.append(yfe.getListHandler(this, getList0().get(i % getList0().size())).getClazz().getSimpleName())
-					.append("]=");
+					.append(yfe.getListHandler(this, getList0().get(i % getList0().size())).getClazz().getSimpleName()).append("]=");
 			String s = getList0().get(i % getList0().size()).toString().replace("\n", "\\n");
 			builder.append("'").append(s).append("'").append('\n');
 		}

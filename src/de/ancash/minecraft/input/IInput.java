@@ -14,12 +14,10 @@ public interface IInput {
 
 	public IStringInput newStringInput(JavaPlugin pl, Player player, Consumer<String> onComplete);
 
-	public IStringInput newStringInput(JavaPlugin pl, Player player, Consumer<String> onComplete,
-			Function<String, Duplet<Boolean, String>> isValid);
+	public IStringInput newStringInput(JavaPlugin pl, Player player, Consumer<String> onComplete, Function<String, Duplet<Boolean, String>> isValid);
 
-	public <T extends Number> INumberInput<T> newNumberInput(JavaPlugin pl, Player player, Class<T> clazz,
-			Consumer<T> onComplete);
+	public <T extends Number> INumberInput<T> newNumberInput(JavaPlugin pl, Player player, Class<T> clazz, Consumer<T> onComplete);
 
-	public <T extends Number> INumberInput<T> newNumberInput(JavaPlugin plugin, Player player, Class<T> clazz,
-			Consumer<T> onComplete, Function<T, Duplet<Boolean, String>> isValid);
+	public <T extends Number> INumberInput<T> newNumberInput(JavaPlugin plugin, Player player, Class<T> clazz, Consumer<T> onComplete,
+			Function<T, Duplet<Boolean, String>> isValid);
 }

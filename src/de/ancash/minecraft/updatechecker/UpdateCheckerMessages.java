@@ -69,10 +69,8 @@ class UpdateCheckerMessages {
 
 		lines.add(String.format("There is a new version of %s available!", plugin.getName()));
 		lines.add(" ");
-		lines.add(String.format("Your version:   %s%s", instance.isColoredConsoleOutput() ? ChatColor.RED : "",
-				event.getUsedVersion()));
-		lines.add(String.format("Latest version: %s%s", instance.isColoredConsoleOutput() ? ChatColor.GREEN : "",
-				event.getLatestVersion()));
+		lines.add(String.format("Your version:   %s%s", instance.isColoredConsoleOutput() ? ChatColor.RED : "", event.getUsedVersion()));
+		lines.add(String.format("Latest version: %s%s", instance.isColoredConsoleOutput() ? ChatColor.GREEN : "", event.getLatestVersion()));
 
 		List<String> downloadLinks = instance.getAppropriateDownloadLinks();
 
@@ -95,22 +93,19 @@ class UpdateCheckerMessages {
 		printNiceBoxToConsole(plugin.getLogger(), lines);
 	}
 
-	protected static void printCheckResultToPlayer(Player player, boolean showMessageWhenLatestVersion,
-			UpdateChecker checker) {
+	protected static void printCheckResultToPlayer(Player player, boolean showMessageWhenLatestVersion, UpdateChecker checker) {
 		if (checker.getLastCheckResult() == UpdateCheckResult.NEW_VERSION_AVAILABLE) {
-			player.sendMessage(ChatColor.GRAY + "There is a new version of " + ChatColor.GOLD
-					+ checker.getPlugin().getName() + ChatColor.GRAY + " available.");
+			player.sendMessage(
+					ChatColor.GRAY + "There is a new version of " + ChatColor.GOLD + checker.getPlugin().getName() + ChatColor.GRAY + " available.");
 			sendLinks(checker, player);
-			player.sendMessage(ChatColor.DARK_GRAY + "Latest version: " + ChatColor.GREEN + checker.getLatestVersion()
-					+ ChatColor.DARK_GRAY + " | Your version: " + ChatColor.RED + checker.getUsedVersion());
+			player.sendMessage(ChatColor.DARK_GRAY + "Latest version: " + ChatColor.GREEN + checker.getLatestVersion() + ChatColor.DARK_GRAY
+					+ " | Your version: " + ChatColor.RED + checker.getUsedVersion());
 			player.sendMessage("");
 		} else if (checker.getLastCheckResult() == UpdateCheckResult.UNKNOWN) {
-			player.sendMessage(
-					ChatColor.GOLD + checker.getPlugin().getName() + ChatColor.RED + " could not check for updates.");
+			player.sendMessage(ChatColor.GOLD + checker.getPlugin().getName() + ChatColor.RED + " could not check for updates.");
 		} else {
 			if (showMessageWhenLatestVersion) {
-				player.sendMessage(ChatColor.GREEN + "You are running the latest version of " + ChatColor.GOLD
-						+ checker.getPlugin().getName());
+				player.sendMessage(ChatColor.GREEN + "You are running the latest version of " + ChatColor.GOLD + checker.getPlugin().getName());
 			}
 		}
 	}

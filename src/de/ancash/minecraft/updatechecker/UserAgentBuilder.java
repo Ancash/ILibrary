@@ -32,8 +32,7 @@ import org.bukkit.plugin.Plugin;
  */
 public class UserAgentBuilder {
 
-	private final StringBuilder builder = new StringBuilder("JEFF-Media-GbR-SpigotUpdateChecker/")
-			.append(UpdateChecker.VERSION);
+	private final StringBuilder builder = new StringBuilder("JEFF-Media-GbR-SpigotUpdateChecker/").append(UpdateChecker.VERSION);
 	private final UpdateChecker instance;
 	private final List<String> list = new ArrayList<>();
 	private final Plugin plugin;

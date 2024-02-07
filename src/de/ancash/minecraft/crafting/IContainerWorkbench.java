@@ -42,18 +42,15 @@ public abstract class IContainerWorkbench {
 
 	static {
 		try {
-			itemStackAsNMSCopyMethod = getCraftBukkitClass("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy",
-					ItemStack.class);
+			itemStackAsNMSCopyMethod = getCraftBukkitClass("inventory.CraftItemStack").getDeclaredMethod("asNMSCopy", ItemStack.class);
 			playerToEntityHumanMethod = getCraftBukkitClass("entity.CraftPlayer").getDeclaredMethod("getHandle");
 			if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_17_R1)) {
 				iRecipeToBukkitRecipeMethod = get(getNMSClass("IRecipe"), "toBukkitRecipe");
-				nmsItemStackAsBukkitCopy = get(getCraftBukkitClass("inventory.CraftItemStack"), "asBukkitCopy",
-						getNMSClass("ItemStack"));
+				nmsItemStackAsBukkitCopy = get(getCraftBukkitClass("inventory.CraftItemStack"), "asBukkitCopy", getNMSClass("ItemStack"));
 			} else if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_20_R2)) {
 				nmsItemStackAsBukkitCopy = get(getCraftBukkitClass("inventory.CraftItemStack"), "asBukkitCopy",
 						Class.forName("net.minecraft.world.item.ItemStack"));
-				iRecipeToBukkitRecipeMethod = get(Class.forName("net.minecraft.world.item.crafting.IRecipe"),
-						"toBukkitRecipe");
+				iRecipeToBukkitRecipeMethod = get(Class.forName("net.minecraft.world.item.crafting.IRecipe"), "toBukkitRecipe");
 			} else {
 				nmsItemStackAsBukkitCopy = get(getCraftBukkitClass("inventory.CraftItemStack"), "asBukkitCopy",
 						Class.forName("net.minecraft.world.item.ItemStack"));
@@ -73,11 +70,10 @@ public abstract class IContainerWorkbench {
 			th.printStackTrace();
 			if (params == null)
 				params = new Class[0];
-			System.err.println(
-					"could not find method " + method + " in " + clazz + " with params " + Arrays.asList(params));
-			Arrays.asList(clazz.getDeclaredMethods()).stream().map(m -> m.getName() + "("
-					+ Arrays.asList(m.getParameters()).stream().map(p -> p.getType()).collect(Collectors.toList())
-					+ ")\n").collect(Collectors.toList());
+			System.err.println("could not find method " + method + " in " + clazz + " with params " + Arrays.asList(params));
+			Arrays.asList(clazz.getDeclaredMethods()).stream().map(
+					m -> m.getName() + "(" + Arrays.asList(m.getParameters()).stream().map(p -> p.getType()).collect(Collectors.toList()) + ")\n")
+					.collect(Collectors.toList());
 			return null;
 		}
 	}
@@ -132,8 +128,7 @@ public abstract class IContainerWorkbench {
 		ItemStack result = craftRecipe0(getCurrentIRecipe());
 		if (result == null || result.getType() == Material.AIR)
 			return null;
-		ComplexRecipeWrapper complex = ComplexRecipeWrapper.newInstance(result,
-				ComplexRecipeType.matchType(getCurrentIRecipe(), result));
+		ComplexRecipeWrapper complex = ComplexRecipeWrapper.newInstance(result, ComplexRecipeType.matchType(getCurrentIRecipe(), result));
 		Duplet<String[], Map<Character, MaterialData>> duplet = mapIngredients(ingredients);
 		complex.shape(duplet.getFirst());
 		for (Entry<Character, MaterialData> entry : duplet.getSecond().entrySet())
@@ -192,14 +187,12 @@ public abstract class IContainerWorkbench {
 		return craftRecipeMethods.computeIfAbsent(clazz, key -> {
 			for (Method m : clazz.getDeclaredMethods()) {
 				if (m.getParameterCount() >= 1) {
-					if (m.getParameterCount() == 1
-							&& m.getParameters()[0].getType().getCanonicalName().contains("Inventory")
+					if (m.getParameterCount() == 1 && m.getParameters()[0].getType().getCanonicalName().contains("Inventory")
 							&& m.getReturnType().getCanonicalName().endsWith("ItemStack")) {
 						m.setAccessible(true);
 						return m;
 					}
-					if (m.getParameterCount() == 2
-							&& m.getParameters()[0].getType().getCanonicalName().contains("Inventory")
+					if (m.getParameterCount() == 2 && m.getParameters()[0].getType().getCanonicalName().contains("Inventory")
 							&& m.getParameters()[1].getType().getCanonicalName().contains("RegistryCustom")
 							&& m.getReturnType().getCanonicalName().endsWith("ItemStack")) {
 						m.setAccessible(true);
@@ -208,11 +201,9 @@ public abstract class IContainerWorkbench {
 				}
 			}
 
-			System.err
-					.println("could not craft complex recipe, available methods in " + clazz.getCanonicalName() + ":");
+			System.err.println("could not craft complex recipe, available methods in " + clazz.getCanonicalName() + ":");
 			System.err.println(Stream.of(clazz.getDeclaredMethods())
-					.map(m -> m.getName()
-							+ Stream.of(m.getParameters()).map(Parameter::getType).collect(Collectors.toList()))
+					.map(m -> m.getName() + Stream.of(m.getParameters()).map(Parameter::getType).collect(Collectors.toList()))
 					.collect(Collectors.toList()));
 			throw new IllegalArgumentException("Could not find craft method for: " + complexRecipe.getClass());
 		});

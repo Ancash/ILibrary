@@ -26,8 +26,7 @@ public class ComplexRecipeWrapper extends ShapedRecipe implements WrappedRecipe 
 		if (!USE_NAMESPACEDKEY)
 			return new ComplexRecipeWrapper(item, type);
 		return new ComplexRecipeWrapper(new NamespacedKey(ILibrary.getInstance(),
-				"complex-recipe-" + type.name().toLowerCase().replace("_", "-") + "-" + COUNTER.incrementAndGet()),
-				item, type);
+				"complex-recipe-" + type.name().toLowerCase().replace("_", "-") + "-" + COUNTER.incrementAndGet()), item, type);
 	}
 
 	protected final ComplexRecipeType type;
@@ -87,8 +86,8 @@ public class ComplexRecipeWrapper extends ShapedRecipe implements WrappedRecipe 
 			if (irecipe.getClass().getCanonicalName().contains("Repair"))
 				return REPAIR;
 
-			throw new IllegalArgumentException("Could not match complex recipe: \nresult name=" + name + "\nclass="
-					+ irecipe.getClass() + "\nsuper class=" + irecipe.getClass().getSuperclass());
+			throw new IllegalArgumentException("Could not match complex recipe: \nresult name=" + name + "\nclass=" + irecipe.getClass()
+					+ "\nsuper class=" + irecipe.getClass().getSuperclass());
 		}
 	}
 }

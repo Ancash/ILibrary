@@ -26,10 +26,9 @@ public enum InputType {
 
 	public IInput newInstance(Object... objs) {
 		try {
-			return clazz.getConstructor(Arrays.asList(objs).stream().map(Object::getClass).toArray(Class[]::new))
-					.newInstance(objs);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
+			return clazz.getConstructor(Arrays.asList(objs).stream().map(Object::getClass).toArray(Class[]::new)).newInstance(objs);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
 			throw new IllegalStateException(e);
 		}
 	}

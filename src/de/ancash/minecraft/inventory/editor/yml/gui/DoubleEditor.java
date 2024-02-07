@@ -25,20 +25,18 @@ public class DoubleEditor extends ValueEditor<Double> {
 	protected final Consumer<Double> onEdit;
 	protected final Runnable onDelete;
 
-	public DoubleEditor(UUID id, String title, ValueEditor<?> parent, YamlEditor yeditor, String key,
-			Supplier<Double> valSup, Consumer<Double> onEdit, Runnable onBack, Runnable onDelete) {
+	public DoubleEditor(UUID id, String title, ValueEditor<?> parent, YamlEditor yeditor, String key, Supplier<Double> valSup,
+			Consumer<Double> onEdit, Runnable onBack, Runnable onDelete) {
 		super(id, title, 36, parent, yeditor, key, valSup, onBack);
 		this.onDelete = onDelete;
 		this.onEdit = onEdit;
-		addInventoryItem(
-				new InventoryItem(this, getEditorItem(), 12, (a, b, c, top) -> Lambda.execIf(top, this::acceptInput)));
+		addInventoryItem(new InventoryItem(this, getEditorItem(), 12, (a, b, c, top) -> Lambda.execIf(top, this::acceptInput)));
 		addEditorItemWithSuggestions(14, XMaterial.CHEST);
 		if (onDelete != null)
-			addInventoryItem(
-					new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
-						onDelete.run();
-						super.back();
-					})));
+			addInventoryItem(new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
+				onDelete.run();
+				super.back();
+			})));
 	}
 
 	public ItemStack getEditorItem() {
@@ -53,15 +51,14 @@ public class DoubleEditor extends ValueEditor<Double> {
 	}
 
 	public void acceptInput() {
-		NumberInputGUI<Double> nig = new NumberInputGUI<>(ILibrary.getInstance(), Bukkit.getPlayer(getId()),
-				Double.class, s -> {
-					onEdit.accept(s);
-					Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> new DoubleEditor(getId(), title,
-							parent, yeditor, key, valSup, onEdit, onBack, onDelete), 1);
-				}, s -> {
-					Optional<String> o = yeditor.isValid(this, s);
-					return Tuple.of(!o.isPresent(), o.orElse(null));
-				});
+		NumberInputGUI<Double> nig = new NumberInputGUI<>(ILibrary.getInstance(), Bukkit.getPlayer(getId()), Double.class, s -> {
+			onEdit.accept(s);
+			Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(),
+					() -> new DoubleEditor(getId(), title, parent, yeditor, key, valSup, onEdit, onBack, onDelete), 1);
+		}, s -> {
+			Optional<String> o = yeditor.isValid(this, s);
+			return Tuple.of(!o.isPresent(), o.orElse(null));
+		});
 		nig.setLeft(XMaterial.DIRT.parseItem());
 		nig.setTitle(title);
 		nig.setText(valSup.get().toString());

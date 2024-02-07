@@ -18,6 +18,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.simpleyaml.configuration.ConfigurationSection;
 import org.simpleyaml.configuration.file.YamlFile;
+import org.simpleyaml.configuration.implementation.snakeyaml.SnakeYamlImplementation;
 
 import de.ancash.ILibrary;
 import de.ancash.minecraft.inventory.editor.yml.gui.ConfigurationSectionEditor;
@@ -42,10 +43,10 @@ public class YamlEditor {
 
 	public static final IHandlerMapper DEFAULT_HANDLER_MAPPER = new IHandlerMapper() {
 	};
-	private static final List<IValueHandler<?>> DEFAULT_VALUE_HANDLER = Collections.unmodifiableList(
-			Arrays.asList(ConfigurationSectionHandler.INSTANCE, MapHandler.INSTANCE, BooleanHandler.INSTANCE,
-					ByteHandler.INSTANCE, ShortHandler.INSTANCE, IntegerHandler.INSTANCE, LongHandler.INSTANCE,
-					FloatHandler.INSTANCE, DoubleHandler.INSTANCE, ListHandler.INSTANCE, StringHandler.INSTANCE));
+	private static final List<IValueHandler<?>> DEFAULT_VALUE_HANDLER = Collections
+			.unmodifiableList(Arrays.asList(ConfigurationSectionHandler.INSTANCE, MapHandler.INSTANCE, BooleanHandler.INSTANCE, ByteHandler.INSTANCE,
+					ShortHandler.INSTANCE, IntegerHandler.INSTANCE, LongHandler.INSTANCE, FloatHandler.INSTANCE, DoubleHandler.INSTANCE,
+					ListHandler.INSTANCE, StringHandler.INSTANCE));
 
 	public static List<IValueHandler<?>> getDefaultHandler() {
 		return Collections.unmodifiableList(DEFAULT_VALUE_HANDLER);
@@ -57,7 +58,7 @@ public class YamlEditor {
 
 	protected final File file;
 	protected final Player p;
-	protected final YamlFile yamlFile = new YamlFile();
+	protected final YamlFile yamlFile = new YamlFile(new SnakeYamlImplementation());
 	protected final String root;
 	protected final EditorSettings settings;
 	protected final ArrayList<IValueHandler<?>> handler;
@@ -70,14 +71,12 @@ public class YamlEditor {
 	protected IKeyValidator keyValidator;
 	protected IHandlerMapper handlerMapper = DEFAULT_HANDLER_MAPPER;
 
-	public YamlEditor(File file, Player p, Consumer<YamlEditor> onSave)
-			throws FileNotFoundException, IOException, InvalidConfigurationException {
+	public YamlEditor(File file, Player p, Consumer<YamlEditor> onSave) throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this(new EditorSettings() {
 		}, file, p, onSave);
 	}
 
-	public YamlEditor(String yaml, Player p, Consumer<YamlEditor> onSave)
-			throws FileNotFoundException, IOException, InvalidConfigurationException {
+	public YamlEditor(String yaml, Player p, Consumer<YamlEditor> onSave) throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this(new EditorSettings() {
 		}, yaml, p, onSave);
 	}
@@ -117,8 +116,8 @@ public class YamlEditor {
 	}
 
 	@SuppressWarnings("nls")
-	public YamlEditor(EditorSettings settings, File file, Player p, List<IValueHandler<?>> handler, String root,
-			Consumer<YamlEditor> onSave) throws FileNotFoundException, IOException, InvalidConfigurationException {
+	public YamlEditor(EditorSettings settings, File file, Player p, List<IValueHandler<?>> handler, String root, Consumer<YamlEditor> onSave)
+			throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this.file = file;
 		this.root = root;
 		this.p = p;
@@ -134,8 +133,8 @@ public class YamlEditor {
 	}
 
 	@SuppressWarnings("nls")
-	public YamlEditor(EditorSettings settings, String yaml, Player p, List<IValueHandler<?>> handler, String root,
-			Consumer<YamlEditor> onSave) throws FileNotFoundException, IOException, InvalidConfigurationException {
+	public YamlEditor(EditorSettings settings, String yaml, Player p, List<IValueHandler<?>> handler, String root, Consumer<YamlEditor> onSave)
+			throws FileNotFoundException, IOException, InvalidConfigurationException {
 		this.root = root;
 		this.p = p;
 		this.settings = settings;
@@ -148,8 +147,8 @@ public class YamlEditor {
 	}
 
 	public void open() {
-		ConfigurationSectionEditor editor = new ConfigurationSectionEditor(this, null, null, p,
-				yamlFile.getConfigurationSection(root), handler, null);
+		ConfigurationSectionEditor editor = new ConfigurationSectionEditor(this, null, null, p, yamlFile.getConfigurationSection(root), handler,
+				null);
 		editor.open();
 	}
 
@@ -223,8 +222,8 @@ public class YamlEditor {
 		IValueHandler<?> ivh = handlerMapper.getHandler(where, key);
 		if (ivh != null)
 			return ivh;
-		ILibrary.getInstance().getLogger().severe(
-				"No handler found for " + where.getCurrent().get(key).getClass() + ": " + where.getCurrent().get(key));
+		ILibrary.getInstance().getLogger()
+				.severe("No handler found for " + where.getCurrent().get(key).getClass() + ": " + where.getCurrent().get(key));
 		return null;
 	}
 
@@ -292,8 +291,7 @@ public class YamlEditor {
 	}
 
 	@SuppressWarnings("nls")
-	public static String createTitle(ConfigurationSection root, ConfigurationSection to, String key, Class<?> clazz,
-			int max) {
+	public static String createTitle(ConfigurationSection root, ConfigurationSection to, String key, Class<?> clazz, int max) {
 		return YamlEditor.cut(String.join(":", YamlEditor.createTitle(root, to, key), clazz.getSimpleName()), 32);
 	}
 

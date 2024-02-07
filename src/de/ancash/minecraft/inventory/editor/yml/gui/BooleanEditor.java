@@ -15,19 +15,17 @@ public class BooleanEditor extends ValueEditor<Boolean> {
 
 	protected final Runnable onToggle;
 
-	public BooleanEditor(UUID id, String title, ValueEditor<?> parent, YamlEditor yeditor, String key,
-			Runnable onToggle, Supplier<Boolean> valSup, Runnable onBack, Runnable onDelete) {
+	public BooleanEditor(UUID id, String title, ValueEditor<?> parent, YamlEditor yeditor, String key, Runnable onToggle, Supplier<Boolean> valSup,
+			Runnable onBack, Runnable onDelete) {
 		super(id, title, 36, parent, yeditor, key, valSup, onBack);
 		this.onToggle = onToggle;
-		addInventoryItem(
-				new InventoryItem(this, getEditorItem(), 12, (a, b, c, top) -> Lambda.execIf(top, this::toggle)));
+		addInventoryItem(new InventoryItem(this, getEditorItem(), 12, (a, b, c, top) -> Lambda.execIf(top, this::toggle)));
 		addEditorItemWithSuggestions(14, XMaterial.CHEST);
 		if (onDelete != null)
-			addInventoryItem(
-					new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
-						onDelete.run();
-						super.back();
-					})));
+			addInventoryItem(new InventoryItem(this, settings.deleteItem(), 35, (a, b, c, top) -> Lambda.execIf(top, () -> {
+				onDelete.run();
+				super.back();
+			})));
 	}
 
 	@Override
@@ -38,8 +36,7 @@ public class BooleanEditor extends ValueEditor<Boolean> {
 
 	public void toggle() {
 		onToggle.run();
-		addInventoryItem(new InventoryItem(this,
-				ItemStackUtils.setDisplayname(settings.getBooleanItem(), String.valueOf(valSup.get())), 12,
+		addInventoryItem(new InventoryItem(this, ItemStackUtils.setDisplayname(settings.getBooleanItem(), String.valueOf(valSup.get())), 12,
 				(a, b, c, top) -> Lambda.execIf(top, this::toggle)));
 	}
 

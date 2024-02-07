@@ -36,8 +36,7 @@ public class StringChatInput implements Listener, IStringInput {
 		this(pl, player, null, (a) -> Tuple.of(true, null));
 	}
 
-	public StringChatInput(JavaPlugin pl, Player player, Consumer<String> c,
-			Function<String, Duplet<Boolean, String>> isValid) {
+	public StringChatInput(JavaPlugin pl, Player player, Consumer<String> c, Function<String, Duplet<Boolean, String>> isValid) {
 		this.player = player;
 		this.pl = pl;
 		this.onComplete = c;

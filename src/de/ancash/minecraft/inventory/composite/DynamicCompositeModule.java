@@ -12,8 +12,8 @@ public class DynamicCompositeModule extends CompositeModule {
 
 	protected final int updateInterval;
 
-	public DynamicCompositeModule(CompositeGUI gui, ItemStack item, List<Integer> slots,
-			Consumer<Triplet<Integer, Boolean, InventoryAction>> onClick, int updateInterval) {
+	public DynamicCompositeModule(CompositeGUI gui, ItemStack item, List<Integer> slots, Consumer<Triplet<Integer, Boolean, InventoryAction>> onClick,
+			int updateInterval) {
 		super(gui, item, slots, onClick);
 		this.updateInterval = updateInterval;
 	}

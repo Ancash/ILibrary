@@ -25,12 +25,11 @@ public interface EditorSettings {
 	@SuppressWarnings("nls")
 	public default ItemStack getKeyValueItem(ConfigurationSection section, String key, IValueHandler<?> type) {
 		StringBuilder b = new StringBuilder();
-		b.append("§7Key: ").append(key).append("\n").append("§7Type: ").append(type.getClazz().getSimpleName())
-				.append("\n").append("§7Value:").append("\n");
+		b.append("§7Key: ").append(key).append("\n").append("§7Type: ").append(type.getClazz().getSimpleName()).append("\n").append("§7Value:")
+				.append("\n");
 		for (String s : type.valueToString(section, key).split("\n"))
 			b.append("§f").append(s).append("\n");
-		return new ItemBuilder(XMaterial.CHEST).setDisplayname(key)
-				.setLore(b.toString().substring(0, b.length() - 1).split("\n")).build();
+		return new ItemBuilder(XMaterial.CHEST).setDisplayname(key).setLore(b.toString().substring(0, b.length() - 1).split("\n")).build();
 	}
 
 	@SuppressWarnings("nls")
@@ -71,8 +70,7 @@ public interface EditorSettings {
 	@SuppressWarnings("nls")
 	public default ItemStack stringEditorSupplierItem() {
 		return new ItemBuilder(XMaterial.CHEST).setDisplayname("Add sections")
-				.setLore("§eRight click to insert section (up to 50 chars) before",
-						"§eLeft click to insert section (up to 50 chars) after",
+				.setLore("§eRight click to insert section (up to 50 chars) before", "§eLeft click to insert section (up to 50 chars) after",
 						"§eShift click to insert up to 256 chars after", "§eQ to insert up to 256 chars before")
 				.build();
 	}

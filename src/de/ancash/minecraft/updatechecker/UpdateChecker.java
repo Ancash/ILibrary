@@ -124,8 +124,7 @@ public class UpdateChecker {
 		case GITHUB_RELEASE_TAG:
 			String[] split = parameter.split("/");
 			if (split.length < 2) {
-				throw new IllegalArgumentException(
-						"Given GitHub repository must be in the format \"<UserOrOrganizationName>/<RepositoryName>\"");
+				throw new IllegalArgumentException("Given GitHub repository must be in the format \"<UserOrOrganizationName>/<RepositoryName>\"");
 			}
 			apiLink = String.format(GITHUB_RELEASE_API, split[0], split[1]);
 			mapper = VersionMapper.GITHUB_RELEASE_TAG;
@@ -210,8 +209,7 @@ public class UpdateChecker {
 		long ticks = ((int) seconds) * 20L;
 		stop();
 		if (ticks > 0) {
-			taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> checkNow(Bukkit.getConsoleSender()),
-					ticks, ticks);
+			taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> checkNow(Bukkit.getConsoleSender()), ticks, ticks);
 		} else {
 			taskId = -1;
 		}
@@ -248,8 +246,7 @@ public class UpdateChecker {
 		checkedAtLeastOnce = true;
 
 		if (userAgentString == null) {
-			userAgentString = new UserAgentBuilder(this).addPluginNameAndVersion().addServerVersion().addBukkitVersion()
-					.build();
+			userAgentString = new UserAgentBuilder(this).addPluginNameAndVersion().addServerVersion().addBukkitVersion().build();
 		}
 
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -347,15 +344,13 @@ public class UpdateChecker {
 	 * Checks that the class was properly relocated. Proudly stolen from bStats.org
 	 */
 	private static void checkRelocation() {
-		final String defaultPackageDe = new String(new byte[] { 'd', 'e', '.', 'j', 'e', 'f', 'f', '_', 'm', 'e', 'd',
-				'i', 'a', '.', 'u', 'p', 'd', 'a', 't', 'e', 'c', 'h', 'e', 'c', 'k', 'e', 'r' });
-		final String defaultPackageCom = new String(new byte[] { 'c', 'o', 'm', '.', 'j', 'e', 'f', 'f', '_', 'm', 'e',
-				'd', 'i', 'a', '.', 'u', 'p', 'd', 'a', 't', 'e', 'c', 'h', 'e', 'c', 'k', 'e', 'r' });
-		final String examplePackage = new String(
-				new byte[] { 'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e' });
+		final String defaultPackageDe = new String(new byte[] { 'd', 'e', '.', 'j', 'e', 'f', 'f', '_', 'm', 'e', 'd', 'i', 'a', '.', 'u', 'p', 'd',
+				'a', 't', 'e', 'c', 'h', 'e', 'c', 'k', 'e', 'r' });
+		final String defaultPackageCom = new String(new byte[] { 'c', 'o', 'm', '.', 'j', 'e', 'f', 'f', '_', 'm', 'e', 'd', 'i', 'a', '.', 'u', 'p',
+				'd', 'a', 't', 'e', 'c', 'h', 'e', 'c', 'k', 'e', 'r' });
+		final String examplePackage = new String(new byte[] { 'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e' });
 		String packageName = UpdateChecker.class.getPackage().getName();
-		if (packageName.startsWith(defaultPackageDe) || packageName.startsWith(defaultPackageCom)
-				|| packageName.startsWith(examplePackage)) {
+		if (packageName.startsWith(defaultPackageDe) || packageName.startsWith(defaultPackageCom) || packageName.startsWith(examplePackage)) {
 			throw new IllegalStateException(
 					"SpigotUpdateChecker class has not been relocated correctly! Check the GitHub's README.md for instructions.");
 		}

@@ -39,16 +39,15 @@ public interface IValueHandler<T> {
 	public Class<?> getClazz();
 
 	public default ItemStack getEditItem(ConfigurationSectionEditor editor, String key) {
-		return ItemStackUtils.setDisplayname(editor.getSettings().getKeyValueItem(editor.getCurrent(), key, this),
-				ChatColor.WHITE.toString() + key);
+		return ItemStackUtils.setDisplayname(editor.getSettings().getKeyValueItem(editor.getCurrent(), key, this), ChatColor.WHITE.toString() + key);
 	}
 
 	public void edit(ConfigurationSectionEditor editor, String key);
 
 	public String valueToString(ConfigurationSection section, String s);
 
-	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
-			String title, Supplier<T> valSup, Consumer<T> onEdit, Runnable onBack, Runnable onDelete);
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title, Supplier<T> valSup,
+			Consumer<T> onEdit, Runnable onBack, Runnable onDelete);
 
 	public T defaultValue();
 
@@ -57,9 +56,8 @@ public interface IValueHandler<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public default void uncheckedEdit(YamlEditor yfe, ValueEditor<?> parent, String key,
-			List<IValueHandler<?>> valHandler, UUID id, String title, Supplier<?> valSup, Consumer<?> onEdit,
-			Runnable onBack, Runnable onDelete) {
+	public default void uncheckedEdit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title,
+			Supplier<?> valSup, Consumer<?> onEdit, Runnable onBack, Runnable onDelete) {
 		edit(yfe, parent, key, valHandler, id, title, (Supplier<T>) valSup, (Consumer<T>) onEdit, onBack, onDelete);
 	}
 

@@ -28,8 +28,7 @@ import com.google.gson.JsonObject;
 interface VersionMapper {
 	ThrowingFunction<BufferedReader, String, IOException> TRIM_FIRST_LINE = reader -> reader.readLine().trim();
 
-	ThrowingFunction<BufferedReader, String, IOException> SPIGET = reader -> new Gson()
-			.fromJson(reader, JsonObject.class).get("name").getAsString();
+	ThrowingFunction<BufferedReader, String, IOException> SPIGET = reader -> new Gson().fromJson(reader, JsonObject.class).get("name").getAsString();
 
 	ThrowingFunction<BufferedReader, String, IOException> GITHUB_RELEASE_TAG = reader -> {
 		JsonArray array = new Gson().fromJson(reader, JsonArray.class);

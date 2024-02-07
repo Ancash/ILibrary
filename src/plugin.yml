@@ -1,9 +1,11 @@
 name: ILibrary
-version: 3.9.1
+version: 3.11.1
 main: de.ancash.ILibrary
 api-version: 1.13
 author: Ancash
 
 #commands:
+#   ms:
+#      usage: "asdas "
 #   fedit:
 #      usage: "§7/fedit <file>"

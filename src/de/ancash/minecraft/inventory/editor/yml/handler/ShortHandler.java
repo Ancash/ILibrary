@@ -59,19 +59,17 @@ public class ShortHandler implements IValueHandler<Short> {
 	}
 
 	@Override
-	public void uncheckedEdit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler,
-			UUID id, String title, Supplier<?> valSup, Consumer<?> onEdit, Runnable onBack, Runnable onDelete) {
-		IValueHandler.super.uncheckedEdit(yfe, parent, key, valHandler, id, title,
-				() -> ((Number) valSup.get()).shortValue(), onEdit, onBack, onDelete);
+	public void uncheckedEdit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title,
+			Supplier<?> valSup, Consumer<?> onEdit, Runnable onBack, Runnable onDelete) {
+		IValueHandler.super.uncheckedEdit(yfe, parent, key, valHandler, id, title, () -> ((Number) valSup.get()).shortValue(), onEdit, onBack,
+				onDelete);
 	}
 
 	@Override
 	public void edit(ConfigurationSectionEditor editor, String key) {
 		edit(editor.getYamlEditor(), editor, key, editor.getValueHandler(), editor.getId(),
-				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(),
-						32),
-				() -> get(editor.getCurrent(), key), l -> editor.getCurrent().set(key, l), editor::open,
-				() -> editor.getCurrent().remove(key));
+				YamlEditor.createTitle(editor.getRoot(), editor.getCurrent(), key, editor.getHandler(key).getClazz(), 32),
+				() -> get(editor.getCurrent(), key), l -> editor.getCurrent().set(key, l), editor::open, () -> editor.getCurrent().remove(key));
 	}
 
 	@Override
@@ -80,10 +78,10 @@ public class ShortHandler implements IValueHandler<Short> {
 	}
 
 	@Override
-	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id,
-			String title, Supplier<Short> valSup, Consumer<Short> onEdit, Runnable onBack, Runnable onDelete) {
-		LongEditor le = new LongEditor(id, title, parent, yfe, key, () -> valSup.get().longValue(),
-				l -> onEdit.accept(l.shortValue()), onBack, onDelete);
+	public void edit(YamlEditor yfe, ValueEditor<?> parent, String key, List<IValueHandler<?>> valHandler, UUID id, String title,
+			Supplier<Short> valSup, Consumer<Short> onEdit, Runnable onBack, Runnable onDelete) {
+		LongEditor le = new LongEditor(id, title, parent, yfe, key, () -> valSup.get().longValue(), l -> onEdit.accept(l.shortValue()), onBack,
+				onDelete);
 		Bukkit.getScheduler().runTaskLater(ILibrary.getInstance(), () -> le.open(), 1);
 	}
 

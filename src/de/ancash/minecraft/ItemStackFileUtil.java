@@ -29,17 +29,12 @@ public class ItemStackFileUtil {
 		GET_CONSUMERS.put("texture", (item, texture) -> ItemStackUtils.setTexture(item, (String) texture));
 
 		GET_CONSUMERS.put("meta.displayname", (item, name) -> ItemStackUtils.setDisplayname(item, (String) name));
-		GET_CONSUMERS
-				.put("meta.lore",
-						(item, lore) -> ItemStackUtils.setLore(((List<String>) lore).stream()
-								.map(s -> ChatColor.translateAlternateColorCodes('&', s)).collect(Collectors.toList()),
-								item));
-		GET_CONSUMERS.put("meta.enchantments",
-				(item, enchantments) -> ((List<String>) enchantments)
-						.forEach(ench -> item.addUnsafeEnchantment(Enchantment.getByName(ench.split(":")[0]),
-								Integer.valueOf(ench.split(":")[1]))));
-		GET_CONSUMERS.put("meta.flags", (item, flags) -> ((List<String>) flags).stream().map(ItemFlag::valueOf)
-				.forEach(flag -> ItemStackUtils.addItemFlag(item, flag)));
+		GET_CONSUMERS.put("meta.lore", (item, lore) -> ItemStackUtils
+				.setLore(((List<String>) lore).stream().map(s -> ChatColor.translateAlternateColorCodes('&', s)).collect(Collectors.toList()), item));
+		GET_CONSUMERS.put("meta.enchantments", (item, enchantments) -> ((List<String>) enchantments)
+				.forEach(ench -> item.addUnsafeEnchantment(Enchantment.getByName(ench.split(":")[0]), Integer.valueOf(ench.split(":")[1]))));
+		GET_CONSUMERS.put("meta.flags",
+				(item, flags) -> ((List<String>) flags).stream().map(ItemFlag::valueOf).forEach(flag -> ItemStackUtils.addItemFlag(item, flag)));
 	}
 
 	public static ItemStack getItemStack(FileConfiguration fc, String path) {
