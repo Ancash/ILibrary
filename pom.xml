@@ -1,8 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ancash</groupId>
 	<artifactId>ilibrary</artifactId>
-	<version>3.11.1</version>
+	<version>3.12.0</version>
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
@@ -21,7 +23,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.4.1</version>
+				<version>3.5.3</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -36,7 +38,8 @@
 								</relocation>
 								<relocation>
 									<pattern>com.cryptomorin.xseries</pattern>
-									<shadedPattern>de.ancash.minecraft.cryptomorin.xseries</shadedPattern>
+									<shadedPattern>
+										de.ancash.minecraft.cryptomorin.xseries</shadedPattern>
 								</relocation>
 								<relocation>
 									<pattern>de.tr7zw.nbtapi</pattern>
@@ -44,7 +47,8 @@
 								</relocation>
 								<relocation>
 									<pattern>de.tr7zw.nbtinjector</pattern>
-									<shadedPattern>de.ancash.minecraft.nbt.injector</shadedPattern>
+									<shadedPattern>
+										de.ancash.minecraft.nbt.injector</shadedPattern>
 								</relocation>
 							</relocations>
 							<filters>
@@ -53,14 +57,21 @@
 									<excludeDefaults>false</excludeDefaults>
 									<excludes>
 										<exclude>com/cryptomorin/xseries/XBiome*</exclude>
-										<exclude>com/cryptomorin/xseries/NMSExtras*</exclude>
-										<exclude>com/cryptomorin/xseries/NoteBlockMusic*</exclude>
+										<exclude>
+											com/cryptomorin/xseries/NMSExtras*</exclude>
+										<exclude>
+											com/cryptomorin/xseries/NoteBlockMusic*</exclude>
 										<exclude>com/cryptomorin/xseries/Skull*</exclude>
-										<exclude>com/cryptomorin/xseries/Reflection*</exclude>
-										<exclude>com/cryptomorin/xseries/XEntity*</exclude>
-										<exclude>com/cryptomorin/xseries/XItemStack*</exclude>
-										<exclude>com/cryptomorin/xseries/messages/*</exclude>
-										<exclude>com/cryptomorin/xseries/particles/*</exclude>
+										<exclude>
+											com/cryptomorin/xseries/Reflection*</exclude>
+										<exclude>
+											com/cryptomorin/xseries/XEntity*</exclude>
+										<exclude>
+											com/cryptomorin/xseries/XItemStack*</exclude>
+										<exclude>
+											com/cryptomorin/xseries/messages/*</exclude>
+										<exclude>
+											com/cryptomorin/xseries/particles/*</exclude>
 									</excludes>
 								</filter>
 							</filters>
@@ -72,12 +83,15 @@
 	</build>
 	<distributionManagement>
 		<repository>
-			<id>github</id>
-			<name>GitHub Ancash Apache Maven Packages</name>
-			<url>https://maven.pkg.github.com/Ancash/ILibrary</url>
+			<id>raspi</id>
+			<url>http://denzo.algoholics.eu:25565/releases</url>
 		</repository>
 	</distributionManagement>
 	<repositories>
+		<repository>
+			<id>redempt.dev</id>
+			<url>https://redempt.dev</url>
+		</repository>
 		<repository>
 			<id>dmulloy2-repo</id>
 			<url>https://repo.dmulloy2.net/repository/public/</url>
@@ -99,12 +113,16 @@
 			<url>https://repo.codemc.io/repository/maven-public/</url>
 			<layout>default</layout>
 		</repository>
+		<repository>
+			<id>raspi</id>
+			<url>http://denzo.algoholics.eu:25565/releases</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>de.tr7zw</groupId>
 			<artifactId>item-nbt-api-plugin</artifactId>
-			<version>2.12.3-SNAPSHOT</version>
+			<version>2.12.5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.comphenix.protocol</groupId>
@@ -115,12 +133,12 @@
 		<dependency>
 			<groupId>com.github.cryptomorin</groupId>
 			<artifactId>XSeries</artifactId>
-			<version>9.8.1</version>
+			<version>10.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.wesjd</groupId>
 			<artifactId>anvilgui</artifactId>
-			<version>1.9.2-SNAPSHOT</version>
+			<version>1.9.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mojang</groupId>
@@ -131,13 +149,18 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.20.2-R0.1-SNAPSHOT</version>
+			<version>1.20.6-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>de.ancash</groupId>
 			<artifactId>sockets</artifactId>
-			<version>0.0.9</version>
+			<version>0.0.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.Redempt</groupId>
+			<artifactId>Crunch</artifactId>
+			<version>2.0</version>
 		</dependency>
 	</dependencies>
 </project>

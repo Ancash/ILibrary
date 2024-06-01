@@ -25,6 +25,7 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 
 import de.tr7zw.nbtapi.utils.MinecraftVersion;
 import net.md_5.bungee.api.ChatColor;
@@ -54,56 +55,17 @@ public class ItemStackUtils {
 		return new String(b);
 	}
 
-	public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
-		try {
-			ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-			BukkitObjectOutputStream bukkitOut = new BukkitObjectOutputStream(byteOut);
-			bukkitOut.writeInt(items.length);
-			for (int i = 0; i < items.length; i++)
-				bukkitOut.writeObject(items[i]);
-			bukkitOut.close();
-			return Base64.getEncoder().encodeToString(byteOut.toByteArray());
-		} catch (Exception e) {
-			throw new IllegalStateException("Unable to save item stacks.", e);
-		}
-	}
-
-	public static String itemStackToString(ItemStack item) throws IOException {
-		File file = new File(System.nanoTime() + "");
-		try {
-			file.createNewFile();
-			YamlConfiguration fc = YamlConfiguration.loadConfiguration(file);
-			setItemStack(fc, "item", item);
-			return fc.saveToString();
-		} finally {
-			file.delete();
-		}
-	}
-
-	public static ItemStack[] itemStackArrayFromBase64(String data) throws IOException {
-		try {
-			ByteArrayInputStream byteIn = new ByteArrayInputStream(Base64.getDecoder().decode(data));
-			BukkitObjectInputStream bukkitIn = new BukkitObjectInputStream(byteIn);
-			ItemStack[] items = new ItemStack[bukkitIn.readInt()];
-
-			for (int i = 0; i < items.length; i++)
-				items[i] = (ItemStack) bukkitIn.readObject();
-
-			bukkitIn.close();
-			return items;
-		} catch (ClassNotFoundException e) {
-			throw new IOException("Unable to decode class type.", e);
-		}
-	}
-
 	public static ItemStack replacePlaceholder(ItemStack is, Map<String, String> placeholder) {
 		ItemMeta im = is.getItemMeta();
-		im.setLore(replacePlaceholder(im.getLore(), placeholder));
+		if(im.hasLore())
+			im.setLore(replacePlaceholder(im.getLore(), placeholder));
 		is.setItemMeta(im);
 		return is;
 	}
 
 	public static List<String> replacePlaceholder(List<String> toReplace, Map<String, String> placeholder) {
+		if(toReplace == null)
+			return null;
 		List<String> lore = new ArrayList<String>();
 		for (String str : toReplace) {
 			for (String place : placeholder.keySet())

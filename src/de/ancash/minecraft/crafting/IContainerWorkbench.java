@@ -23,7 +23,6 @@ import org.bukkit.material.MaterialData;
 
 import de.ancash.datastructures.tuples.Duplet;
 import de.ancash.datastructures.tuples.Tuple;
-import de.ancash.minecraft.IItemStack;
 import de.ancash.minecraft.crafting.recipe.ComplexRecipeWrapper;
 import de.ancash.minecraft.crafting.recipe.ComplexRecipeWrapper.ComplexRecipeType;
 import de.tr7zw.nbtapi.utils.MinecraftVersion;
@@ -96,14 +95,6 @@ public abstract class IContainerWorkbench {
 	}
 
 	public Recipe getRecipe(ItemStack[] ings) {
-		return getRecipe(ings, Stream.of(ings).map(i -> i != null ? i.hashCode() : null).collect(Collectors.toList()));
-	}
-
-	public Recipe getRecipe(IItemStack[] ings, List<Integer> key) {
-		return getRecipe(Stream.of(ings).map(i -> i != null ? i.getOriginal() : null).toArray(ItemStack[]::new), key);
-	}
-
-	public Recipe getRecipe(IItemStack[] ings) {
 		return getRecipe(ings, Stream.of(ings).map(i -> i != null ? i.hashCode() : null).collect(Collectors.toList()));
 	}
 

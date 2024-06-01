@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.ancash</groupId>
   <artifactId>ilibrary</artifactId>
-  <version>3.11.0</version>
+  <version>3.12.0</version>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
@@ -17,7 +17,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.4.1</version>
+        <version>3.5.3</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -68,6 +68,10 @@
   </build>
   <repositories>
     <repository>
+      <id>redempt.dev</id>
+      <url>https://redempt.dev</url>
+    </repository>
+    <repository>
       <id>dmulloy2-repo</id>
       <url>https://repo.dmulloy2.net/repository/public/</url>
     </repository>
@@ -87,6 +91,10 @@
       <id>codemc-repo</id>
       <url>https://repo.codemc.io/repository/maven-public/</url>
     </repository>
+    <repository>
+      <id>raspi</id>
+      <url>http://denzo.algoholics.eu:25565/releases</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -104,15 +112,14 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.20.2-R0.1-SNAPSHOT</version>
+      <version>1.20.6-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
   <distributionManagement>
     <repository>
-      <id>github</id>
-      <name>GitHub Ancash Apache Maven Packages</name>
-      <url>https://maven.pkg.github.com/Ancash/ILibrary</url>
+      <id>raspi</id>
+      <url>http://denzo.algoholics.eu:25565/releases</url>
     </repository>
   </distributionManagement>
   <properties>

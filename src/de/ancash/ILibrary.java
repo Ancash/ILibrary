@@ -14,9 +14,11 @@ import de.ancash.libs.org.bukkit.event.Order;
 import de.ancash.minecraft.DefaultCompositeModuleParser;
 import de.ancash.minecraft.crafting.ICraftingManager;
 import de.ancash.minecraft.inventory.IGUIManager;
+import de.ancash.minecraft.inventory.PickupItemListener;
 import de.ancash.minecraft.inventory.composite.CompositeModuleRegistry;
 import de.ancash.minecraft.updatechecker.UpdateCheckSource;
 import de.ancash.minecraft.updatechecker.UpdateChecker;
+import de.ancash.nbtnexus.NBTNexus;
 import de.ancash.sockets.async.impl.packet.client.AsyncPacketClientFactory;
 
 public class ILibrary extends JavaPlugin {
@@ -25,7 +27,8 @@ public class ILibrary extends JavaPlugin {
 
 	private static ILibrary plugin;
 	private static final AtomicInteger TICK = new AtomicInteger(0);
-
+	private NBTNexus nbtNexus;
+	
 	public ILibrary() {
 		plugin = this;
 	}
@@ -34,11 +37,12 @@ public class ILibrary extends JavaPlugin {
 	public void onEnable() {
 		Bukkit.getScheduler().runTaskTimer(plugin, () -> TICK.incrementAndGet(), 0, 1);
 //		getCommand("fedit").setExecutor(new FEditCommand());
-//		getCommand("ms").setExecutor(new MaterialSearchCommand());
 		ICraftingManager.getSingleton().init(this);
 		checkForUpdates();
 		Bukkit.getPluginManager().registerEvents(new IGUIManager(this), this);
+		Bukkit.getPluginManager().registerEvents(new PickupItemListener(), this);
 		CompositeModuleRegistry.register(this, new DefaultCompositeModuleParser());
+		nbtNexus =  new NBTNexus(this);
 	}
 
 	private final int SPIGOT_RESOURCE_ID = 89796;

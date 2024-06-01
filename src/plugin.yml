@@ -1,11 +1,14 @@
 name: ILibrary
-version: 3.11.1
+version: 3.12.0
 main: de.ancash.ILibrary
 api-version: 1.13
 author: Ancash
 
-#commands:
-#   ms:
-#      usage: "asdas "
+commands:
 #   fedit:
 #      usage: "§7/fedit <file>"
+   nbtn:
+      usage:
+      - "§7/nbtn edit (edit item in hand in gui)"
+      - "§7/nbtn s/ser/serialize (serialize item in hand to json & yaml)"
+      - "§7/nbtn tsdc (measures ser/de time)"
