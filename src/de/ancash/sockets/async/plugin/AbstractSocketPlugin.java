@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import de.ancash.ILibrary;
 import de.ancash.libs.org.bukkit.event.EventHandler;
 import de.ancash.libs.org.bukkit.event.EventManager;
+import de.ancash.libs.org.bukkit.event.HandlerList;
 import de.ancash.libs.org.bukkit.event.Listener;
 import de.ancash.sockets.async.client.AbstractAsyncClient;
 import de.ancash.sockets.async.impl.packet.client.AsyncPacketClient;
@@ -36,6 +37,7 @@ public abstract class AbstractSocketPlugin implements Listener {
 			chatClient = null;
 		}
 		try {
+			EventManager.registerEvents(this, this);
 			chatClient = ILibrary.ASYNC_CHAT_CLIENT_FACTORY.newInstance(address, port, 4 * 1024, 4 * 1024);
 		} catch (IOException e) {
 			logger.severe("Could not connect to " + address + ":" + port + ": " + e);
@@ -64,8 +66,10 @@ public abstract class AbstractSocketPlugin implements Listener {
 
 	@EventHandler
 	public void onClientDisconnect(ClientDisconnectEvent event) {
-		if (event.getClient() == null || chatClient == null || event.getClient().equals(chatClient))
+		if (event.getClient() == null || chatClient == null || event.getClient().equals(chatClient)) {
+			HandlerList.unregisterAll(this);
 			this.onClientDisconnect(event.getClient());
+		}
 	}
 
 	@EventHandler

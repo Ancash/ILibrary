@@ -92,6 +92,7 @@ import de.ancash.nbtnexus.serde.handler.TropicalFishBucketMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.UnspecificMetaSerDe;
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.NBTContainer;
+import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTType;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBTCompoundList;
@@ -251,9 +252,9 @@ public class ItemSerializer {
 					blacklisted.addAll(ims.getBlacklistedKeys());
 			}
 		}
-		ReadWriteNBT nbt = NBT.itemStackToNBT(is);
 
 		if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_20_R4)) {
+			ReadWriteNBT nbt = NBT.itemStackToNBT(is);
 			ReadWriteNBT components = nbt.getOrCreateCompound("components");
 			if (components.hasTag("minecraft:custom_data")) {
 				serializeReadWriteNBT(components.getCompound("minecraft:custom_data")).forEach(map::put);
@@ -263,7 +264,7 @@ public class ItemSerializer {
 				map.put(COMPONENTS, serializeReadWriteNBT(components));
 			}
 		} else
-			serializeReadWriteNBT(nbt).forEach(map::put);
+			serializeReadWriteNBT(new NBTItem(is)).forEach(map::put);
 
 		blacklisted.forEach(map::remove);
 		Map<String, Object> nexus = (Map<String, Object>) map.computeIfAbsent(NBTNexusItem.NBT_NEXUS_ITEM_PROPERTIES_TAG, k -> new HashMap<>());

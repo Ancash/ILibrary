@@ -2,12 +2,14 @@ package de.ancash.sockets.async.plugin;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.ancash.ILibrary;
 import de.ancash.libs.org.bukkit.event.EventHandler;
 import de.ancash.libs.org.bukkit.event.EventManager;
+import de.ancash.libs.org.bukkit.event.HandlerList;
 import de.ancash.libs.org.bukkit.event.Listener;
 import de.ancash.sockets.async.client.AbstractAsyncClient;
 import de.ancash.sockets.async.impl.packet.client.AsyncPacketClient;
@@ -19,13 +21,13 @@ import de.ancash.sockets.packet.PacketFuture;
 
 public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Listener {
 
+	static AtomicInteger cnt = new AtomicInteger();
+	
 	protected AsyncPacketClient chatClient;
-
-	public AbstractJavaSocketPlugin() {
-		EventManager.registerEvents(this, this);
-	}
-
+	private String ref;
+	
 	public synchronized void connect(String address, int port) {
+		
 		if (chatClient != null) {
 			try {
 				chatClient.onDisconnect(new IllegalStateException("Only one AsyncChatClient per plugin"));
@@ -34,6 +36,8 @@ public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Lis
 			chatClient = null;
 		}
 		try {
+			ref = "SocketPlugin: " + cnt.getAndIncrement();
+			EventManager.registerEvents(this, ref);
 			chatClient = ILibrary.ASYNC_CHAT_CLIENT_FACTORY.newInstance(address, port, 16 * 1024, 16 * 1024);
 		} catch (IOException e) {
 			getLogger().severe("Could not connect to " + address + ":" + port + ": " + e);
@@ -61,8 +65,10 @@ public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Lis
 
 	@EventHandler
 	public void onClientDisconnect(ClientDisconnectEvent event) {
-		if (event.getClient().equals(chatClient))
+		if (event.getClient().equals(chatClient)) {
+			HandlerList.unregisterAll(ref);
 			this.onClientDisconnect(event.getClient());
+		}
 	}
 
 	@EventHandler
