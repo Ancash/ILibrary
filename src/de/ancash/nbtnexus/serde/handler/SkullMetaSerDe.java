@@ -102,6 +102,7 @@ public class SkullMetaSerDe implements IItemSerDe {
 			map.put(GAME_PROFILE_PROPERTIES_TAG, ItemSerializer.INSTANCE.serialzePropertyMap(gp.getProperties()));
 			try {
 				gameProfileField.set(meta, null);
+				item.setItemMeta(meta);
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				throw new IllegalStateException(e);
 			}

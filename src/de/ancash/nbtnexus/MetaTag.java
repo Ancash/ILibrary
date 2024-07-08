@@ -45,6 +45,8 @@ public class MetaTag {
 
 	public static final String DAMAGEABLE_TAG = "Damageable";
 	public static final String DAMAGEABLE_DAMAGE_TAG = "Damage";
+	
+	public static final String OMINOUS_BOTTLE_AMPLIFIER_TAG = "Amplifier";
 
 	public static final String BOOK_PAGES_TAG = "Pages";
 	public static final String BOOK_AUTHOR_TAG = "Author";

@@ -61,6 +61,9 @@ public class ICraftingManager {
 			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_20_R4)) {
 				ContainerWorkbench_1_20_R4.initReflection();
 				clazz = ContainerWorkbench_1_20_R4.class;
+			} else if(MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_21_R1)) {
+				ContainerWorkbench_1_21_R1.initReflection();
+				clazz = ContainerWorkbench_1_21_R1.class;
 			} else {
 				throw new IllegalStateException("unsupported version " + MinecraftVersion.getVersion());
 			}

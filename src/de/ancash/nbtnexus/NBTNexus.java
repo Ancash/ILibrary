@@ -76,7 +76,13 @@ public class NBTNexus {
 //		}
 		structure.putEntry(AMOUNT_TAG, new SerDeStructureEntry(new SerDeStructureKeySuggestion<Byte>(NBTTag.BYTE, a -> a > 0 && a <= 64), null));
 		structure.putEntry(XMATERIAL_TAG, new SerDeStructureEntry(SerDeStructureKeySuggestion.forEnum(XMaterial.class), SerDeStructureValueSuggestion
-				.forEnum(Arrays.asList(XMaterial.VALUES).stream().filter(x -> x.isSupported() && x.parseItem() != null).toArray(XMaterial[]::new))));
+				.forEnum(Arrays.asList(XMaterial.VALUES).stream().filter(x -> {
+					try {
+						return x.isSupported() && x.parseItem() != null;
+					} catch(Throwable th) {
+						return false;
+					}
+				}).toArray(XMaterial[]::new))));
 		structure.putMap(NBTNexusItem.NBT_NEXUS_ITEM_PROPERTIES_TAG);
 		structure.putMap(MetaTag.COMPONENTS);
 		SerDeStructure props = structure.getMap(NBTNexusItem.NBT_NEXUS_ITEM_PROPERTIES_TAG);

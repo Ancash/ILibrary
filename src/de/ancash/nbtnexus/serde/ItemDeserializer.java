@@ -92,6 +92,7 @@ import de.ancash.nbtnexus.serde.handler.KnowledgeBookMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.LeatherArmorMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.MapMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.MusicInstrumentMetaSerDe;
+import de.ancash.nbtnexus.serde.handler.OminousBottleMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.PotionMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.RepairableMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.SkullMetaSerDe;
@@ -137,6 +138,7 @@ public class ItemDeserializer {
 		itemDeserializer.add(EnchantmentStorageMetaSerDe.INSTANCE);
 		itemDeserializer.add(CrossbowMetaSerDe.INSTANCE);
 		itemDeserializer.add(ArmorMetaSerDe.INSTANCE);
+		itemDeserializer.add(OminousBottleMetaSerDe.INSTANCE);
 	}
 
 	public void registerDeserializer(IItemSerDe des) {
@@ -233,7 +235,7 @@ public class ItemDeserializer {
 		Iterator<Entry<String, Object>> iter = map.entrySet().iterator();
 		Entry<String, Object> e = null;
 		Set<String> remove = new HashSet<>();
-		
+
 		while (iter.hasNext()) {
 			e = iter.next();
 			for (IItemSerDe itd : itemDeserializer)
@@ -247,18 +249,18 @@ public class ItemDeserializer {
 		}
 		remove.forEach(map::remove);
 		ReadWriteNBT nbt = NBT.itemStackToNBT(item);
-		if(!map.isEmpty()) {
+		if (!map.isEmpty()) {
 			ReadWriteNBT customData;
-			if(MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_20_R4)) {
+			if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_20_R4)) {
 				ReadWriteNBT components = nbt.getOrCreateCompound("components");
-				if(map.containsKey(MetaTag.COMPONENTS)) {
+				if (map.containsKey(MetaTag.COMPONENTS)) {
 					deserialize(components, (Map<String, Object>) map.remove(MetaTag.COMPONENTS));
 				}
 				customData = components.getOrCreateCompound("custom_data");
 			} else {
 				customData = nbt;
 			}
-			
+
 			deserialize(customData, map);
 		}
 		return NBT.itemStackFromNBT(nbt);
@@ -320,7 +322,7 @@ public class ItemDeserializer {
 
 	@SuppressWarnings({ "unchecked", "nls" })
 	private void deserialize0(ReadWriteNBT compound, Map<String, Object> map, String fullKey) {
-		if(map.get(fullKey) == null)
+		if (map.get(fullKey) == null)
 			return;
 		String[] keys = fullKey.split(SPLITTER_REGEX);
 		String field = keys[0];
@@ -361,7 +363,7 @@ public class ItemDeserializer {
 
 		if (keys.length == 2) {
 			if (tag == NBTTag.COMPOUND) {
-				if(((Map<String, Object>) map.get(fullKey)).isEmpty())
+				if (((Map<String, Object>) map.get(fullKey)).isEmpty())
 					return;
 				createNBTCompound(compound, (Map<String, Object>) map.get(fullKey), fullKey);
 			} else

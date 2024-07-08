@@ -83,6 +83,7 @@ import de.ancash.nbtnexus.serde.handler.KnowledgeBookMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.LeatherArmorMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.MapMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.MusicInstrumentMetaSerDe;
+import de.ancash.nbtnexus.serde.handler.OminousBottleMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.PotionMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.RepairableMetaSerDe;
 import de.ancash.nbtnexus.serde.handler.SkullMetaSerDe;
@@ -132,6 +133,7 @@ public class ItemSerializer {
 		itemSerDe.add(EnchantmentStorageMetaSerDe.INSTANCE);
 		itemSerDe.add(CrossbowMetaSerDe.INSTANCE);
 		itemSerDe.add(ArmorMetaSerDe.INSTANCE);
+		itemSerDe.add(OminousBottleMetaSerDe.INSTANCE);
 	}
 
 	public void registerSerializer(IItemSerDe ims) {
