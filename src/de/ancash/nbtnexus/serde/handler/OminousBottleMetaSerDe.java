@@ -44,7 +44,7 @@ public class OminousBottleMetaSerDe implements IItemSerDe {
 
 	@Override
 	public boolean isValid(ItemStack item) {
-		return MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_21_R1);
+		return MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_21_R1) && item.getItemMeta() instanceof OminousBottleMeta;
 	}
 
 	@Override
