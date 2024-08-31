@@ -1,6 +1,7 @@
 package de.ancash.nbtnexus.serde.structure;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,5 +52,9 @@ public class SerDeStructureEntry {
 
 	public static <T extends Enum<T>> SerDeStructureEntry forEnum(Class<T> clazz) {
 		return new SerDeStructureEntry(SerDeStructureKeySuggestion.forEnum(clazz), SerDeStructureValueSuggestion.forEnum(clazz));
+	}
+	
+	public static <T extends Enum<T>> SerDeStructureEntry forStringCollection(Collection<String> col) {
+		return new SerDeStructureEntry(SerDeStructureKeySuggestion.forStringCollection(col), SerDeStructureValueSuggestion.forStringCollection(col));
 	}
 }

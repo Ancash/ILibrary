@@ -11,7 +11,6 @@ import org.bukkit.command.CommandSender;
 
 import de.ancash.nbtnexus.NBTNexus;
 
-@SuppressWarnings("nls")
 public class NBTNexusCommand implements CommandExecutor {
 
 	private final NBTNexus plugin;

@@ -33,6 +33,11 @@ public class SerDeStructureValueSuggestion<T> {
 				.map(e -> new ValueSuggestion<>(StringHandler.INSTANCE, e.name(), e.name())).collect(Collectors.toList()));
 	}
 
+	public static SerDeStructureValueSuggestion<String> forStringCollection(Collection<String> coll) {
+		return new SerDeStructureValueSuggestion<String>(
+				coll.stream().map(e -> new ValueSuggestion<String>(StringHandler.INSTANCE, e, e)).collect(Collectors.toList()));
+	}
+
 	public static <T extends Enum<T>> SerDeStructureValueSuggestion<String> forEnum(T[] enums) {
 		return new SerDeStructureValueSuggestion<String>(Arrays.asList(enums).stream()
 				.map(e -> new ValueSuggestion<>(StringHandler.INSTANCE, e.name(), e.name())).collect(Collectors.toList()));

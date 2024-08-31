@@ -1,6 +1,7 @@
 package de.ancash.nbtnexus.serde.structure;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -59,6 +60,10 @@ public class SerDeStructureKeySuggestion<T> {
 				return false;
 			}
 		});
+	}
+	
+	public static <T extends Enum<T>> SerDeStructureKeySuggestion<String> forStringCollection(Collection<String> col) {
+		return new SerDeStructureKeySuggestion<String>(NBTTag.STRING, col::contains);
 	}
 
 	public static <T extends Keyed> SerDeStructureKeySuggestion<String> forRegistry(Registry<T> registry) {
