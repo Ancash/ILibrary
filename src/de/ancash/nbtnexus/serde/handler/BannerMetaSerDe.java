@@ -20,8 +20,8 @@ import de.ancash.nbtnexus.NBTTag;
 import de.ancash.nbtnexus.serde.IItemSerDe;
 import de.ancash.nbtnexus.serde.structure.SerDeStructure;
 import de.ancash.nbtnexus.serde.structure.SerDeStructureEntry;
-import de.tr7zw.nbtapi.utils.MinecraftVersion;
 
+@SuppressWarnings("unchecked")
 public class BannerMetaSerDe implements IItemSerDe {
 
 	public static final BannerMetaSerDe INSTANCE = new BannerMetaSerDe();
@@ -30,19 +30,8 @@ public class BannerMetaSerDe implements IItemSerDe {
 	static {
 		structure.putList(BANNER_PATTERNS_TAG, NBTTag.COMPOUND);
 		SerDeStructure pattern = structure.getList(BANNER_PATTERNS_TAG);
-		
-		try {
-			if(MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_21_R1)) {
-				
-			} else {
-				pattern.putEntry(BANNER_PATTERN_TYPE_TAG, SerDeStructureEntry.forEnum((Class<? extends Enum>) Class.forName("org.bukkit.block.banner.PatternType")));
-				pattern.putEntry(BANNER_PATTERN_COLOR_TAG, SerDeStructureEntry.forEnum(DyeColor.class));
-			}
-		} catch(Throwable th) {
-			throw new IllegalStateException(th);
-		}
-		
-		
+		pattern.putEntry(BANNER_PATTERN_TYPE_TAG, SerDeStructureEntry.forEnum(PatternType.class));
+		pattern.putEntry(BANNER_PATTERN_COLOR_TAG, SerDeStructureEntry.forEnum(DyeColor.class));
 	}
 
 	public SerDeStructure getStructure() {

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import de.ancash.minecraft.inventory.editor.yml.handler.StringHandler;
@@ -28,28 +29,39 @@ public class SerDeStructureValueSuggestion<T> {
 		return suggestions;
 	}
 
+	public static <T> SerDeStructureValueSuggestion<String> forCustomString(Collection<T> collection,
+			Function<T, String> suggestion, Function<T, String> abbreviation) {
+		return new SerDeStructureValueSuggestion<String>(collection.stream().map(
+				t -> new ValueSuggestion<String>(StringHandler.INSTANCE, suggestion.apply(t), abbreviation.apply(t)))
+				.collect(Collectors.toList()));
+	}
+
 	public static <T extends Enum<T>> SerDeStructureValueSuggestion<String> forEnum(Class<T> clazz) {
 		return new SerDeStructureValueSuggestion<String>(Arrays.asList(clazz.getEnumConstants()).stream()
-				.map(e -> new ValueSuggestion<>(StringHandler.INSTANCE, e.name(), e.name())).collect(Collectors.toList()));
+				.map(e -> new ValueSuggestion<>(StringHandler.INSTANCE, e.name(), e.name()))
+				.collect(Collectors.toList()));
 	}
 
 	public static SerDeStructureValueSuggestion<String> forStringCollection(Collection<String> coll) {
-		return new SerDeStructureValueSuggestion<String>(
-				coll.stream().map(e -> new ValueSuggestion<String>(StringHandler.INSTANCE, e, e)).collect(Collectors.toList()));
+		return new SerDeStructureValueSuggestion<String>(coll.stream()
+				.map(e -> new ValueSuggestion<String>(StringHandler.INSTANCE, e, e)).collect(Collectors.toList()));
 	}
 
 	public static <T extends Enum<T>> SerDeStructureValueSuggestion<String> forEnum(T[] enums) {
 		return new SerDeStructureValueSuggestion<String>(Arrays.asList(enums).stream()
-				.map(e -> new ValueSuggestion<>(StringHandler.INSTANCE, e.name(), e.name())).collect(Collectors.toList()));
+				.map(e -> new ValueSuggestion<>(StringHandler.INSTANCE, e.name(), e.name()))
+				.collect(Collectors.toList()));
 	}
 
 	public static <T extends Enum<T>> SerDeStructureValueSuggestion<String> forUUID() {
 		UUID rnd = UUID.randomUUID();
-		return new SerDeStructureValueSuggestion<String>(new ValueSuggestion<String>(StringHandler.INSTANCE, rnd.toString(), rnd.toString())) {
+		return new SerDeStructureValueSuggestion<String>(
+				new ValueSuggestion<String>(StringHandler.INSTANCE, rnd.toString(), rnd.toString())) {
 			@Override
 			public Set<ValueSuggestion<String>> getSuggestions() {
 				UUID u = UUID.randomUUID();
-				return new HashSet<>(Arrays.asList(new ValueSuggestion<String>(StringHandler.INSTANCE, u.toString(), u.toString())));
+				return new HashSet<>(
+						Arrays.asList(new ValueSuggestion<String>(StringHandler.INSTANCE, u.toString(), u.toString())));
 			}
 		};
 	}

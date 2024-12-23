@@ -23,7 +23,8 @@ public class ICraftingManager {
 
 	@SuppressWarnings("nls")
 	public void init(ILibrary il) {
-		il.getLogger().info("Init version specific " + getClass().getSimpleName() + " for " + MinecraftVersion.getVersion().name());
+		il.getLogger().info(
+				"Init version specific " + getClass().getSimpleName() + " for " + MinecraftVersion.getVersion().name());
 		try {
 			if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1)) {
 				ContainerWorkbench_1_8_1_13.initReflection();
@@ -61,14 +62,15 @@ public class ICraftingManager {
 			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_20_R4)) {
 				ContainerWorkbench_1_20_R4.initReflection();
 				clazz = ContainerWorkbench_1_20_R4.class;
-			} else if(MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_21_R1)) {
+			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_21_R1)) {
 				ContainerWorkbench_1_21_R1.initReflection();
 				clazz = ContainerWorkbench_1_21_R1.class;
 			} else {
-				throw new IllegalStateException("unsupported version " + MinecraftVersion.getVersion());
+				il.getLogger().severe(String.format("crafting not supported %s", MinecraftVersion.getVersion()));
+				return;
 			}
-		} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException | IllegalArgumentException
-				| IllegalAccessException e) {
+		} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
+				| IllegalArgumentException | IllegalAccessException e) {
 			il.getLogger().severe("Reflection failed:");
 			e.printStackTrace();
 		}
@@ -79,8 +81,8 @@ public class ICraftingManager {
 	public IContainerWorkbench newInstance(Player player) {
 		try {
 			return clazz.getDeclaredConstructor(Player.class).newInstance(player);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
-				| SecurityException e) {
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 			return null;
 		}

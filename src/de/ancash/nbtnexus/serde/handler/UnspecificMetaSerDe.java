@@ -34,13 +34,8 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.components.FoodComponent;
-import org.bukkit.inventory.meta.components.ToolComponent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import com.cryptomorin.xseries.XEnchantment;
-import com.cryptomorin.xseries.XMaterial;
 
 import de.ancash.nbtnexus.MetaTag;
 import de.ancash.nbtnexus.NBTTag;
@@ -50,7 +45,8 @@ import de.ancash.nbtnexus.serde.ItemSerializer;
 import de.ancash.nbtnexus.serde.access.SerializedMetaAccess;
 import de.ancash.nbtnexus.serde.structure.SerDeStructure;
 import de.ancash.nbtnexus.serde.structure.SerDeStructureEntry;
-import de.tr7zw.nbtapi.utils.MinecraftVersion;
+import de.ancash.nbtnexus.serde.structure.SerDeStructureKeySuggestion;
+import de.ancash.nbtnexus.serde.structure.SerDeStructureValueSuggestion;
 import net.md_5.bungee.api.ChatColor;
 
 public class UnspecificMetaSerDe extends SerializedMetaAccess implements IItemSerDe {
@@ -67,7 +63,11 @@ public class UnspecificMetaSerDe extends SerializedMetaAccess implements IItemSe
 		structure.putList(ITEM_FLAGS_TAG, NBTTag.STRING, SerDeStructureEntry.forEnum(ItemFlag.class));
 		SerDeStructure enchs = structure.getList(ENCHANTMENTS_TAG);
 		enchs.putEntry(ENCHANTMENT_LEVEL_TAG, SerDeStructureEntry.INT);
-		enchs.putEntry(ENCHANTMENT_TYPE_TAG, SerDeStructureEntry.forEnum(XEnchantment.class));
+		enchs.putEntry(ENCHANTMENT_TYPE_TAG, new SerDeStructureEntry(
+				SerDeStructureKeySuggestion.forStringCollection(XEnchantment.REGISTRY.getValues().stream()
+						.map(XEnchantment::name).collect(Collectors.toList())),
+				SerDeStructureValueSuggestion.forCustomString(XEnchantment.REGISTRY.getValues(),
+						XEnchantment::name, XEnchantment::name)));
 		structure.putList(ATTRIBUTES_TAG, NBTTag.COMPOUND);
 		SerDeStructure attr = structure.getList(ATTRIBUTES_TAG);
 		attr.putEntry(ATTRIBUTE_TYPE_TAG, SerDeStructureEntry.forEnum(Attribute.class));
@@ -141,44 +141,6 @@ public class UnspecificMetaSerDe extends SerializedMetaAccess implements IItemSe
 			}
 			map.put(ATTRIBUTES_TAG, attributes);
 			Arrays.stream(Attribute.values()).forEach(meta::removeAttributeModifier);
-		}
-
-		if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_20_R4)) {
-//			if (meta.hasFood()) {
-//				FoodComponent food = meta.getFood();
-//				meta.setFood(null);
-//
-//				Map<String, Object> foodMap = new HashMap<String, Object>();
-//				foodMap.put(MetaTag.POTION_EFFECTS_TAG, food.getEffects().stream().map(f -> {
-//					Map<String, Object> e = new HashMap<String, Object>();
-//					e.putAll(ItemSerializer.INSTANCE.serializePotionEffect(f.getEffect()));
-//					e.put(MetaTag.FOOD_EFFECT_PROBABILITY_TAG, f.getProbability());
-//					return e;
-//				}).collect(Collectors.toCollection(ArrayList::new)));
-//				foodMap.put(MetaTag.FOOD_NUTRITION_TAG, food.getNutrition());
-//				foodMap.put(MetaTag.FOOD_SATURATION_TAG, food.getSaturation());
-//				foodMap.put(MetaTag.FOOD_EAT_SECONDS_TAG, food.getEatSeconds());
-//				foodMap.put(MetaTag.FOOD_CAN_ALWAYS_EAT_TAG, food.canAlwaysEat());
-//				map.put(MetaTag.FOOD_COMPONENT_TAG, foodMap);
-//			}
-//
-//			if (meta.hasTool()) {
-//				ToolComponent tool = meta.getTool();
-//				meta.setTool(null);
-//
-//				Map<String, Object> toolMap = new HashMap<String, Object>();
-//				toolMap.put(MetaTag.TOOL_DEFAULT_MINING_SPEED_TAG, tool.getDefaultMiningSpeed());
-//				toolMap.put(MetaTag.TOOL_DAMAGE_PER_BLOCK_TAG, tool.getDamagePerBlock());
-//				toolMap.put(MetaTag.TOOL_RULES_TAG, tool.getRules().stream().map(r -> {
-//					Map<String, Object> rule = new HashMap<String, Object>();
-//					rule.put(MetaTag.TOOL_CORRECT_FOR_DROPS_TAG, r.isCorrectForDrops());
-//					rule.put(MetaTag.TOOL_RULE_SPEED_TAG, r.getSpeed());
-//					rule.put(MetaTag.TOOL_RULE_BLOCKS_TAG,
-//							r.getBlocks().stream().map(XMaterial::matchXMaterial).map(Enum::name).collect(Collectors.toList()));
-//					return rule;
-//				}).collect(Collectors.toList()));
-//				map.put(MetaTag.TOOL_COMPONENT_TAG, toolMap);
-//			}
 		}
 
 		item.setItemMeta(meta);

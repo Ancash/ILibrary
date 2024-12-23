@@ -20,14 +20,16 @@ public class SerDeStructureKeySuggestion<T> {
 	public static final SerDeStructureKeySuggestion<Float> FLOAT = new SerDeStructureKeySuggestion<>(NBTTag.FLOAT);
 	public static final SerDeStructureKeySuggestion<Double> DOUBLE = new SerDeStructureKeySuggestion<>(NBTTag.DOUBLE);
 	public static final SerDeStructureKeySuggestion<String> STRING = new SerDeStructureKeySuggestion<>(NBTTag.STRING);
-	public static final SerDeStructureKeySuggestion<Boolean> BOOLEAN = new SerDeStructureKeySuggestion<>(NBTTag.BOOLEAN);
-	public static final SerDeStructureKeySuggestion<String> UUID = new SerDeStructureKeySuggestion<String>(NBTTag.STRING, u -> {
-		try {
-			return java.util.UUID.fromString(u) != null;
-		} catch (Exception e) {
-			return false;
-		}
-	});
+	public static final SerDeStructureKeySuggestion<Boolean> BOOLEAN = new SerDeStructureKeySuggestion<>(
+			NBTTag.BOOLEAN);
+	public static final SerDeStructureKeySuggestion<String> UUID = new SerDeStructureKeySuggestion<String>(
+			NBTTag.STRING, u -> {
+				try {
+					return java.util.UUID.fromString(u) != null;
+				} catch (Exception e) {
+					return false;
+				}
+			});
 
 	protected final NBTTag type;
 	protected final Function<T, Boolean> validator;
@@ -61,7 +63,7 @@ public class SerDeStructureKeySuggestion<T> {
 			}
 		});
 	}
-	
+
 	public static <T extends Enum<T>> SerDeStructureKeySuggestion<String> forStringCollection(Collection<String> col) {
 		return new SerDeStructureKeySuggestion<String>(NBTTag.STRING, col::contains);
 	}
@@ -70,8 +72,8 @@ public class SerDeStructureKeySuggestion<T> {
 		return new SerDeStructureKeySuggestion<String>(NBTTag.STRING, s -> registry.match(s) != null);
 	}
 
-	@SuppressWarnings("nls")
 	public static String[] splitArray(Object[] o) {
-		return Arrays.asList(o).stream().collect(Collectors.toList()).toString().replaceAll("(.{1,150})\\s+", "$1\n").split("\n");
+		return Arrays.asList(o).stream().collect(Collectors.toList()).toString().replaceAll("(.{1,150})\\s+", "$1\n")
+				.split("\n");
 	}
 }
