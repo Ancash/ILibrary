@@ -208,7 +208,7 @@ public abstract class IGUI {
 		modules.values().stream().filter(IGUIModule::isEnabled).forEach(IGUIModule::disable);
 	}
 
-	protected void updateModules() {
+	public void updateModules() {
 		for (IGUIModule mod : modules.values()) {
 			if (!mod.isEnabled() && mod.canBeEnabled())
 				mod.enable();
