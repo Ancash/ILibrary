@@ -65,6 +65,9 @@ public class ICraftingManager {
 			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_21_R1)) {
 				ContainerWorkbench_1_21_R1.initReflection();
 				clazz = ContainerWorkbench_1_21_R1.class;
+			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_21_R2)) {
+				ContainerWorkbench_1_21_R2.initReflection();
+				clazz = ContainerWorkbench_1_21_R2.class;
 			} else {
 				il.getLogger().severe(String.format("crafting not supported %s", MinecraftVersion.getVersion()));
 				return;
