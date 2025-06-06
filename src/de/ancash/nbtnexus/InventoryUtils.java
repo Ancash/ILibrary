@@ -85,6 +85,13 @@ public class InventoryUtils {
 		return removeItemStack(player, SerializedItem.of(is), amount);
 	}
 
+	/**
+	 * 
+	 * @param player
+	 * @param si
+	 * @param amount
+	 * @return how many not removed
+	 */
 	public static int removeItemStack(Player player, SerializedItem si, int amount) {
 		ItemStack[] content = player.getInventory().getContents();
 		for (int s = 0; s < content.length; s++) {
