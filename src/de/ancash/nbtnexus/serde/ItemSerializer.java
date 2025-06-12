@@ -53,8 +53,10 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
 import org.simpleyaml.configuration.file.YamlFile;
@@ -177,7 +179,8 @@ public class ItemSerializer {
 	}
 
 	public List<Map<String, Object>> serializeEnchantments(Map<Enchantment, Integer> enchs) {
-		return enchs.entrySet().stream().map(entry -> ItemSerializer.INSTANCE.serializeEnchantment(entry.getKey(), entry.getValue()))
+		return enchs.entrySet().stream()
+				.map(entry -> ItemSerializer.INSTANCE.serializeEnchantment(entry.getKey(), entry.getValue()))
 				.collect(Collectors.toList());
 	}
 
@@ -217,9 +220,10 @@ public class ItemSerializer {
 		map.put(FIREWORK_EFFECT_TRAIL_TAG, effect.hasTrail());
 		map.put(FIREWORK_EFFECT_FLICKER_TAG, effect.hasFlicker());
 		map.put(FIREWORK_EFFECT_TYPE_TAG, effect.getType().name());
-		map.put(FIREWORK_EFFECT_COLORS_TAG, effect.getColors().stream().map(ItemSerializer.INSTANCE::serializeColor).collect(Collectors.toList()));
-		map.put(FIREWORK_EFFECT_FADE_COLORS_TAG,
-				effect.getFadeColors().stream().map(ItemSerializer.INSTANCE::serializeColor).collect(Collectors.toList()));
+		map.put(FIREWORK_EFFECT_COLORS_TAG,
+				effect.getColors().stream().map(ItemSerializer.INSTANCE::serializeColor).collect(Collectors.toList()));
+		map.put(FIREWORK_EFFECT_FADE_COLORS_TAG, effect.getFadeColors().stream()
+				.map(ItemSerializer.INSTANCE::serializeColor).collect(Collectors.toList()));
 		return map;
 	}
 
@@ -269,7 +273,8 @@ public class ItemSerializer {
 			serializeReadWriteNBT(new NBTItem(is)).forEach(map::put);
 
 		blacklisted.forEach(map::remove);
-		Map<String, Object> nexus = (Map<String, Object>) map.computeIfAbsent(NBTNexusItem.NBT_NEXUS_ITEM_PROPERTIES_TAG, k -> new HashMap<>());
+		Map<String, Object> nexus = (Map<String, Object>) map
+				.computeIfAbsent(NBTNexusItem.NBT_NEXUS_ITEM_PROPERTIES_TAG, k -> new HashMap<>());
 		nexus.computeIfAbsent(NBTNexusItem.NBT_NEXUS_ITEM_TYPE_TAG, k -> NBTNexusItem.Type.SERIALIZED.name());
 //		relocate(map, relocate);
 		return map;
@@ -334,6 +339,10 @@ public class ItemSerializer {
 		container.addCompound("temp").mergeCompound(nbt);
 		ItemStack item = null;
 		try {
+			if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_21_R1)
+					&& Registry.ITEM.get(NamespacedKey.fromString(nbt.getString("id"))) == null) {
+				return null;
+			}
 			item = container.getItemStack("temp");
 		} catch (Throwable th) {
 			return null;
@@ -354,7 +363,8 @@ public class ItemSerializer {
 		}
 		if (itemArr != null && itemArr.length > 0
 				&& Arrays.stream(itemArr).filter(i -> i != null && i.getType() != Material.AIR).findAny().isPresent())
-			map.put(key + SPLITTER + NBTTag.ITEM_STACK_ARRAY, Arrays.stream(itemArr).map(this::serializeItemStack).collect(Collectors.toList()));
+			map.put(key + SPLITTER + NBTTag.ITEM_STACK_ARRAY,
+					Arrays.stream(itemArr).map(this::serializeItemStack).collect(Collectors.toList()));
 		return itemArr != null;
 	}
 
@@ -419,7 +429,8 @@ public class ItemSerializer {
 				map.put(key + SPLITTER + ntype, byteList);
 				break;
 			case INT_ARRAY:
-				map.put(key + SPLITTER + ntype, Arrays.stream(nbt.getIntArray(key)).boxed().collect(Collectors.toList()));
+				map.put(key + SPLITTER + ntype,
+						Arrays.stream(nbt.getIntArray(key)).boxed().collect(Collectors.toList()));
 				break;
 			case LIST:
 				List<?> list = serializeNBTList(nbt, key + SPLITTER + ntype);
