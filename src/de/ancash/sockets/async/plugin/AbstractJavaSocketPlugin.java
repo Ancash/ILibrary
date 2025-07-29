@@ -49,11 +49,7 @@ public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Lis
 	}
 
 	public PacketFuture sendPacket(Packet packet, UUID uuid) {
-		try {
-			chatClient.write(packet);
-		} catch (InterruptedException e) {
-			return null;
-		}
+		chatClient.write(packet);
 		return new PacketFuture(packet, uuid);
 	}
 
