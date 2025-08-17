@@ -1,31 +1,26 @@
 package de.ancash.minecraft;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.properties.PropertyMap;
 
 import de.tr7zw.nbtapi.utils.MinecraftVersion;
 import net.md_5.bungee.api.ChatColor;
@@ -35,15 +30,47 @@ public class ItemStackUtils {
 
 	private static Field profileField;
 	private static Field gameProfileIdField;
+	private static Method resolveGameProfile;
+	private static Constructor<?> resolvableProfileConstructor;
 
 	static {
 		try {
 			gameProfileIdField = GameProfile.class.getDeclaredField("id");
 			gameProfileIdField.setAccessible(true);
-			profileField = ((SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta()).getClass().getDeclaredField("profile");
+			profileField = ((SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta()).getClass()
+					.getDeclaredField("profile");
 			profileField.setAccessible(true);
 		} catch (NoSuchFieldException | SecurityException e) {
 			e.printStackTrace();
+		}
+		findResolvableProfileToGameProfileMethod();
+		findResolvableProfileConstructor();
+	}
+
+	private static void findResolvableProfileConstructor() {
+		Class<?> clazz;
+		try {
+			clazz = Class.forName("net.minecraft.world.item.component.ResolvableProfile");
+			resolvableProfileConstructor = clazz.getDeclaredConstructor(GameProfile.class);
+		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+			return;
+		}
+	}
+	
+	static void findResolvableProfileToGameProfileMethod() {
+		Class<?> clazz;
+		try {
+			clazz = Class.forName("net.minecraft.world.item.component.ResolvableProfile");
+		} catch (ClassNotFoundException e) {
+			return;
+		}
+		for (Method m : clazz.getDeclaredMethods()) {
+			if (!Modifier.isStatic(m.getModifiers()) && m.getReturnType().equals(GameProfile.class)) {
+				resolveGameProfile = m;
+				System.out.println("found " + m.getDeclaringClass().getCanonicalName() + "#" + m.getName()
+						+ " to convert profiles");
+				break;
+			}
 		}
 	}
 
@@ -57,14 +84,14 @@ public class ItemStackUtils {
 
 	public static ItemStack replacePlaceholder(ItemStack is, Map<String, String> placeholder) {
 		ItemMeta im = is.getItemMeta();
-		if(im.hasLore())
+		if (im.hasLore())
 			im.setLore(replacePlaceholder(im.getLore(), placeholder));
 		is.setItemMeta(im);
 		return is;
 	}
 
 	public static List<String> replacePlaceholder(List<String> toReplace, Map<String, String> placeholder) {
-		if(toReplace == null)
+		if (toReplace == null)
 			return null;
 		List<String> lore = new ArrayList<String>();
 		for (String str : toReplace) {
@@ -89,7 +116,8 @@ public class ItemStackUtils {
 	}
 
 	public static String getDisplayName(ItemStack item) {
-		return !item.getItemMeta().hasDisplayName() ? XMaterial.matchXMaterial(item).toString() : item.getItemMeta().getDisplayName();
+		return !item.getItemMeta().hasDisplayName() ? XMaterial.matchXMaterial(item).toString()
+				: item.getItemMeta().getDisplayName();
 	}
 
 	public static ItemStack setDisplayname(ItemStack is, String str) {
@@ -143,7 +171,8 @@ public class ItemStackUtils {
 				String txt = null;
 				try {
 					txt = ItemStackUtils.getTexure(item);
-				} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+				} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
+						| InvocationTargetException e) {
 
 				}
 				SkullMeta sm = (SkullMeta) item.getItemMeta();
@@ -188,14 +217,16 @@ public class ItemStackUtils {
 			Field nameField = profile.getClass().getDeclaredField("name");
 			nameField.setAccessible(true);
 			nameField.set(profile, name);
-		} catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException e) {
+		} catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException | SecurityException
+				| InvocationTargetException e) {
 			e.printStackTrace();
 		}
 		is.setItemMeta(hm);
 		return is;
 	}
 
-	public static String getTexure(ItemStack is) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public static String getTexure(ItemStack is) throws NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		String texture = null;
 		GameProfile profile = getGameProfile(is);
 		Collection<Property> textures = profile.getProperties().get("textures");
@@ -204,34 +235,49 @@ public class ItemStackUtils {
 		return texture;
 	}
 
-	public static GameProfile getGameProfile(ItemStack is)
-			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public static GameProfile getGameProfile(ItemStack is) throws NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		return getGameProfile(is.getItemMeta());
 	}
 
-	public static GameProfile getGameProfile(ItemMeta im)
-			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-		return (GameProfile) profileField.get(im);
+	public static GameProfile getGameProfile(ItemMeta im) throws NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		Object o = profileField.get(im);
+		if (o == null) {
+			return null;
+		}
+		if (o.getClass().getName().equals("net.minecraft.world.item.component.ResolvableProfile")) {
+			return (GameProfile) resolveGameProfile.invoke(o);
+		}
+		return (GameProfile) o;
 	}
 
-	public static ItemStack setGameProfileId(ItemStack item, UUID id)
-			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public static ItemStack setGameProfileId(ItemStack item, UUID id) throws NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
 		item.setItemMeta(setGameProfileId(item.getItemMeta(), id));
 		return item;
 	}
 
-	public static ItemMeta setGameProfileId(ItemMeta im, UUID id)
-			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public static ItemMeta setGameProfileId(ItemMeta im, UUID id) throws NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
 		GameProfile gameProfile = getGameProfile(im);
 		gameProfileIdField.set(gameProfile, id);
-		profileField.set(im, gameProfile);
+		setGameProfile(im, gameProfile);
 		return im;
+	}
+	
+	public static void setGameProfile(ItemMeta im, GameProfile profile) throws IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException {
+		if(resolvableProfileConstructor != null) {
+			profileField.set(im, resolvableProfileConstructor.newInstance(profile));
+		} else {
+			profileField.set(im, profile);
+		}
 	}
 
 	public static ItemStack setTexture(ItemStack is, String texture) {
 		SkullMeta hm = (SkullMeta) is.getItemMeta();
-		GameProfile profile = AuthLibUtil.createGameProfile(texture != null ? new UUID(texture.hashCode(), texture.hashCode()) : UUID.randomUUID(),
-				null);
+		GameProfile profile = AuthLibUtil.createGameProfile(
+				texture != null ? new UUID(texture.hashCode(), texture.hashCode()) : UUID.randomUUID(), null);
 		profile.getProperties().put("textures", new Property("textures", texture));
 		try {
 			Field field = hm.getClass().getDeclaredField("profile");
