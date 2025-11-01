@@ -7,7 +7,10 @@ import static de.ancash.nbtnexus.MetaTag.GAME_PROFILE_TAG;
 import static de.ancash.nbtnexus.MetaTag.SKULL_NOTE_BLOCK_SOUND_TAG;
 import static de.ancash.nbtnexus.MetaTag.SKULL_TAG;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +24,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import com.mojang.authlib.GameProfile;
 import com.cryptomorin.xseries.XMaterial;
+import com.google.common.base.Optional;
 
 import de.ancash.minecraft.AuthLibUtil;
 import de.ancash.minecraft.ItemStackUtils;
@@ -40,8 +44,8 @@ import de.tr7zw.nbtapi.utils.MinecraftVersion;
 @SuppressWarnings({ "nls", "unchecked" })
 public class SkullMetaSerDe implements IItemSerDe {
 
-	public static final SkullMetaSerDe INSTANCE = new SkullMetaSerDe();
 	private static Field gameProfileField;
+	public static final SkullMetaSerDe INSTANCE = new SkullMetaSerDe();
 	private static final SerDeStructure structure = new SerDeStructure();
 
 	static {
@@ -55,8 +59,9 @@ public class SkullMetaSerDe implements IItemSerDe {
 		prop.putList("textures", NBTTag.COMPOUND);
 		SerDeStructure texture = prop.getList("textures");
 		texture.putEntry("Value", SerDeStructureEntry.STRING);
-		texture.putEntry("Name", new SerDeStructureEntry(SerDeStructureKeySuggestion.STRING,
-				new SerDeStructureValueSuggestion<String>(new ValueSuggestion<String>(StringHandler.INSTANCE, "textures", "textures"))));
+		texture.putEntry("Name",
+				new SerDeStructureEntry(SerDeStructureKeySuggestion.STRING, new SerDeStructureValueSuggestion<String>(
+						new ValueSuggestion<String>(StringHandler.INSTANCE, "textures", "textures"))));
 	}
 
 	public SerDeStructure getStructure() {
@@ -68,7 +73,8 @@ public class SkullMetaSerDe implements IItemSerDe {
 
 	static {
 		try {
-			gameProfileField = ((SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta()).getClass().getDeclaredField("profile");
+			gameProfileField = ((SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta()).getClass()
+					.getDeclaredField("profile");
 			gameProfileField.setAccessible(true);
 		} catch (NoSuchFieldException | SecurityException e) {
 			throw new IllegalStateException(e);
@@ -90,7 +96,8 @@ public class SkullMetaSerDe implements IItemSerDe {
 		GameProfile gp = null;
 		try {
 			gp = ItemStackUtils.getGameProfile(meta);
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
+				| InvocationTargetException e) {
 			throw new IllegalStateException(e);
 		}
 		if (gp != null) {
@@ -108,7 +115,8 @@ public class SkullMetaSerDe implements IItemSerDe {
 			}
 		}
 		if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_19_R2) && meta.getNoteBlockSound() != null) {
-			map.put(SKULL_NOTE_BLOCK_SOUND_TAG, ItemSerializer.INSTANCE.serializeNamespacedKey(meta.getNoteBlockSound()));
+			map.put(SKULL_NOTE_BLOCK_SOUND_TAG,
+					ItemSerializer.INSTANCE.serializeNamespacedKey(meta.getNoteBlockSound()));
 		}
 		return map;
 	}
@@ -130,23 +138,27 @@ public class SkullMetaSerDe implements IItemSerDe {
 			Map<String, Object> gps = (Map<String, Object>) map.get(GAME_PROFILE_TAG);
 			GameProfile gp = null;
 			if (gps.containsKey(GAME_PROFILE_ID_TAG))
-				gp = AuthLibUtil.createGameProfile(UUID.fromString((String) gps.get(GAME_PROFILE_ID_TAG)), (String) gps.get(GAME_PROFILE_NAME_TAG));
+				gp = AuthLibUtil.createGameProfile(UUID.fromString((String) gps.get(GAME_PROFILE_ID_TAG)),
+						(String) gps.get(GAME_PROFILE_NAME_TAG));
 			else
 				gp = AuthLibUtil.createGameProfile(null, (String) gps.get(GAME_PROFILE_NAME_TAG));
 
 			if (map.containsKey(GAME_PROFILE_PROPERTIES_TAG))
-				gp.getProperties()
-						.putAll(ItemDeserializer.INSTANCE.deserializePropertyMap((Map<String, Object>) map.get(GAME_PROFILE_PROPERTIES_TAG)));
+				gp.getProperties().putAll(ItemDeserializer.INSTANCE
+						.deserializePropertyMap((Map<String, Object>) map.get(GAME_PROFILE_PROPERTIES_TAG)));
 			try {
-				gameProfileField.set(meta, gp);
+				ItemStackUtils.setGameProfile(meta, gp);
+
 				if (gps.containsKey(GAME_PROFILE_ID_TAG))
 					ItemStackUtils.setGameProfileId(meta, UUID.fromString((String) gps.get(GAME_PROFILE_ID_TAG)));
-			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException
+					| InvocationTargetException | InstantiationException e) {
 				throw new IllegalStateException(e);
 			}
 		}
 		if (map.containsKey(SKULL_NOTE_BLOCK_SOUND_TAG))
-			meta.setNoteBlockSound(ItemDeserializer.INSTANCE.deserializeNamespacedKey((String) map.get(SKULL_NOTE_BLOCK_SOUND_TAG)));
+			meta.setNoteBlockSound(
+					ItemDeserializer.INSTANCE.deserializeNamespacedKey((String) map.get(SKULL_NOTE_BLOCK_SOUND_TAG)));
 		item.setItemMeta(meta);
 	}
 }
