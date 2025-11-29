@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ancash</groupId>
 	<artifactId>ilibrary</artifactId>
-	<version>3.13.3</version>
+	<version>3.14.0</version>
 	<properties>
 <maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
@@ -56,6 +56,8 @@
 									<artifact>*:*</artifact>
 									<excludeDefaults>false</excludeDefaults>
 									<excludes>
+										<exclude>io/netty/*</exclude>
+										<exclude>io/netty/**</exclude>
 										<exclude>com/cryptomorin/xseries/XBiome*</exclude>
 										<exclude>
 											com/cryptomorin/xseries/NMSExtras*</exclude>
@@ -155,7 +157,7 @@
 		<dependency>
 			<groupId>de.ancash</groupId>
 			<artifactId>sockets</artifactId>
-			<version>0.0.11</version>
+			<version>0.0.12</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.Redempt</groupId>
