@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import de.ancash.sockets.async.impl.packet.netty.NettyPacketClient;
+import de.ancash.sockets.async.impl.packet.client.netty.NettyPacketClient;
 import de.ancash.sockets.packet.Packet;
 import de.ancash.sockets.packet.PacketFuture;
 
@@ -18,7 +18,7 @@ public abstract class AbstractJavaNettyPlugin extends JavaPlugin {
 	public synchronized boolean connect(String address, int port) {
 
 		if (client != null) {
-			client.disconnect();
+			client.disconnect(new IllegalStateException());
 			client = null;
 		}
 		try {

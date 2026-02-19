@@ -21,11 +21,12 @@ public class ICraftingManager {
 
 	}
 
-	@SuppressWarnings("nls")
+	@SuppressWarnings({ "nls", "unchecked" })
 	public void init(ILibrary il) {
 		il.getLogger().info(
 				"Init version specific " + getClass().getSimpleName() + " for " + MinecraftVersion.getVersion().name());
 		try {
+
 			if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1)) {
 				ContainerWorkbench_1_8_1_13.initReflection();
 				clazz = ContainerWorkbench_1_8_1_13.class;
@@ -35,51 +36,13 @@ public class ICraftingManager {
 			} else if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_18_R1)) {
 				ContainerWorkbench_1_17.initReflection();
 				clazz = ContainerWorkbench_1_17.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_18_R1)) {
-				ContainerWorkbench_1_18_R1.initReflection();
-				clazz = ContainerWorkbench_1_18_R1.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_18_R2)) {
-				ContainerWorkbench_1_18_R2.initReflection();
-				clazz = ContainerWorkbench_1_18_R2.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_19_R1)) {
-				ContainerWorkbench_1_19_R1.initReflection();
-				clazz = ContainerWorkbench_1_19_R1.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_19_R2)) {
-				ContainerWorkbench_1_19_R2.initReflection();
-				clazz = ContainerWorkbench_1_19_R2.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_19_R3)) {
-				ContainerWorkbench_1_19_R3.initReflection();
-				clazz = ContainerWorkbench_1_19_R3.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_20_R1)) {
-				ContainerWorkbench_1_20_R1.initReflection();
-				clazz = ContainerWorkbench_1_20_R1.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_20_R2)) {
-				ContainerWorkbench_1_20_R2.initReflection();
-				clazz = ContainerWorkbench_1_20_R2.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_20_R3)) {
-				ContainerWorkbench_1_20_R3.initReflection();
-				clazz = ContainerWorkbench_1_20_R3.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_20_R4)) {
-				ContainerWorkbench_1_20_R4.initReflection();
-				clazz = ContainerWorkbench_1_20_R4.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_21_R1)) {
-				ContainerWorkbench_1_21_R1.initReflection();
-				clazz = ContainerWorkbench_1_21_R1.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_21_R2)) {
-				ContainerWorkbench_1_21_R2.initReflection();
-				clazz = ContainerWorkbench_1_21_R2.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_21_R3)) {
-				ContainerWorkbench_1_21_R3.initReflection();
-				clazz = ContainerWorkbench_1_21_R3.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_21_R4)) {
-				ContainerWorkbench_1_21_R4.initReflection();
-				clazz = ContainerWorkbench_1_21_R4.class;
-			} else if (MinecraftVersion.getVersion().equals(MinecraftVersion.MC1_21_R5)) {
-				ContainerWorkbench_1_21_R5.initReflection();
-				clazz = ContainerWorkbench_1_21_R5.class;
 			} else {
-				il.getLogger().severe(String.format("crafting not supported %s", MinecraftVersion.getVersion()));
-				return;
+				clazz = (Class<? extends IContainerWorkbench>) Class.forName(
+						"de.ancash.minecraft.crafting.ContainerWorkbench_" + MinecraftVersion.getVersion().toString());
+				if (clazz == null) {
+					il.getLogger().severe(String.format("crafting not supported %s", MinecraftVersion.getVersion()));
+					return;
+				}
 			}
 		} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
 				| IllegalArgumentException | IllegalAccessException e) {

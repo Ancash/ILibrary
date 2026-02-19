@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
-public class ContainerWorkbench_1_21_R2 extends IContainerWorkbench {
+public class ContainerWorkbench_MC1_21_R2 extends IContainerWorkbench {
 
 	private static Constructor<?> containerWorkbenchConstructor;
 	private static Constructor<?> blockPositionConstructor;
@@ -64,7 +64,7 @@ public class ContainerWorkbench_1_21_R2 extends IContainerWorkbench {
 	private final Player player;
 	private final Object inventoryCrafting;
 
-	ContainerWorkbench_1_21_R2(Player player) throws ClassNotFoundException {
+	ContainerWorkbench_MC1_21_R2(Player player) throws ClassNotFoundException {
 		try {
 			this.player = player;
 			Object nmsPlayer = playerToEntityHuman(player);

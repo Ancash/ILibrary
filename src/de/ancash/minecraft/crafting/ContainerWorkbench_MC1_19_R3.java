@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
-public class ContainerWorkbench_1_19_R1 extends IContainerWorkbench {
+public class ContainerWorkbench_MC1_19_R3 extends IContainerWorkbench {
 
 	private static Constructor<?> containerWorkbenchConstructor;
 	private static Constructor<?> blockPositionConstructor;
@@ -36,9 +36,9 @@ public class ContainerWorkbench_1_19_R1 extends IContainerWorkbench {
 				cac);
 		containerAccessMethod = cac.getDeclaredMethod("a", Class.forName("net.minecraft.world.level.World"), bpc);
 		Class<?> entityHuman = Class.forName("net.minecraft.world.entity.player.EntityHuman");
-		playerInventoryField = entityHuman.getDeclaredField("cp");
+		playerInventoryField = entityHuman.getDeclaredField("ck");
 		playerInventoryField.setAccessible(true);
-		worldField = Class.forName("net.minecraft.world.entity.Entity").getDeclaredField("s");
+		worldField = Class.forName("net.minecraft.world.entity.Entity").getDeclaredField("H");
 		worldField.setAccessible(true);
 
 		setItemMethod = icc.getDeclaredMethod("a", int.class, Class.forName("net.minecraft.world.item.ItemStack"));
@@ -60,7 +60,7 @@ public class ContainerWorkbench_1_19_R1 extends IContainerWorkbench {
 	private final Player player;
 	private final Object inventoryCrafting;
 
-	ContainerWorkbench_1_19_R1(Player player) throws ClassNotFoundException {
+	ContainerWorkbench_MC1_19_R3(Player player) throws ClassNotFoundException {
 		try {
 			this.player = player;
 			Object nmsPlayer = playerToEntityHuman(player);

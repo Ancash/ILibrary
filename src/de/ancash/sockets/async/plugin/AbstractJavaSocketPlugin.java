@@ -11,11 +11,11 @@ import de.ancash.libs.org.bukkit.event.EventHandler;
 import de.ancash.libs.org.bukkit.event.EventManager;
 import de.ancash.libs.org.bukkit.event.HandlerList;
 import de.ancash.libs.org.bukkit.event.Listener;
-import de.ancash.sockets.async.client.AbstractAsyncClient;
 import de.ancash.sockets.async.impl.packet.client.AsyncPacketClient;
 import de.ancash.sockets.events.ClientConnectEvent;
 import de.ancash.sockets.events.ClientDisconnectEvent;
 import de.ancash.sockets.events.ClientPacketReceiveEvent;
+import de.ancash.sockets.io.ITCPClient;
 import de.ancash.sockets.packet.Packet;
 import de.ancash.sockets.packet.PacketFuture;
 
@@ -30,7 +30,7 @@ public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Lis
 		
 		if (chatClient != null) {
 			try {
-				chatClient.onDisconnect(new IllegalStateException("Only one AsyncChatClient per plugin"));
+				chatClient.disconnect(new IllegalStateException("Only one AsyncChatClient per plugin"));
 			} catch (Exception ex) {
 			}
 			chatClient = null;
@@ -73,9 +73,9 @@ public abstract class AbstractJavaSocketPlugin extends JavaPlugin implements Lis
 			this.onClientConnect(event.getClient());
 	}
 
-	public abstract void onClientDisconnect(AbstractAsyncClient client);
+	public abstract void onClientDisconnect(ITCPClient client);
 
-	public abstract void onClientConnect(AbstractAsyncClient client);
+	public abstract void onClientConnect(ITCPClient client);
 
 	public abstract void onPacketReceive(Packet packet);
 }

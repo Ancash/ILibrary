@@ -4,12 +4,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Random;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
-public class ContainerWorkbench_1_20_R4 extends IContainerWorkbench {
+public class ContainerWorkbench_MC1_19_R2 extends IContainerWorkbench {
 
 	private static Constructor<?> containerWorkbenchConstructor;
 	private static Constructor<?> blockPositionConstructor;
@@ -18,52 +19,48 @@ public class ContainerWorkbench_1_20_R4 extends IContainerWorkbench {
 	private static Field worldField;
 
 	private static Field inventoryCraftingField;
-	private static Field recipeHolderField;
-	private static Method toBukkitRecipe;
-	private static Field currentIRecipe;
+	private static Field getCurrentIRecipeField;
 	private static Method setItemMethod;
 	private static Method getItemMethod;
+	private static Random r;
 
-	@SuppressWarnings("nls")
 	static void initReflection() throws ClassNotFoundException, NoSuchFieldException, SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException {
+		r = new Random();
 		Class<?> bpc = Class.forName("net.minecraft.core.BlockPosition");
 		Class<?> cac = Class.forName("net.minecraft.world.inventory.ContainerAccess");
 		Class<?> cwc = Class.forName("net.minecraft.world.inventory.ContainerWorkbench");
-		Class<?> tcc = Class.forName("net.minecraft.world.inventory.TransientCraftingContainer");
-		Class<?> iic = Class.forName("net.minecraft.world.IInventory");
+		Class<?> icc = Class.forName("net.minecraft.world.inventory.InventoryCrafting");
 		blockPositionConstructor = bpc.getDeclaredConstructor(int.class, int.class, int.class);
 		containerWorkbenchConstructor = cwc.getDeclaredConstructor(int.class, Class.forName("net.minecraft.world.entity.player.PlayerInventory"),
 				cac);
 		containerAccessMethod = cac.getDeclaredMethod("a", Class.forName("net.minecraft.world.level.World"), bpc);
 		Class<?> entityHuman = Class.forName("net.minecraft.world.entity.player.EntityHuman");
-		playerInventoryField = entityHuman.getDeclaredField("cm");
+		playerInventoryField = entityHuman.getDeclaredField("co");
 		playerInventoryField.setAccessible(true);
-		worldField = Class.forName("net.minecraft.world.entity.Entity").getDeclaredField("t");
+		worldField = Class.forName("net.minecraft.world.entity.Entity").getDeclaredField("s");
 		worldField.setAccessible(true);
 
-		setItemMethod = iic.getDeclaredMethod("a", int.class, Class.forName("net.minecraft.world.item.ItemStack"));
-		getItemMethod = iic.getDeclaredMethod("a", int.class);
+		setItemMethod = icc.getDeclaredMethod("a", int.class, Class.forName("net.minecraft.world.item.ItemStack"));
+		getItemMethod = icc.getDeclaredMethod("a", int.class);
 
-		inventoryCraftingField = ReflectionUtil.findField(cwc, tcc);
+		Class<?> containerWorkbench = cwc;
+		inventoryCraftingField = containerWorkbench.getDeclaredField("r");
+		inventoryCraftingField.setAccessible(true);
 
-		recipeHolderField = tcc.getDeclaredField("currentRecipe");
-		recipeHolderField.setAccessible(true);
-		Class<?> recipeHolder = Class.forName("net.minecraft.world.item.crafting.RecipeHolder");
-		toBukkitRecipe = recipeHolder.getDeclaredMethod("toBukkitRecipe");
-		currentIRecipe = recipeHolder.getDeclaredField("b");
-		currentIRecipe.setAccessible(true);
+		getCurrentIRecipeField = icc.getDeclaredField("currentRecipe");
+		getCurrentIRecipeField.setAccessible(true);
 	}
 
 	private static Object newBlockPosition()
 			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		return blockPositionConstructor.newInstance(0, 0, 0);
+		return blockPositionConstructor.newInstance(r.nextInt(10000) - 5000, r.nextInt(255), r.nextInt(10000) - 5000);
 	}
 
 	private final Player player;
 	private final Object inventoryCrafting;
 
-	ContainerWorkbench_1_20_R4(Player player) throws ClassNotFoundException {
+	ContainerWorkbench_MC1_19_R2(Player player) throws ClassNotFoundException {
 		try {
 			this.player = player;
 			Object nmsPlayer = playerToEntityHuman(player);
@@ -89,10 +86,10 @@ public class ContainerWorkbench_1_20_R4 extends IContainerWorkbench {
 	@Override
 	public Recipe getCurrentRecipe() {
 		try {
-			Object ir = getCurrentRecipeHolder();
+			Object ir = getCurrentIRecipe();
 			if (ir == null)
 				return null;
-			return (Recipe) toBukkitRecipe.invoke(ir);
+			return (Recipe) iRecipeToBukkitRecipeMethod.invoke(ir);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 			return null;
@@ -118,19 +115,10 @@ public class ContainerWorkbench_1_20_R4 extends IContainerWorkbench {
 		}
 	}
 
-	public Object getCurrentRecipeHolder() {
-		try {
-			return recipeHolderField.get(inventoryCrafting);
-		} catch (IllegalArgumentException | IllegalAccessException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
 	@Override
 	public Object getCurrentIRecipe() {
 		try {
-			return currentIRecipe.get(getCurrentRecipeHolder());
+			return getCurrentIRecipeField.get(inventoryCrafting);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 			return null;

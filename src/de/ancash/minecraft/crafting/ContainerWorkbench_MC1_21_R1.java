@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
-public class ContainerWorkbench_1_20_R1 extends IContainerWorkbench {
+public class ContainerWorkbench_MC1_21_R1 extends IContainerWorkbench {
 
 	private static Constructor<?> containerWorkbenchConstructor;
 	private static Constructor<?> blockPositionConstructor;
@@ -18,7 +18,9 @@ public class ContainerWorkbench_1_20_R1 extends IContainerWorkbench {
 	private static Field worldField;
 
 	private static Field inventoryCraftingField;
-	private static Field getCurrentIRecipeField;
+	private static Field recipeHolderField;
+	private static Method toBukkitRecipe;
+	private static Field currentIRecipe;
 	private static Method setItemMethod;
 	private static Method getItemMethod;
 
@@ -35,7 +37,7 @@ public class ContainerWorkbench_1_20_R1 extends IContainerWorkbench {
 				cac);
 		containerAccessMethod = cac.getDeclaredMethod("a", Class.forName("net.minecraft.world.level.World"), bpc);
 		Class<?> entityHuman = Class.forName("net.minecraft.world.entity.player.EntityHuman");
-		playerInventoryField = entityHuman.getDeclaredField("cl");
+		playerInventoryField = entityHuman.getDeclaredField("cm");
 		playerInventoryField.setAccessible(true);
 		worldField = Class.forName("net.minecraft.world.entity.Entity").getDeclaredField("t");
 		worldField.setAccessible(true);
@@ -45,8 +47,12 @@ public class ContainerWorkbench_1_20_R1 extends IContainerWorkbench {
 
 		inventoryCraftingField = ReflectionUtil.findField(cwc, tcc);
 
-		getCurrentIRecipeField = tcc.getDeclaredField("currentRecipe");
-		getCurrentIRecipeField.setAccessible(true);
+		recipeHolderField = tcc.getDeclaredField("currentRecipe");
+		recipeHolderField.setAccessible(true);
+		Class<?> recipeHolder = Class.forName("net.minecraft.world.item.crafting.RecipeHolder");
+		toBukkitRecipe = recipeHolder.getDeclaredMethod("toBukkitRecipe");
+		currentIRecipe = recipeHolder.getDeclaredField("b");
+		currentIRecipe.setAccessible(true);
 	}
 
 	private static Object newBlockPosition()
@@ -57,7 +63,7 @@ public class ContainerWorkbench_1_20_R1 extends IContainerWorkbench {
 	private final Player player;
 	private final Object inventoryCrafting;
 
-	ContainerWorkbench_1_20_R1(Player player) throws ClassNotFoundException {
+	ContainerWorkbench_MC1_21_R1(Player player) throws ClassNotFoundException {
 		try {
 			this.player = player;
 			Object nmsPlayer = playerToEntityHuman(player);
@@ -83,10 +89,10 @@ public class ContainerWorkbench_1_20_R1 extends IContainerWorkbench {
 	@Override
 	public Recipe getCurrentRecipe() {
 		try {
-			Object ir = getCurrentIRecipe();
+			Object ir = getCurrentRecipeHolder();
 			if (ir == null)
 				return null;
-			return (Recipe) iRecipeToBukkitRecipeMethod.invoke(ir);
+			return (Recipe) toBukkitRecipe.invoke(ir);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 			return null;
@@ -112,10 +118,19 @@ public class ContainerWorkbench_1_20_R1 extends IContainerWorkbench {
 		}
 	}
 
+	public Object getCurrentRecipeHolder() {
+		try {
+			return recipeHolderField.get(inventoryCrafting);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	@Override
 	public Object getCurrentIRecipe() {
 		try {
-			return getCurrentIRecipeField.get(inventoryCrafting);
+			return currentIRecipe.get(getCurrentRecipeHolder());
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 			return null;

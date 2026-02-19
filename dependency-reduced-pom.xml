@@ -90,6 +90,10 @@
       <url>https://repo.codemc.io/repository/maven-snapshots/</url>
     </repository>
     <repository>
+      <id>mvn-wesjd-net</id>
+      <url>https://mvn.wesjd.net/</url>
+    </repository>
+    <repository>
       <id>codemc-repo</id>
       <url>https://repo.codemc.io/repository/maven-public/</url>
     </repository>
