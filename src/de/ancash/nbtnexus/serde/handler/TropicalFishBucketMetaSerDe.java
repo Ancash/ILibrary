@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.DyeColor;
+import org.bukkit.entity.TropicalFish;
 import org.bukkit.entity.TropicalFish.Pattern;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.TropicalFishBucketMeta;
@@ -24,10 +25,21 @@ public class TropicalFishBucketMetaSerDe implements IItemSerDe {
 	public static final TropicalFishBucketMetaSerDe INSTANCE = new TropicalFishBucketMetaSerDe();
 	private static final SerDeStructure structure = new SerDeStructure();
 
+	private static final String PATTERN_CLAZZ = "org.bukkit.entity.TropicalFish$Pattern";
+	
 	static {
-		structure.putEntry(TROPICAL_FISH_BUCKET_BODY_COLOR_TAG, SerDeStructureEntry.forEnum(DyeColor.class));
-		structure.putEntry(TROPICAL_FISH_BUCKET_PATTERN_COLOR_TAG, SerDeStructureEntry.forEnum(DyeColor.class));
-		structure.putEntry(TROPICAL_FISH_BUCKET_PATTERN_TAG, SerDeStructureEntry.forEnum(Pattern.class));
+		try {
+			Class.forName(PATTERN_CLAZZ);
+			structure.putEntry(TROPICAL_FISH_BUCKET_BODY_COLOR_TAG, SerDeStructureEntry.forEnum(DyeColor.class));
+			structure.putEntry(TROPICAL_FISH_BUCKET_PATTERN_COLOR_TAG, SerDeStructureEntry.forEnum(DyeColor.class));
+			structure.putEntry(TROPICAL_FISH_BUCKET_PATTERN_TAG, SerDeStructureEntry.forEnum(Pattern.class));
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			System.err.println(PATTERN_CLAZZ + " not found -> no TropicalFishBucket support");
+			System.out.println(TropicalFish.class);
+			System.out.println(TropicalFish.Pattern.class);
+		}
+
 	}
 
 	public SerDeStructure getStructure() {

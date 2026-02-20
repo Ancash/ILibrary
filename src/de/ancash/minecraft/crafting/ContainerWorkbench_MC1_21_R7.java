@@ -24,7 +24,6 @@ public class ContainerWorkbench_MC1_21_R7 extends IContainerWorkbench {
 	private static Method setItemMethod;
 	private static Method getItemMethod;
 
-	@SuppressWarnings("nls")
 	static void initReflection() throws ClassNotFoundException, NoSuchFieldException, SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException {
 		Class<?> bpc = Class.forName("net.minecraft.core.BlockPos");
@@ -38,9 +37,9 @@ public class ContainerWorkbench_MC1_21_R7 extends IContainerWorkbench {
 				containerLevelAccess);
 		containerAccessMethod = containerLevelAccess.getDeclaredMethod("create", Class.forName("net.minecraft.world.level.Level"), bpc);
 		Class<?> entityHuman = Class.forName("net.minecraft.world.entity.player.Player");
-		playerInventoryField = entityHuman.getDeclaredField("cQ");
+		playerInventoryField = entityHuman.getDeclaredField("cE");
 		playerInventoryField.setAccessible(true);
-		worldField = Class.forName("net.minecraft.world.entity.Entity").getDeclaredField("aT");
+		worldField = Class.forName("net.minecraft.world.entity.Entity").getDeclaredField("aU");
 		worldField.setAccessible(true);
 
 		setItemMethod = iic.getDeclaredMethod("setItem", int.class, Class.forName("net.minecraft.world.item.ItemStack"));

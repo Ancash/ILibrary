@@ -48,7 +48,7 @@ public class SuspiciousStewMetaSerDe implements IItemSerDe {
 		effects.putEntry(POTION_EFFECT_DURATION_TAG, SerDeStructureEntry.INT);
 		effects.putEntry(POTION_EFFECT_TYPE_TAG,
 				new SerDeStructureEntry(new SerDeStructureKeySuggestion<String>(NBTTag.STRING, s -> PotionEffectType.getByName(s) != null),
-						new SerDeStructureValueSuggestion<>(Arrays.asList(PotionEffectType.values()).stream()
+						new SerDeStructureValueSuggestion<>(Arrays.asList(PotionEffectType.values()).stream().filter(p -> p != null)
 								.map(pet -> new ValueSuggestion<>(StringHandler.INSTANCE, pet.getName(), pet.getName()))
 								.collect(Collectors.toList()))));
 		effects.putEntry(POTION_EFFECT_SHOW_ICON_TAG, SerDeStructureEntry.BOOLEAN);

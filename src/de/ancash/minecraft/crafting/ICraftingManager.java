@@ -21,7 +21,7 @@ public class ICraftingManager {
 
 	}
 
-	@SuppressWarnings({ "nls", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	public void init(ILibrary il) {
 		il.getLogger().info(
 				"Init version specific " + getClass().getSimpleName() + " for " + MinecraftVersion.getVersion().name());
@@ -43,9 +43,10 @@ public class ICraftingManager {
 					il.getLogger().severe(String.format("crafting not supported %s", MinecraftVersion.getVersion()));
 					return;
 				}
+				clazz.getDeclaredMethod("initReflection").invoke(null);
 			}
 		} catch (ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException
-				| IllegalArgumentException | IllegalAccessException e) {
+				| IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			il.getLogger().severe("Reflection failed:");
 			e.printStackTrace();
 		}
@@ -56,8 +57,7 @@ public class ICraftingManager {
 	public IContainerWorkbench newInstance(Player player) {
 		try {
 			return clazz.getDeclaredConstructor(Player.class).newInstance(player);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			return null;
 		}
