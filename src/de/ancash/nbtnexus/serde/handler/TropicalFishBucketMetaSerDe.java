@@ -36,8 +36,6 @@ public class TropicalFishBucketMetaSerDe implements IItemSerDe {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			System.err.println(PATTERN_CLAZZ + " not found -> no TropicalFishBucket support");
-			System.out.println(TropicalFish.class);
-			System.out.println(TropicalFish.Pattern.class);
 		}
 
 	}
