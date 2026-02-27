@@ -1,13 +1,19 @@
 package de.ancash.minecraft;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 
 import de.ancash.misc.ConversionUtil;
 
@@ -23,8 +29,40 @@ public class AuthLibUtil {
 	private static Field gameProfileUUIDField;
 	private static Field gameProfileNameField;
 	private static boolean requireAllGameProfileArgumentsNotNull;
+	private static Function<Multimap<String, Property>, PropertyMap> propertyMapConstructor;
+	private static PropertyMap emptyPropertyMap;
 
 	static {
+
+		try {
+			Constructor<PropertyMap> c1 = PropertyMap.class.getConstructor(Multimap.class);
+			propertyMapConstructor = map -> {
+				try {
+					return c1.newInstance(map);
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException e) {
+					throw new IllegalStateException(e);
+				}
+			};
+			System.out.println("using immutable multi map constructor for property map");
+		} catch (NoSuchMethodException | SecurityException e) {
+			try {
+				Constructor<PropertyMap> c2 = PropertyMap.class.getConstructor();
+				propertyMapConstructor = map -> {
+					try {
+						PropertyMap pm = c2.newInstance();
+						pm.putAll(map);
+						return pm;
+					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+							| InvocationTargetException e1) {
+						throw new IllegalStateException(e1);
+					}
+				};
+			} catch (NoSuchMethodException | SecurityException e1) {
+				throw new IllegalStateException(e1);
+			}
+
+		}
 
 		for (Method m : Property.class.getDeclaredMethods()) {
 			if (m.getName().equals("name") || m.getName().equals("getName"))
@@ -49,17 +87,25 @@ public class AuthLibUtil {
 		} catch (Throwable th) {
 			requireAllGameProfileArgumentsNotNull = true;
 		}
+		
+		emptyPropertyMap = propertyMapConstructor.apply(ImmutableMultimap.of());
 	}
 
-	public static GameProfile createGameProfile(UUID id, String name) {
+	public static GameProfile createGameProfile(UUID id, String name, PropertyMap pm) {
 		GameProfile dummy = new GameProfile(dummyUUID, dummyName);
 		try {
 			gameProfileUUIDField.set(dummy, id);
-			gameProfileNameField.set(dummy, Optional.ofNullable(name).orElse(requireAllGameProfileArgumentsNotNull ? "" : null));
+			gameProfileNameField.set(dummy,
+					Optional.ofNullable(name).orElse(requireAllGameProfileArgumentsNotNull ? "" : null));
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			throw new IllegalStateException(e);
+			return new GameProfile(id, name);
 		}
+		dummy.getProperties().putAll(pm);
 		return dummy;
+	}
+	
+	public static PropertyMap createPropertyMap(Multimap<String, Property> map) {
+		return propertyMapConstructor.apply(map);
 	}
 
 	public static String getPropertyName(Property p) {

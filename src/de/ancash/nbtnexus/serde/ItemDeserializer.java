@@ -31,6 +31,8 @@ import static de.ancash.nbtnexus.MetaTag.XMATERIAL_TAG;
 import static de.ancash.nbtnexus.NBTNexus.SPLITTER_REGEX;
 
 import java.io.StringReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -67,6 +69,9 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableMultimap.Builder;
+import com.google.common.collect.Multimap;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 
@@ -112,6 +117,16 @@ import de.tr7zw.nbtapi.utils.MinecraftVersion;
 public class ItemDeserializer {
 
 	public static final ItemDeserializer INSTANCE = new ItemDeserializer();
+	private static Constructor<PropertyMap> propertyMapConstructor;
+
+	static {
+		try {
+			propertyMapConstructor = PropertyMap.class.getConstructor(Multimap.class);
+			System.out.println("using immutable multi map constructor for property map");
+		} catch (NoSuchMethodException | SecurityException e) {
+			
+		}
+	}
 
 	private final Set<IItemSerDe> itemDeserializer = new HashSet<>();
 
@@ -154,7 +169,8 @@ public class ItemDeserializer {
 	}
 
 	public Map<Enchantment, Integer> deserializeEnchantments(List<Map<String, Object>> enchs) {
-		return enchs.stream().map(this::deserializeEnchantment).collect(Collectors.toMap(d -> d.getFirst(), d -> d.getSecond()));
+		return enchs.stream().map(this::deserializeEnchantment)
+				.collect(Collectors.toMap(d -> d.getFirst(), d -> d.getSecond()));
 	}
 
 	public Duplet<Enchantment, Integer> deserializeEnchantment(Map<String, Object> ench) {
@@ -179,25 +195,44 @@ public class ItemDeserializer {
 
 	@SuppressWarnings("unchecked")
 	public PropertyMap deserializePropertyMap(Map<String, Object> map) {
-		PropertyMap pm = new PropertyMap();
-		for (Entry<String, Object> e : map.entrySet())
-			pm.putAll(e.getKey(), ((List<Map<String, Object>>) e.getValue()).stream().map(this::deserializeProperty).collect(Collectors.toList()));
-		return pm;
+		PropertyMap pm;
+
+		if (propertyMapConstructor == null) {
+			pm = new PropertyMap();
+			for (Entry<String, Object> e : map.entrySet()) {
+				pm.putAll(e.getKey(), ((List<Map<String, Object>>) e.getValue()).stream().map(this::deserializeProperty)
+						.collect(Collectors.toList()));
+			}
+			return pm;
+		} else {
+			Builder<Object, Object> mm = ImmutableMultimap.builder();
+			for (Entry<String, Object> e : map.entrySet()) {
+				mm.putAll(e.getKey(), ((List<Map<String, Object>>) e.getValue()).stream().map(this::deserializeProperty)
+						.collect(Collectors.toList()));
+			}
+			try {
+				return propertyMapConstructor.newInstance(mm.build());
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e1) {
+				throw new IllegalStateException();
+			}
+		}
 	}
 
 	public Property deserializeProperty(Map<String, Object> map) {
-		return new Property((String) map.get(PROPERTY_NAME_TAG), (String) map.get(PROPERTY_VALUE_TAG), (String) map.get(PROPERTY_SIGNATURE_TAG));
+		return new Property((String) map.get(PROPERTY_NAME_TAG), (String) map.get(PROPERTY_VALUE_TAG),
+				(String) map.get(PROPERTY_SIGNATURE_TAG));
 	}
 
-	@SuppressWarnings({ "nls" })
 	public NamespacedKey deserializeNamespacedKey(String s) {
 		return new NamespacedKey(s.split(":")[0], s.split(":")[1]);
 	}
 
 	public PotionEffect deserializePotionEffect(Map<String, Object> effect) {
-		return new PotionEffect(PotionEffectType.getByName((String) effect.get(POTION_EFFECT_TYPE_TAG)), (int) effect.get(POTION_EFFECT_DURATION_TAG),
-				(int) effect.get(POTION_EFFECT_AMPLIFIER_TAG), (boolean) effect.get(POTION_EFFECT_AMBIENT_TAG),
-				(boolean) effect.get(POTION_EFFECT_SHOW_PARTICLES_TAG), (boolean) effect.get(POTION_EFFECT_SHOW_ICON_TAG));
+		return new PotionEffect(PotionEffectType.getByName((String) effect.get(POTION_EFFECT_TYPE_TAG)),
+				(int) effect.get(POTION_EFFECT_DURATION_TAG), (int) effect.get(POTION_EFFECT_AMPLIFIER_TAG),
+				(boolean) effect.get(POTION_EFFECT_AMBIENT_TAG), (boolean) effect.get(POTION_EFFECT_SHOW_PARTICLES_TAG),
+				(boolean) effect.get(POTION_EFFECT_SHOW_ICON_TAG));
 	}
 
 	private Map<String, Object> deserializeYaml(ConfigurationSection cs) {
@@ -212,10 +247,11 @@ public class ItemDeserializer {
 
 	@SuppressWarnings("unchecked")
 	public FireworkEffect deserializeFireworkEffect(Map<String, Object> map) {
-		return FireworkEffect.builder().trail((boolean) map.get(FIREWORK_EFFECT_TRAIL_TAG)).flicker((boolean) map.get(FIREWORK_EFFECT_FLICKER_TAG))
+		return FireworkEffect.builder().trail((boolean) map.get(FIREWORK_EFFECT_TRAIL_TAG))
+				.flicker((boolean) map.get(FIREWORK_EFFECT_FLICKER_TAG))
 				.with(FireworkEffect.Type.valueOf((String) map.get(FIREWORK_EFFECT_TYPE_TAG)))
-				.withColor(((List<Map<String, Object>>) map.get(FIREWORK_EFFECT_COLORS_TAG)).stream().map(ItemDeserializer.INSTANCE::deserializeColor)
-						.collect(Collectors.toList()))
+				.withColor(((List<Map<String, Object>>) map.get(FIREWORK_EFFECT_COLORS_TAG)).stream()
+						.map(ItemDeserializer.INSTANCE::deserializeColor).collect(Collectors.toList()))
 				.withFade(((List<Map<String, Object>>) map.get(FIREWORK_EFFECT_FADE_COLORS_TAG)).stream()
 						.map(ItemDeserializer.INSTANCE::deserializeColor).collect(Collectors.toList()))
 				.build();
@@ -316,7 +352,8 @@ public class ItemDeserializer {
 		try {
 			deserialize0(compound, map, fullKey);
 		} catch (Exception ex) {
-			throw new IllegalStateException("Could not deserialize key " + fullKey + ", value: " + map.get(fullKey) + "; map:" + map, ex);
+			throw new IllegalStateException(
+					"Could not deserialize key " + fullKey + ", value: " + map.get(fullKey) + "; map:" + map, ex);
 		}
 	}
 
@@ -409,8 +446,8 @@ public class ItemDeserializer {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Set<NBTTag> getListTypes(List list) {
-		return (Set<NBTTag>) list.stream().map(Object::getClass).map(c -> NBTTag.getByClazz((Class<?>) c)).filter(i -> i != null)
-				.collect(Collectors.toSet());
+		return (Set<NBTTag>) list.stream().map(Object::getClass).map(c -> NBTTag.getByClazz((Class<?>) c))
+				.filter(i -> i != null).collect(Collectors.toSet());
 	}
 
 	@SuppressWarnings({ "unchecked", "nls", "rawtypes" })
@@ -432,7 +469,8 @@ public class ItemDeserializer {
 
 			for (Map<String, Object> temp : mapList) {
 				if (temp.containsKey(NBTNexusItem.NBT_NEXUS_ITEM_PROPERTIES_TAG)) {
-					compound.setItemStackArray(field, mapList.stream().map(this::deserializeItemStack).toArray(ItemStack[]::new));
+					compound.setItemStackArray(field,
+							mapList.stream().map(this::deserializeItemStack).toArray(ItemStack[]::new));
 					return;
 				}
 			}
@@ -468,8 +506,8 @@ public class ItemDeserializer {
 				iaList.add(arr.stream().mapToInt(Integer::valueOf).toArray());
 			break;
 		case OBJECT:
-			deserializeList0(compound, src,
-					String.join(NBTNexus.SPLITTER, String.join(NBTNexus.SPLITTER, Arrays.copyOfRange(keys, 0, 2)), actual.name()), val);
+			deserializeList0(compound, src, String.join(NBTNexus.SPLITTER,
+					String.join(NBTNexus.SPLITTER, Arrays.copyOfRange(keys, 0, 2)), actual.name()), val);
 			break;
 		case LIST:
 			throw new UnsupportedOperationException("nested lists not supported");

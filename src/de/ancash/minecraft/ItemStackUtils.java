@@ -19,8 +19,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.google.common.collect.ImmutableMultimap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 
 import de.tr7zw.nbtapi.utils.MinecraftVersion;
 import net.md_5.bungee.api.ChatColor;
@@ -30,6 +32,8 @@ public class ItemStackUtils {
 
 	private static Field profileField;
 	private static Field gameProfileIdField;
+	private static Field gameProfileNameField;
+	private static Field gameProfilePropertiesField;
 	private static Method resolveGameProfile;
 	private static Constructor<?> resolvableProfileConstructor;
 
@@ -40,6 +44,10 @@ public class ItemStackUtils {
 			profileField = ((SkullMeta) XMaterial.PLAYER_HEAD.parseItem().getItemMeta()).getClass()
 					.getDeclaredField("profile");
 			profileField.setAccessible(true);
+			gameProfileNameField = GameProfile.class.getDeclaredField("name");
+			gameProfileNameField.setAccessible(true);
+			gameProfilePropertiesField = GameProfile.class.getDeclaredField("properties");
+			gameProfilePropertiesField.setAccessible(true);
 		} catch (NoSuchFieldException | SecurityException e) {
 			e.printStackTrace();
 		}
@@ -209,7 +217,7 @@ public class ItemStackUtils {
 	public static void set(FileConfiguration fc, String path, ItemStack is) {
 		setItemStack(fc, path, is);
 	}
-
+	
 	public static ItemStack setProfileName(ItemStack is, String name) {
 		SkullMeta hm = (SkullMeta) is.getItemMeta().clone();
 		try {
@@ -246,12 +254,14 @@ public class ItemStackUtils {
 		if (o == null) {
 			return null;
 		}
-		if (o.getClass().getName().equals("net.minecraft.world.item.component.ResolvableProfile")) {
+		
+		if (o.getClass().getName().startsWith("net.minecraft.world.item.component.ResolvableProfile")) {
 			return (GameProfile) resolveGameProfile.invoke(o);
 		}
+		
 		return (GameProfile) o;
 	}
-
+	
 	public static ItemStack setGameProfileId(ItemStack item, UUID id) throws NoSuchFieldException, SecurityException,
 			IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
 		item.setItemMeta(setGameProfileId(item.getItemMeta(), id));
@@ -276,9 +286,9 @@ public class ItemStackUtils {
 
 	public static ItemStack setTexture(ItemStack is, String texture) {
 		SkullMeta hm = (SkullMeta) is.getItemMeta();
+		ImmutableMultimap.of("textures", new Property("textures", texture));
 		GameProfile profile = AuthLibUtil.createGameProfile(
-				texture != null ? new UUID(texture.hashCode(), texture.hashCode()) : UUID.randomUUID(), null);
-		profile.getProperties().put("textures", new Property("textures", texture));
+				texture != null ? new UUID(texture.hashCode(), texture.hashCode()) : UUID.randomUUID(), null, AuthLibUtil.createPropertyMap(ImmutableMultimap.of("textures", new Property("textures", texture))));
 		try {
 			Field field = hm.getClass().getDeclaredField("profile");
 			field.setAccessible(true);

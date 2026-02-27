@@ -7,10 +7,8 @@ import static de.ancash.nbtnexus.MetaTag.GAME_PROFILE_TAG;
 import static de.ancash.nbtnexus.MetaTag.SKULL_NOTE_BLOCK_SOUND_TAG;
 import static de.ancash.nbtnexus.MetaTag.SKULL_TAG;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,13 +21,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.PropertyMap;
 import com.cryptomorin.xseries.XMaterial;
-import com.google.common.base.Optional;
 
 import de.ancash.minecraft.AuthLibUtil;
 import de.ancash.minecraft.ItemStackUtils;
 import de.ancash.minecraft.inventory.editor.yml.handler.StringHandler;
 import de.ancash.minecraft.inventory.editor.yml.suggestion.ValueSuggestion;
+import de.ancash.minecraft.util.GameProfileUtil;
 import de.ancash.nbtnexus.NBTNexus;
 import de.ancash.nbtnexus.NBTTag;
 import de.ancash.nbtnexus.serde.IItemSerDe;
@@ -41,7 +40,7 @@ import de.ancash.nbtnexus.serde.structure.SerDeStructureKeySuggestion;
 import de.ancash.nbtnexus.serde.structure.SerDeStructureValueSuggestion;
 import de.tr7zw.nbtapi.utils.MinecraftVersion;
 
-@SuppressWarnings({ "nls", "unchecked" })
+@SuppressWarnings({ "unchecked" })
 public class SkullMetaSerDe implements IItemSerDe {
 
 	private static Field gameProfileField;
@@ -102,11 +101,15 @@ public class SkullMetaSerDe implements IItemSerDe {
 		}
 		if (gp != null) {
 			Map<String, Object> gps = (Map<String, Object>) map.computeIfAbsent(GAME_PROFILE_TAG, k -> new HashMap<>());
-			if (gp.getId() != null)
-				gps.put(GAME_PROFILE_ID_TAG, gp.getId().toString());
-			if (gp.getName() != null)
-				gps.put(GAME_PROFILE_NAME_TAG, gp.getName());
-			map.put(GAME_PROFILE_PROPERTIES_TAG, ItemSerializer.INSTANCE.serialzePropertyMap(gp.getProperties()));
+
+			UUID gpid = GameProfileUtil.getGameProfileId(gp);
+			if (gpid != null)
+				gps.put(GAME_PROFILE_ID_TAG, gpid.toString());
+			String gpname = GameProfileUtil.getGameProfileName(gp);
+			if (gpname != null)
+				gps.put(GAME_PROFILE_NAME_TAG, gpname);
+			map.put(GAME_PROFILE_PROPERTIES_TAG,
+					ItemSerializer.INSTANCE.serialzePropertyMap(GameProfileUtil.getGameProfileProperties(gp)));
 			try {
 				gameProfileField.set(meta, null);
 				item.setItemMeta(meta);
@@ -137,15 +140,16 @@ public class SkullMetaSerDe implements IItemSerDe {
 		if (map.containsKey(GAME_PROFILE_TAG)) {
 			Map<String, Object> gps = (Map<String, Object>) map.get(GAME_PROFILE_TAG);
 			GameProfile gp = null;
-			if (gps.containsKey(GAME_PROFILE_ID_TAG))
-				gp = AuthLibUtil.createGameProfile(UUID.fromString((String) gps.get(GAME_PROFILE_ID_TAG)),
-						(String) gps.get(GAME_PROFILE_NAME_TAG));
-			else
-				gp = AuthLibUtil.createGameProfile(null, (String) gps.get(GAME_PROFILE_NAME_TAG));
+			UUID gpid = gps.containsKey(GAME_PROFILE_ID_TAG) ? UUID.fromString((String) gps.get(GAME_PROFILE_ID_TAG))
+					: null;
+			String gpname = (String) gps.get(GAME_PROFILE_NAME_TAG);
 
 			if (map.containsKey(GAME_PROFILE_PROPERTIES_TAG))
-				gp.getProperties().putAll(ItemDeserializer.INSTANCE
+				gp = GameProfileUtil.createGameProfile(gpid, gpname, ItemDeserializer.INSTANCE
 						.deserializePropertyMap((Map<String, Object>) map.get(GAME_PROFILE_PROPERTIES_TAG)));
+			else
+				gp = GameProfileUtil.createGameProfile(gpid, gpname, null);
+			
 			try {
 				ItemStackUtils.setGameProfile(meta, gp);
 
