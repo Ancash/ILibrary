@@ -22,7 +22,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.google.common.collect.ImmutableMultimap;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.properties.PropertyMap;
+import com.mojang.datafixers.util.Either;
 
 import de.tr7zw.nbtapi.utils.MinecraftVersion;
 import net.md_5.bungee.api.ChatColor;
@@ -36,6 +36,10 @@ public class ItemStackUtils {
 	private static Field gameProfilePropertiesField;
 	private static Method resolveGameProfile;
 	private static Constructor<?> resolvableProfileConstructor;
+	private static Object emptySkinPatch;
+	private static Constructor<?> resolvableProfileStaticConstructor;
+	private static Class<?> either;
+	private static Method eitherLeft;
 
 	static {
 		try {
@@ -48,11 +52,26 @@ public class ItemStackUtils {
 			gameProfileNameField.setAccessible(true);
 			gameProfilePropertiesField = GameProfile.class.getDeclaredField("properties");
 			gameProfilePropertiesField.setAccessible(true);
-		} catch (NoSuchFieldException | SecurityException e) {
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException e) {
 			e.printStackTrace();
 		}
+		
 		findResolvableProfileToGameProfileMethod();
 		findResolvableProfileConstructor();
+		
+		try {
+			if(MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_21_R7)) {
+				either = Class.forName("com.mojang.datafixers.util.Either");
+				Class<?> playerSkinPatch = Class.forName("net.minecraft.world.entity.player.PlayerSkin$Patch");
+				emptySkinPatch = playerSkinPatch.getDeclaredField("EMPTY").get(null);
+				Class<?> resolvableProfileStatic = Class.forName("net.minecraft.world.item.component.ResolvableProfile$Static");
+				resolvableProfileStaticConstructor = resolvableProfileStatic.getConstructor(either, playerSkinPatch);
+				eitherLeft = either.getDeclaredMethod("left", Object.class);
+				
+			}
+		} catch(ClassNotFoundException | IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException | NoSuchMethodException c) {
+			c.printStackTrace();
+		}
 	}
 
 	private static void findResolvableProfileConstructor() {
@@ -262,21 +281,28 @@ public class ItemStackUtils {
 		return (GameProfile) o;
 	}
 	
-	public static ItemStack setGameProfileId(ItemStack item, UUID id) throws NoSuchFieldException, SecurityException,
-			IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
-		item.setItemMeta(setGameProfileId(item.getItemMeta(), id));
-		return item;
-	}
-
-	public static ItemMeta setGameProfileId(ItemMeta im, UUID id) throws NoSuchFieldException, SecurityException,
-			IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
-		GameProfile gameProfile = getGameProfile(im);
-		gameProfileIdField.set(gameProfile, id);
-		setGameProfile(im, gameProfile);
-		return im;
-	}
+//	public static ItemStack setGameProfileId(ItemStack item, UUID id) throws NoSuchFieldException, SecurityException,
+//			IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+//		item.setItemMeta(setGameProfileId(item.getItemMeta(), id));
+//		return item;
+//	}
+//
+//	public static ItemMeta setGameProfileId(ItemMeta im, UUID id) throws NoSuchFieldException, SecurityException,
+//			IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+//		GameProfile gameProfile = getGameProfile(im);
+//		gameProfileIdField.set(gameProfile, id);
+//		setGameProfile(im, gameProfile);
+//		return im;
+//	}
 	
 	public static void setGameProfile(ItemMeta im, GameProfile profile) throws IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException {
+		if(MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_21_R7)) {
+			Object either = eitherLeft.invoke(null, profile);
+			Object rps = resolvableProfileStaticConstructor.newInstance(either, emptySkinPatch);
+			profileField.set(im, rps);
+			return;
+		}
+		
 		if(resolvableProfileConstructor != null) {
 			profileField.set(im, resolvableProfileConstructor.newInstance(profile));
 		} else {

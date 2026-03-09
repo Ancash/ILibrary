@@ -23,7 +23,7 @@ public class ContainerWorkbench_MC1_21_R7 extends IContainerWorkbench {
 	private static Field currentIRecipe;
 	private static Method setItemMethod;
 	private static Method getItemMethod;
-
+	
 	static void initReflection() throws ClassNotFoundException, NoSuchFieldException, SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException {
 		Class<?> bpc = Class.forName("net.minecraft.core.BlockPos");
@@ -44,7 +44,6 @@ public class ContainerWorkbench_MC1_21_R7 extends IContainerWorkbench {
 
 		setItemMethod = iic.getDeclaredMethod("setItem", int.class, Class.forName("net.minecraft.world.item.ItemStack"));
 		getItemMethod = iic.getDeclaredMethod("getItem", int.class);
-
 		craftingContainerField = abstractCraftingMenu.getDeclaredField("craftSlots");
 
 		recipeHolderField = transientCraftingContainer.getDeclaredField("currentRecipe");

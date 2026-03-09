@@ -58,22 +58,27 @@ public class TestSerDeComparisonCommand extends NBTNexusSubCommand {
 			long ll = System.nanoTime();
 			SerializedItem a = SerializedItem.of(item);
 			SerializedItem b = SerializedItem.of(ItemDeserializer.INSTANCE.deserializeYamlToItemStack(copy));
-			for (int i = 1; i < 10000; i++) {
-				a.areEqual(b);
-			}
-			if (a.areEqual(b)) {
-				player.sendMessage(
-						"§aComparison successful! " + MathsUtils.round((System.nanoTime() - ll) / 1000000d / 10000, 6) + "ms avg (10.000 iters)");
-			} else {
+			
+			if(!a.areEqual(b)) {
 				player.sendMessage("§cComparison failed! See console for the data");
 				try {
-					Bukkit.getConsoleSender().sendMessage(copy);
-					Bukkit.getConsoleSender().sendMessage(ItemSerializer.INSTANCE.serializeItemStackToYaml(item));
+					Bukkit.getConsoleSender().sendMessage("step 1: \n" + ItemSerializer.INSTANCE.serializeItemStackToYaml(item));
+					Bukkit.getConsoleSender().sendMessage("step 2: \n" + ItemSerializer.INSTANCE.serializeItemStackToJson(
+							ItemDeserializer.INSTANCE.deserializeYamlToItemStack(ItemSerializer.INSTANCE.serializeItemStackToYaml(item))));
+					Bukkit.getConsoleSender().sendMessage("step 3: \n" + ItemSerializer.INSTANCE.serializeItemStackToYaml(
+						ItemDeserializer.INSTANCE.deserializeJsonToItemStack(ItemSerializer.INSTANCE.serializeItemStackToJson(
+								ItemDeserializer.INSTANCE.deserializeYamlToItemStack(ItemSerializer.INSTANCE.serializeItemStackToYaml(item))))));
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
-
+				return;
 			}
+			
+			for (int i = 1; i < 10000; i++) {
+				a.areEqual(b);
+			}
+			player.sendMessage(
+					"§aComparison successful! " + MathsUtils.round((System.nanoTime() - ll) / 1000000d / 10000, 6) + "ms avg (10.000 iters)");
 		});
 		return true;
 	}

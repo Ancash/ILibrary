@@ -153,9 +153,9 @@ public class SkullMetaSerDe implements IItemSerDe {
 			try {
 				ItemStackUtils.setGameProfile(meta, gp);
 
-				if (gps.containsKey(GAME_PROFILE_ID_TAG))
-					ItemStackUtils.setGameProfileId(meta, UUID.fromString((String) gps.get(GAME_PROFILE_ID_TAG)));
-			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException
+//				if (gps.containsKey(GAME_PROFILE_ID_TAG))
+//					ItemStackUtils.setGameProfileId(meta, UUID.fromString((String) gps.get(GAME_PROFILE_ID_TAG)));
+			} catch (IllegalArgumentException | IllegalAccessException | SecurityException
 					| InvocationTargetException | InstantiationException e) {
 				throw new IllegalStateException(e);
 			}

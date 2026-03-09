@@ -100,6 +100,12 @@
   </repositories>
   <dependencies>
     <dependency>
+      <groupId>com.mojang</groupId>
+      <artifactId>datafixerupper</artifactId>
+      <version>8.0.16</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>net.dmulloy2</groupId>
       <artifactId>ProtocolLib</artifactId>
       <version>5.4.0</version>
