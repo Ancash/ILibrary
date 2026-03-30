@@ -14,7 +14,7 @@ import org.bukkit.inventory.meta.CompassMeta;
 import de.ancash.nbtnexus.serde.IItemSerDe;
 import de.ancash.nbtnexus.serde.structure.SerDeStructure;
 import de.ancash.nbtnexus.serde.structure.SerDeStructureEntry;
-import de.tr7zw.nbtapi.utils.MinecraftVersion;
+import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
 
 @SuppressWarnings("nls")
 public class CompassMetaSerDe implements IItemSerDe {

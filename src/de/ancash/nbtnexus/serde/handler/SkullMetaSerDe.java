@@ -38,7 +38,7 @@ import de.ancash.nbtnexus.serde.structure.SerDeStructure;
 import de.ancash.nbtnexus.serde.structure.SerDeStructureEntry;
 import de.ancash.nbtnexus.serde.structure.SerDeStructureKeySuggestion;
 import de.ancash.nbtnexus.serde.structure.SerDeStructureValueSuggestion;
-import de.tr7zw.nbtapi.utils.MinecraftVersion;
+import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
 
 @SuppressWarnings({ "unchecked" })
 public class SkullMetaSerDe implements IItemSerDe {

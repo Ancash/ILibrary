@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.bukkit.entity.Player;
 
 import de.ancash.ILibrary;
-import de.tr7zw.nbtapi.utils.MinecraftVersion;
+import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
 
 public class ICraftingManager {
 

@@ -20,7 +20,7 @@ import de.ancash.minecraft.inventory.editor.yml.handler.ListHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.LongHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.ShortHandler;
 import de.ancash.minecraft.inventory.editor.yml.handler.StringHandler;
-import de.tr7zw.nbtapi.NBTType;
+import de.tr7zw.changeme.nbtapi.NBTType;
 
 public enum NBTTag {
 
